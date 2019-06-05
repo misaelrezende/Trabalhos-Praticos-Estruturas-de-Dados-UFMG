@@ -6,9 +6,14 @@
 #include <string.h>
 #include <time.h>
 
-void gerarVetor(int*, int, char*);
+typedef struct {
+	int Chave;
+} Item;
 
 
+void gerarVetor(Item*, int, char*);
+
+void imprimeResultados(char*, char*, int, int, int, int);
 
 #endif
 

@@ -1,18 +1,16 @@
 #ifndef QUICKSORT_H
 #define QUICKSORT_H
 
-typedef struct {
-	int Chave;
-} Item;
+#include "MinhaBiblioteca.h"
 
 /*
 	COMECO dos Prototipos de funcoes relacionadas ao QUICKSORT CLASSICO
 */
-void Particao(int, int, int*, int*, Item*);
+void Particao(int, int, int*, int*, Item*, int*, int*);
 
-void Ordena(int, int, Item*);
+void Ordena(int, int, Item*, int*, int*);
 
-void QuickSort(Item*, int);
+void QuickSort(Item*, int, int*, int*);
 /*
 	FIM dos Prototipos de funcoes relacionadas ao QUICKSORT CLASSICO
 */
