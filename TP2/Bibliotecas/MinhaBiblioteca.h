@@ -11,9 +11,9 @@ typedef struct {
 } Item;
 
 
-void gerarVetor(Item*, int, char*);
+void gerarVetor(Item*, int, char*, Item*, int);
 
-void imprimeResultados(char*, char*, int, int, int, int);
+void imprimeResultados(char*, char*, int, int, int);
 
 #endif
 
