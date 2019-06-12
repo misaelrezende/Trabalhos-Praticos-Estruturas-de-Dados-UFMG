@@ -12,8 +12,9 @@ typedef struct {
 
 
 void gerarVetor(Item*, int, char*, Item*, int);
+void gerarVetorSem(Item*, int , char*);
 
-void imprimeResultados(char*, char*, int, int, int);
+void imprimeResultados(char*, char*, int, int, int, long);
 
 #endif
 
