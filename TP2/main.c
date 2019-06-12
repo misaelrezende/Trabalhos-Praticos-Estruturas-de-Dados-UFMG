@@ -2,7 +2,7 @@
 
 /* 
 
-	------///---- CODIGO CONTINUA RODANDO LISO MEU IRMAO!  ------///----
+	------///---- CODIGO CONTINUA RODANDO LISO MEU IRMAO!!!!!!! ------///----
 
 */
 
@@ -18,12 +18,13 @@ int main(int argc, char *argv[]){
 	strcpy(tipo, argv[2]);
 	tamanho = atoi(argv[3]);
 	
+	// declaracao de Registro e Registro auxiliar (para impressao caso -p)
 	Item Itens[tamanho], **Auxiliar;
 	
 	if(argc == 5){ // ou seja, se incluiu o parametro p
 		parametroOpcional = 1;
-		Auxiliar = (Item**) malloc((tamanho*2)*sizeof(Item*));
-		for(i = 0; i < (tamanho*2); i++)
+		Auxiliar = (Item**) malloc(20*sizeof(Item*)); // troquei de (tamanho*2 sizeof) para (20*sizeof) 
+		for(i = 0; i < 20; i++) // // troquei de (i de 0 a tamanho) para (i de 0 a 20)
 			Auxiliar[i] = (Item*) malloc(tamanho*sizeof(Item));
 	}
 
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]){
 		imprimeResultados(variacao, tipo, tamanho, mediaQtdeComparacao,
 						mediaqtdeMovimentacao);
 		if(parametroOpcional == 1){
-			for(i = 0; i < (tamanho*2); i++){
+			for(i = 0; i < 20; i++){ // troquei de (tamanho*2) para (20) 
 				for(j = 0; j < tamanho; j++)
 					printf("%d ", Auxiliar[i][j].Chave);
 				printf("\n");
@@ -64,6 +65,9 @@ int main(int argc, char *argv[]){
 	}
   
 	/* LIBERAR Item Auxiliar da MEMORIA*/
-	
+	for(i = 0; i < 20; i++)
+			free(Auxiliar[i]);
+		free(Auxiliar);
+
   return 0;
 }

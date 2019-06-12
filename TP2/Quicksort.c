@@ -15,15 +15,19 @@ void Particao(int Esq, int Dir, int *i, int *j, Item *A, int *qtdeComparacao, in
 			(*i)++;
 			(*qtdeComparacao)++;
 		}
+		(*qtdeComparacao)++; // adicao da comparacao do laco
+
 		while (x.Chave < A[*j].Chave){
 			(*j)--;
 			(*qtdeComparacao)++;
 		}
-		if (*i <= *j){ // comparacao unica
+		(*qtdeComparacao)++; // adicao da comparacao do laco
+		
+		if (*i <= *j){
 			w = A[*i];
-			A[*i] = A[*j]; // contando essa...
-			A[*j] = w; // ...e essa movimentacao
-			(*qtdeMovimentacao) += 2;
+			A[*i] = A[*j];
+			A[*j] = w;
+			(*qtdeMovimentacao)++;
 			(*i)++;
 			(*j)--;
 		}

@@ -9,7 +9,7 @@ void gerarVetor(Item *Itens, int tamanho, char *tipo, Item *Auxiliar,
 
 	if(strcmp(Ale, tipo) == 0){ // ordem aleatoria
 		for(i = 0; i < tamanho; i++){
-			Itens[i].Chave = rand() % tamanho;
+			Itens[i].Chave = (rand() % tamanho) + 1; // varia de 0 a tamanho
 			if(parametroOpcional == 1)
 				Auxiliar[i].Chave = Itens[i].Chave;
 		}
