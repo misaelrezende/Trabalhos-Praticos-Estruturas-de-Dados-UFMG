@@ -10,11 +10,12 @@ typedef struct {
 	int Chave;
 } Item;
 
+void Insercao(long int*);
+void escolheMediana(long int*, long int*);
 
 void gerarVetor(Item*, int, char*, Item*, int);
 void gerarVetorSem(Item*, int , char*);
 
-void imprimeResultados(char*, char*, int, int, int, long);
+void imprimeResultados(char*, char*, int, int, int, long int);
 
 #endif
-

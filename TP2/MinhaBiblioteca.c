@@ -1,7 +1,29 @@
 #include "Bibliotecas/MinhaBiblioteca.h"
+#define Troca(A, B) {long int c = A; A = B; B = c; }
 
+// referencia (slide Raquel)
+void Insercao(long int *v){
+	int i,j;
+	long int aux;
+	for(i = 1; i < 20; i++) {
+		aux = v[i];
+		j = i - 1;
+		while (( j >= 0 ) && (aux < v[j])) {
+			v[j+1] = v[j];
+			j--;
+		}
+		v[j+1] = aux;
+	}
+}
+
+void escolheMediana(long int *valoresTempo, long int *mediana){
+	Insercao(valoresTempo);
+	// pega os dois valores medios e divide p/ 2 para obter a mediana
+	(*mediana) = (valoresTempo[9] + valoresTempo[10]) / 2; // "retorna" mediana
+}
 
 // preenche o vetor de acordo com a ordenacao escolhida
+// referencia (slide Raquel)
 void gerarVetor(Item *Itens, int tamanho, char *tipo, Item *Auxiliar,
 				int parametroOpcional){
 	char *Ale = {"Ale\0"}, *OrdC = {"OrdC\0"};
@@ -30,6 +52,7 @@ void gerarVetor(Item *Itens, int tamanho, char *tipo, Item *Auxiliar,
 }
 
 // preenche o vetor de acordo com a ordenacao escolhida
+// referencia (slide Raquel)
 void gerarVetorSem(Item *Itens, int tamanho, char *tipo){
 	char *Ale = {"Ale\0"}, *OrdC = {"OrdC\0"};
 	int i;
@@ -51,6 +74,6 @@ void gerarVetorSem(Item *Itens, int tamanho, char *tipo){
 }
 
 void imprimeResultados(char *variacao, char *tipo, int tamanho,
-		int mediaQtdeComparacao, int mediaqtdeMovimentacao, long elapsed_time){
-		printf("%s %s %d %d %d %ld\n", variacao, tipo, tamanho, mediaQtdeComparacao, mediaqtdeMovimentacao, elapsed_time);
+		int mediaQtdeComparacao, int mediaqtdeMovimentacao, long int medianaTempo){
+		printf("%s %s %d %d %d %ld\n", variacao, tipo, tamanho, mediaQtdeComparacao, mediaqtdeMovimentacao, medianaTempo);
 }
