@@ -2,14 +2,15 @@
 #include <time.h>
 
 /* 			ÚLTIMAS MUDANÇAS:
-		** Adicionei p/ pegar a mediana do tempo porem nao tenho certeza se está
-		** corretamente implementado
-		**
+	** Resolvido problema da matriz Auxiliar
+	** Corrigido medição do tempo
+	** medição do tempo funcionando e mediana sendo calculada corretamente
+	** Desalocação da var Auxiliar p/ caso -p não seja passado
+	** Retirado a macro troca pois a mesma não era necessária até o momento
+	**
 
-				PROBLEMA/DÚVIDAS
-		** Tive que criar uma funcao extra gerarVetorSem()
-			(caso não fosse inserido o parametro -p) -- como resolver?
-		** como realizar a medição de tempo corretamente?
+				PROBLEMA/DÚVIDAS: 
+	** 
 
 */
 
@@ -37,18 +38,25 @@ int main(int argc, char *argv[]){
 		Auxiliar = (Item**) malloc(20*sizeof(Item*));
 		for(i = 0; i < 20; i++)
 			Auxiliar[i] = (Item*) malloc(tamanho*sizeof(Item));
+	}else{
+		/* meio para contornar caso não fosse passado o parâmetro -p
+		ou seja, será alocado uma matriz (20x1) para passar para a função gerarVetor
+		mesmo que, nesse caso, o vetor não seja utilizado. Fiz isso pois senão teria
+		que criar uma função igual a gerarVetor porém sem a passagem desse vetor como
+		parametro. */
+		Auxiliar = (Item**) malloc(20*sizeof(Item*));
+
+		for(i = 0; i < 20; i++)
+			Auxiliar[i] = (Item*) malloc(1*sizeof(Item));
 	}
 
 	srand(time(NULL));
 	for(i = 0; i < 20; i++){
+		// gera vetor novo a cada iteracao
+		gerarVetor(Itens, tamanho, tipo, Auxiliar[i], parametroOpcional);
 
-		// Pega o horário do sistema antes da execuçao do código
+		// Pega o horário do sistema antes da execuçao do quicksort
 		clock_gettime(CLOCK_REALTIME, &start);
-
-		if(parametroOpcional == 1)
-			gerarVetor(Itens, tamanho, tipo, Auxiliar[i], parametroOpcional); // gera vetor novo a cada iteracao
-		else
-			gerarVetorSem(Itens, tamanho, tipo); // gera vetor novo a cada iteracao
 
 		// se QuickSort Clássico
 		if(strcmp(variacao, QC) == 0){
@@ -67,6 +75,14 @@ int main(int argc, char *argv[]){
 
 		}
 
+		// Pega o horário do sistema depois da execuçao do quicksort
+		clock_gettime(CLOCK_REALTIME, &end);
+		// Obtém a diferença entre o horário de fim e o de inı́cio
+		elapsed_time = 1.e+6 * (double) (end.tv_sec - start.tv_sec)
+		+ 1.e-3 * (double) (end.tv_nsec - start.tv_nsec);
+
+		valoresTempo[i] = elapsed_time; // guarda esse tempo no vetor
+
 		// // impressão dos elementos ordenados
 		// for(j = 0; j < tamanho; j++)
 		// 	printf("%d ", Itens[j].Chave);
@@ -74,14 +90,6 @@ int main(int argc, char *argv[]){
 
 		mediaQtdeComparacao += (qtdeComparacao/20);
 		mediaqtdeMovimentacao += (qtdeMovimentacao/20);
-
-		// Pega o horário do sistema depois da execuçao do código
-		clock_gettime(CLOCK_REALTIME, &end);
-		// Obtém a diferença entre o horário de fim e o de inı́cio
-		elapsed_time = 1.e+6 * (double) (end.tv_sec - start.tv_sec)
-		+ 1.e-3 * (double) (end.tv_nsec - start.tv_nsec);
-
-		valoresTempo[i] = elapsed_time;
 
 	}
 
@@ -97,8 +105,6 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-
-
   // liberar memória se foi inserido o parametro -p
   if(parametroOpcional == 1){
 		/* LIBERAR Item Auxiliar da MEMORIA*/
@@ -106,7 +112,12 @@ int main(int argc, char *argv[]){
 				free(Auxiliar[i]);
 			free(Auxiliar);
 	}
-
+	// liberar memória se foi nao inserido o parametro -p
+	else{
+		for(i = 0; i < 20; i++)
+				free(Auxiliar[i]); // esta desalocando corretamente agora?
+			free(Auxiliar); // acho que sim
+	}
 
   return 0;
 }

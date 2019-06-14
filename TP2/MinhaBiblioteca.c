@@ -1,7 +1,6 @@
 #include "Bibliotecas/MinhaBiblioteca.h"
-#define Troca(A, B) {long int c = A; A = B; B = c; }
 
-// referencia (slide Raquel)
+// ** referencia ** (slide Raquel)
 void Insercao(long int *v){
 	int i,j;
 	long int aux;
@@ -18,17 +17,16 @@ void Insercao(long int *v){
 
 void escolheMediana(long int *valoresTempo, long int *mediana){
 	Insercao(valoresTempo);
-	// pega os dois valores medios e divide p/ 2 para obter a mediana
+	// pega os dois valores do meio e divide p/ 2 para obter a mediana
 	(*mediana) = (valoresTempo[9] + valoresTempo[10]) / 2; // "retorna" mediana
 }
 
 // preenche o vetor de acordo com a ordenacao escolhida
-// referencia (slide Raquel)
 void gerarVetor(Item *Itens, int tamanho, char *tipo, Item *Auxiliar,
 				int parametroOpcional){
 	char *Ale = {"Ale\0"}, *OrdC = {"OrdC\0"};
 	int i;
-
+	
 	if(strcmp(Ale, tipo) == 0){ // ordem aleatoria
 		for(i = 0; i < tamanho; i++){
 			Itens[i].Chave = (rand() % tamanho) + 1; // varia de 0 a tamanho
@@ -51,27 +49,6 @@ void gerarVetor(Item *Itens, int tamanho, char *tipo, Item *Auxiliar,
 	}
 }
 
-// preenche o vetor de acordo com a ordenacao escolhida
-// referencia (slide Raquel)
-void gerarVetorSem(Item *Itens, int tamanho, char *tipo){
-	char *Ale = {"Ale\0"}, *OrdC = {"OrdC\0"};
-	int i;
-
-	if(strcmp(Ale, tipo) == 0){ // ordem aleatoria
-		for(i = 0; i < tamanho; i++){
-			Itens[i].Chave = (rand() % tamanho) + 1; // varia de 0 a tamanho
-		}
-	}else if(strcmp(OrdC, tipo) == 0){ // ordem crescente
-		for(i = 0; i < tamanho; i++){
-			Itens[i].Chave = i;
-		}
-	}else{ // ordem decresente
-		int aux;
-		for(i = 0, aux = tamanho - 1; i < tamanho; i++, aux--){
-			Itens[i].Chave = aux;
-		}
-	}
-}
 
 void imprimeResultados(char *variacao, char *tipo, int tamanho,
 		int mediaQtdeComparacao, int mediaqtdeMovimentacao, long int medianaTempo){
