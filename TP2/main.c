@@ -2,13 +2,10 @@
 #include <time.h>
 
 /* 			ÚLTIMAS MUDANÇAS:
-	** Resolvido problema da matriz Auxiliar
-	** Corrigido medição do tempo
-	** medição do tempo funcionando e mediana sendo calculada corretamente
-	** Desalocação da var Auxiliar p/ caso -p não seja passado
-	** Retirado a macro troca pois a mesma não era necessária até o momento
-	**
-
+	** Implementação do QuickSort Primeiro Elemento
+	** QPE funcionando corretamente
+	** Tudo funcionando corretamente (ordenação, ale, OrdC, OrdD)!
+	** 
 				PROBLEMA/DÚVIDAS: 
 	** 
 
@@ -64,7 +61,7 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(variacao, QM3) == 0){ // se QuickSort c/ Mediana de 3
 
 		}else if(strcmp(variacao, QPE) == 0){ // se QuickSort Primeiro Elemento
-
+			QuickSortPrimeiroElemento(Itens, 0, tamanho - 1, &qtdeComparacao, &qtdeMovimentacao);
 		}else if(strcmp(variacao, QI1) == 0){ // se QuickSort 1%
 
 		}else if(strcmp(variacao, QI5) == 0){ // se QuickSort 5%
@@ -88,6 +85,8 @@ int main(int argc, char *argv[]){
 		// 	printf("%d ", Itens[j].Chave);
 		// printf("--\n");
 
+		// cálculo da media in-place, ou seja, não precisa salvar os valores de
+		// cada iteração pois eu já estou dividindo cada iteração por 20
 		mediaQtdeComparacao += (qtdeComparacao/20);
 		mediaqtdeMovimentacao += (qtdeMovimentacao/20);
 
@@ -98,7 +97,7 @@ int main(int argc, char *argv[]){
 						mediaqtdeMovimentacao, medianaTempo);
 
 	if(parametroOpcional == 1){
-		for(i = 0; i < 20; i++){ // troquei de (tamanho*2) para (20)
+		for(i = 0; i < 20; i++){
 			for(j = 0; j < tamanho; j++)
 				printf("%d ", Auxiliar[i][j].Chave);
 			printf("\n");
