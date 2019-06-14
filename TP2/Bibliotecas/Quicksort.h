@@ -29,7 +29,10 @@ void QuickSortPrimeiroElemento(Item*, int, int, int*, int*);
 /* -----------------------//////////--------------------------- */
 
 /*
-	COMECO dos Prototipos de funcoes relacionadas ao QUICKSORT
+	COMECO do Prototipo de funcao relacionada ao QUICKSORT
 */
-
+void QuickSortNaoRec(Item*, int, int*, int*);
+/*
+	FIM do Prototipo de funcao relacionada ao QUICKSORT NAO RECURSIVO
+*/
 #endif

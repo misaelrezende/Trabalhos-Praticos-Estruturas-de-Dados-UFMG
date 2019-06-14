@@ -54,3 +54,42 @@ void imprimeResultados(char *variacao, char *tipo, int tamanho,
 		int mediaQtdeComparacao, int mediaqtdeMovimentacao, long int medianaTempo){
 		printf("%s %s %d %d %d %ld\n", variacao, tipo, tamanho, mediaQtdeComparacao, mediaqtdeMovimentacao, medianaTempo);
 }
+
+void FPVazia(TipoPilha *Pilha) {
+	Pilha->Topo = (Apontador) malloc(sizeof(Celula));
+	Pilha->Fundo = Pilha->Topo;
+	Pilha->Topo->Prox = NULL;
+	Pilha->Tamanho = 0;
+} /* FPVazia */
+
+int Vazia(const TipoPilha *Pilha){
+	return (Pilha->Topo == Pilha->Fundo);
+} /* Vazia */
+
+void Empilha(TipoItem x, TipoPilha *Pilha) {
+	Apontador Aux;
+	Aux = (Apontador) malloc(sizeof(Celula));
+	Pilha->Topo->item.dir = x.dir;
+	Pilha->Topo->item.esq = x.esq;
+	Aux->Prox = Pilha->Topo;
+	Pilha->Topo = Aux;
+	Pilha->Tamanho++;
+}
+
+int Desempilha(TipoPilha *Pilha, TipoItem *item) {
+	Apontador q;
+	if (Vazia(Pilha)) {
+		printf("Erro: pilha vazia\n"); return 0;
+	}
+	q = Pilha->Topo;
+	Pilha->Topo = q->Prox;
+	free(q);
+	Pilha->Tamanho--;
+	*item = Pilha->Topo->item;
+	return 1;
+}
+
+int Tamanho(const TipoPilha *Pilha){
+	return (Pilha->Tamanho);
+} /* Tamanho */
+

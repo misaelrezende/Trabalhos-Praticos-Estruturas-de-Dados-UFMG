@@ -130,3 +130,48 @@ void QuickSortPrimeiroElemento(Item *A, int esq, int dir, int *qtdeComparacao, i
 
 
 
+/*
+	Aqui COMECA a funcao relacionada ao QUICKSORT NAO RECURSIVO
+*/
+// ** referencia ** (slide Raquel)
+// O(nlogn) average case and O(n^2) worst case
+void QuickSortNaoRec(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao){
+	TipoPilha pilha;
+	TipoItem item; // campos esq e dir
+	int esq, dir, i, j;
+	char variacao[4] = {"QNR\0"};
+
+	FPVazia(&pilha);
+	esq = 0;
+	dir = n-1;
+	item.dir = dir;
+	item.esq = esq;
+	Empilha(item, &pilha);
+
+	do{
+		if(dir > esq){
+			Particao(esq,dir,&i, &j, A, qtdeComparacao, qtdeMovimentacao, variacao);
+			if ((j-esq)>(dir-i)) {
+				item.dir = j;
+				item.esq = esq;
+				Empilha(item, &pilha);
+				esq = i;
+			}
+			else {
+				item.esq = i;
+				item.dir = dir;
+				Empilha(item, &pilha);
+				dir = j;
+			}
+		}
+		else{
+			Desempilha(&pilha,&item);
+			dir = item.dir;
+			esq = item.esq;
+		}
+	}while(!Vazia(&pilha));
+
+}
+/*
+	Aqui TERMINA aa funcao relacionada ao QUICKSORT NAO RECURSIVO
+*/

@@ -2,8 +2,8 @@
 #include <time.h>
 
 /* 			ÚLTIMAS MUDANÇAS:
-	** Implementação do QuickSort Mediana de Tres
-	** QM3 funcionando corretamente
+	** Implementação do QuickSort Nao Recursivo
+	** QuickSort funcionando corretamente
 	** Tudo funcionando corretamente (ordenação, ale, OrdC, OrdD)!
 	**
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(variacao, QI10) == 0){ // se QuickSort 10%
 
 		}else{ // // se QuickSort Não Recursivo
-
+			QuickSortNaoRec(Itens, tamanho, &qtdeComparacao, &qtdeMovimentacao);
 		}
 
 		// Pega o horário do sistema depois da execuçao do quicksort
