@@ -4,7 +4,7 @@ SRC = $(wildcard *.c)
 OBJ = $(patsubst %.c, %.o, $(wildcard *.c))
 
 CC = gcc
-CFLAGS = -lm -Wall
+CFLAGS = -lm -Wall -g
 
 all: $(ALL)
 

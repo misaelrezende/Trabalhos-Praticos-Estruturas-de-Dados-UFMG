@@ -2,10 +2,11 @@
 #include <time.h>
 
 /* 			ÚLTIMAS MUDANÇAS:
-	** Implementação do QuickSort Primeiro Elemento
-	** QPE funcionando corretamente
+	** Implementação do QuickSort Mediana de Tres
+	** QM3 funcionando corretamente
 	** Tudo funcionando corretamente (ordenação, ale, OrdC, OrdD)!
-	** 
+	**
+
 				PROBLEMA/DÚVIDAS: 
 	** 
 
@@ -55,13 +56,11 @@ int main(int argc, char *argv[]){
 		// Pega o horário do sistema antes da execuçao do quicksort
 		clock_gettime(CLOCK_REALTIME, &start);
 
-		// se QuickSort Clássico
-		if(strcmp(variacao, QC) == 0){
-			QuickSort(Itens, tamanho, &qtdeComparacao, &qtdeMovimentacao); // executa a ordenação no vetor
-		}else if(strcmp(variacao, QM3) == 0){ // se QuickSort c/ Mediana de 3
-
+		// se QuickSort Clássico ou se QuickSort c/ Mediana de 3
+		if(strcmp(variacao, QC) == 0 || strcmp(variacao, QM3) == 0){
+			QuickSort(Itens, tamanho, &qtdeComparacao, &qtdeMovimentacao, variacao); // executa a ordenação no vetor
 		}else if(strcmp(variacao, QPE) == 0){ // se QuickSort Primeiro Elemento
-			QuickSortPrimeiroElemento(Itens, 0, tamanho - 1, &qtdeComparacao, &qtdeMovimentacao);
+			QuickSortPrimeiroElemento(Itens, 0, tamanho, &qtdeComparacao, &qtdeMovimentacao);
 		}else if(strcmp(variacao, QI1) == 0){ // se QuickSort 1%
 
 		}else if(strcmp(variacao, QI5) == 0){ // se QuickSort 5%
@@ -80,10 +79,10 @@ int main(int argc, char *argv[]){
 
 		valoresTempo[i] = elapsed_time; // guarda esse tempo no vetor
 
-		// // impressão dos elementos ordenados
-		// for(j = 0; j < tamanho; j++)
-		// 	printf("%d ", Itens[j].Chave);
-		// printf("--\n");
+		// impressão dos elementos ordenados
+		for(j = 0; j < tamanho; j++)
+			printf("%d ", Itens[j].Chave);
+		printf("--\n");
 
 		// cálculo da media in-place, ou seja, não precisa salvar os valores de
 		// cada iteração pois eu já estou dividindo cada iteração por 20

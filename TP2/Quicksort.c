@@ -1,14 +1,33 @@
 #include "Bibliotecas/Quicksort.h"
+#define Troca(A, B) {Item c = A; A = B; B = c; }
+
 
 /*
-	Aqui COMECA as funcoes relacionadas ao QUICKSORT CLASSICO
+	Aqui COMECA as funcoes relacionadas ao QUICKSORT CLASSICO 
+	e ao QUICKSORT MEDIANA DE TRES
 */
 // ** referencia ** (slide Raquel)
-void Particao(int Esq, int Dir, int *i, int *j, Item *A, int *qtdeComparacao, int *qtdeMovimentacao){
+void Particao(int Esq, int Dir, int *i, int *j, Item *A, int *qtdeComparacao, int *qtdeMovimentacao, char *variacao){
 	Item pivo, auxiliar;
+	char QC[3] = {"QC\0"};
 	*i = Esq;
 	*j = Dir;
-	pivo = A[(*i + *j)/2]; // obtem o pivo
+
+	// se QuickSort Clássico
+	if(strcmp(variacao, QC) == 0){
+		pivo = A[(*i + *j)/2]; // obtem o pivo
+	}
+	// se QuickSort Mediana de Tres
+	else{
+		int meio = (Esq + Dir) / 2;
+		if(A[meio].Chave < A[Dir].Chave)
+		  Troca(A[Dir], A[meio]);
+		if(A[Esq].Chave < A[Dir].Chave)
+		  Troca(A[Dir], A[Esq]);
+		if(A[meio].Chave < A[Esq].Chave)
+		  Troca(A[meio], A[Esq]);
+		pivo = A[Esq];
+	}
 
 	do{
 		while (pivo.Chave > A[*i].Chave){
@@ -34,23 +53,29 @@ void Particao(int Esq, int Dir, int *i, int *j, Item *A, int *qtdeComparacao, in
 	}while(*i <= *j);
 }
 // ** referencia ** (slide Raquel)
-void Ordena(int Esq, int Dir, Item *A, int *qtdeComparacao, int *qtdeMovimentacao){
+void Ordena(int Esq, int Dir, Item *A, int *qtdeComparacao, int *qtdeMovimentacao, char *variacao){
 	int i, j;
-	Particao(Esq, Dir, &i, &j, A, qtdeComparacao, qtdeMovimentacao);
+	Particao(Esq, Dir, &i, &j, A, qtdeComparacao, qtdeMovimentacao, variacao);
 	if(Esq < j)
-		Ordena(Esq, j, A, qtdeComparacao, qtdeMovimentacao);
+		Ordena(Esq, j, A, qtdeComparacao, qtdeMovimentacao, variacao);
 	if(i < Dir)
-		Ordena(i, Dir, A, qtdeComparacao, qtdeMovimentacao);
+		Ordena(i, Dir, A, qtdeComparacao, qtdeMovimentacao, variacao);
 }
 // ** referencia ** (slide Raquel)
 // O(n log n)
-void QuickSort(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao){
-	Ordena(0, n-1, A, qtdeComparacao, qtdeMovimentacao);
+void QuickSort(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao, char *variacao){
+	Ordena(0, n-1, A, qtdeComparacao, qtdeMovimentacao, variacao);
 }
-
 /*
 	Aqui TERMINA as funcoes relacionadas ao QUICKSORT CLASSICO
+	e ao QUICKSORT MEDIANA DE TRES
 */
+
+
+
+/* -----------------------//////////--------------------------- */
+
+
 
 /*
 	Aqui COMECA as funcoes relacionadas ao QUICKSORT PRIMEIRO ELEMENTO
@@ -95,7 +120,13 @@ void QuickSortPrimeiroElemento(Item *A, int esq, int dir, int *qtdeComparacao, i
     QuickSortPrimeiroElemento(A, auxiliar, dir, qtdeComparacao, qtdeMovimentacao);
   }
 }
-
 /*
 	Aqui TERMINA as funcoes relacionadas ao QUICKSORT PRIMEIRO ELEMENTO
 */
+
+
+
+/* -----------------------//////////--------------------------- */
+
+
+
