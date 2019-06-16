@@ -7,6 +7,7 @@
 	COMECO dos Prototipos de funcoes relacionadas ao QUICKSORT CLASSICO
 	e ao QUICKSORT MEDIANA DE TRES
 */
+// O(n log n)
 void Particao(int, int, int*, int*, Item*, int*, int*, char*);
 void Ordena(int, int, Item*, int*, int*, char*);
 void QuickSort(Item*, int, int*, int*, char*);
@@ -20,6 +21,7 @@ void QuickSort(Item*, int, int*, int*, char*);
 /*
 	COMECO dos Prototipos de funcoes relacionadas ao QUICKSORT PRIMEIRO ELEMENTO
 */
+// O(n^2)
 int ParticaoPE(int, int, Item*, int*, int*);
 void QuickSortPrimeiroElemento(Item*, int, int, int*, int*);
 /*
@@ -29,9 +31,10 @@ void QuickSortPrimeiroElemento(Item*, int, int, int*, int*);
 /* -----------------------//////////--------------------------- */
 
 /*
-	COMECO do Prototipo de funcao relacionada ao QUICKSORT
+	COMECO do Prototipo de funcao relacionada ao QUICKSORT NAO RECURSIVO
 */
-void QuickSortNaoRec(Item*, int, int*, int*);
+// O (n log n) caso medio e O(n^2) pior caso
+void QuickSortNaoRecursivo(Item*, int, int*, int*);
 /*
 	FIM do Prototipo de funcao relacionada ao QUICKSORT NAO RECURSIVO
 */

@@ -1,7 +1,6 @@
 #include "Bibliotecas/Quicksort.h"
 #define Troca(A, B) {Item c = A; A = B; B = c; }
 
-
 /*
 	Aqui COMECA as funcoes relacionadas ao QUICKSORT CLASSICO 
 	e ao QUICKSORT MEDIANA DE TRES
@@ -62,7 +61,6 @@ void Ordena(int Esq, int Dir, Item *A, int *qtdeComparacao, int *qtdeMovimentaca
 		Ordena(i, Dir, A, qtdeComparacao, qtdeMovimentacao, variacao);
 }
 // ** referencia ** (slide Raquel)
-// O(n log n)
 void QuickSort(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao, char *variacao){
 	Ordena(0, n-1, A, qtdeComparacao, qtdeMovimentacao, variacao);
 }
@@ -80,6 +78,7 @@ void QuickSort(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao, char 
 /*
 	Aqui COMECA as funcoes relacionadas ao QUICKSORT PRIMEIRO ELEMENTO
 */
+
 int ParticaoPE(int Esq, int Dir, Item *A, int *qtdeComparacao, int *qtdeMovimentacao){
 	Item pivo, auxiliar;
 	pivo = A[Esq]; // obtem o pivo como o primeiro elemento do vetor
@@ -109,9 +108,7 @@ int ParticaoPE(int Esq, int Dir, Item *A, int *qtdeComparacao, int *qtdeMoviment
 	return Esq;
 }
 // ** referencia de ajuda**  https://stackoverflow.com/a/51284766
-// O(n^2)
 void QuickSortPrimeiroElemento(Item *A, int esq, int dir, int *qtdeComparacao, int *qtdeMovimentacao){
-	//Ordena(0, n-1, A, qtdeComparacao, qtdeMovimentacao);
 	int auxiliar = ParticaoPE(esq, dir, A, qtdeComparacao, qtdeMovimentacao);
 	if(esq < auxiliar - 1){
     QuickSortPrimeiroElemento(A, esq, auxiliar - 1, qtdeComparacao, qtdeMovimentacao);
@@ -134,10 +131,9 @@ void QuickSortPrimeiroElemento(Item *A, int esq, int dir, int *qtdeComparacao, i
 	Aqui COMECA a funcao relacionada ao QUICKSORT NAO RECURSIVO
 */
 // ** referencia ** (slide Raquel)
-// O(nlogn) average case and O(n^2) worst case
-void QuickSortNaoRec(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao){
+void QuickSortNaoRecursivo(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao){
 	TipoPilha pilha;
-	TipoItem item; // campos esq e dir
+	TipoItem item; // contem os campos esq e dir
 	int esq, dir, i, j;
 	char variacao[4] = {"QNR\0"};
 
@@ -147,11 +143,12 @@ void QuickSortNaoRec(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao)
 	item.dir = dir;
 	item.esq = esq;
 	Empilha(item, &pilha);
-
+	
 	do{
+
 		if(dir > esq){
 			Particao(esq,dir,&i, &j, A, qtdeComparacao, qtdeMovimentacao, variacao);
-			if ((j-esq)>(dir-i)) {
+			if ((j - esq) > (dir - i)){
 				item.dir = j;
 				item.esq = esq;
 				Empilha(item, &pilha);
@@ -169,9 +166,10 @@ void QuickSortNaoRec(Item *A, int n, int *qtdeComparacao, int *qtdeMovimentacao)
 			dir = item.dir;
 			esq = item.esq;
 		}
+
 	}while(!Vazia(&pilha));
 
 }
 /*
-	Aqui TERMINA aa funcao relacionada ao QUICKSORT NAO RECURSIVO
+	Aqui TERMINA a funcao relacionada ao QUICKSORT NAO RECURSIVO
 */

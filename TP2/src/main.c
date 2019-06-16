@@ -1,17 +1,6 @@
 #include "Bibliotecas/Quicksort.h"
 #include <time.h>
 
-/* 			ÚLTIMAS MUDANÇAS:
-	** Implementação do QuickSort Nao Recursivo
-	** QuickSort funcionando corretamente
-	** Tudo funcionando corretamente (ordenação, ale, OrdC, OrdD)!
-	**
-
-				PROBLEMA/DÚVIDAS: 
-	** 
-
-*/
-
 int main(int argc, char *argv[]){
 	struct timespec start, end;
 	long int elapsed_time, valoresTempo[20], medianaTempo;
@@ -23,11 +12,12 @@ int main(int argc, char *argv[]){
 	int qtdeComparacao = 0, qtdeMovimentacao = 0, parametroOpcional = 0;
 	int mediaQtdeComparacao = 0, mediaqtdeMovimentacao = 0;
 
-	strcpy(variacao, argv[1]);
-	strcpy(tipo, argv[2]);
-	tamanho = atoi(argv[3]);
+	strcpy(variacao, argv[1]); // variação do quicksort (se QNR, QPE, ...)
+	strcpy(tipo, argv[2]); // tipo da ordenação (se Ale, OrdC ou OrdD)
+	tamanho = atoi(argv[3]); // quantidade de elementos (se 50 mil, 150 mil, etc)
 
-	// declaracao de Registro e Registro auxiliar (para impressao caso -p)
+	// declaracao de Registro para armazenar os elementos
+	// e Registro auxiliar (para impressao caso -p)
 	Item Itens[tamanho], **Auxiliar = NULL;
 
 	if(argc == 5){ // ou seja, se incluiu o parametro p
@@ -60,15 +50,15 @@ int main(int argc, char *argv[]){
 		if(strcmp(variacao, QC) == 0 || strcmp(variacao, QM3) == 0){
 			QuickSort(Itens, tamanho, &qtdeComparacao, &qtdeMovimentacao, variacao); // executa a ordenação no vetor
 		}else if(strcmp(variacao, QPE) == 0){ // se QuickSort Primeiro Elemento
-			QuickSortPrimeiroElemento(Itens, 0, tamanho, &qtdeComparacao, &qtdeMovimentacao);
+			QuickSortPrimeiroElemento(Itens, 0, tamanho, &qtdeComparacao, &qtdeMovimentacao); // executa a ordenação no vetor
 		}else if(strcmp(variacao, QI1) == 0){ // se QuickSort 1%
 
 		}else if(strcmp(variacao, QI5) == 0){ // se QuickSort 5%
 
 		}else if(strcmp(variacao, QI10) == 0){ // se QuickSort 10%
 
-		}else{ // // se QuickSort Não Recursivo
-			QuickSortNaoRec(Itens, tamanho, &qtdeComparacao, &qtdeMovimentacao);
+		}else{ // se QuickSort Não Recursivo
+			QuickSortNaoRecursivo(Itens, tamanho, &qtdeComparacao, &qtdeMovimentacao); // executa a ordenação no vetor
 		}
 
 		// Pega o horário do sistema depois da execuçao do quicksort
@@ -79,10 +69,10 @@ int main(int argc, char *argv[]){
 
 		valoresTempo[i] = elapsed_time; // guarda esse tempo no vetor
 
-		// impressão dos elementos ordenados
-		for(j = 0; j < tamanho; j++)
-			printf("%d ", Itens[j].Chave);
-		printf("--\n");
+		// // teste para impressão dos elementos ordenados
+		// for(j = 0; j < tamanho; j++)
+		// 	printf("%d ", Itens[j].Chave);
+		// printf("--\n");
 
 		// cálculo da media in-place, ou seja, não precisa salvar os valores de
 		// cada iteração pois eu já estou dividindo cada iteração por 20
@@ -90,11 +80,12 @@ int main(int argc, char *argv[]){
 		mediaqtdeMovimentacao += (qtdeMovimentacao/20);
 
 	}
-
+	// escolhe mediana do tempo
 	escolheMediana(valoresTempo, &medianaTempo);
 	imprimeResultados(variacao, tipo, tamanho, mediaQtdeComparacao,
 						mediaqtdeMovimentacao, medianaTempo);
 
+	// "imprime" o vetor caso parâmetro -p seja passado
 	if(parametroOpcional == 1){
 		for(i = 0; i < 20; i++){
 			for(j = 0; j < tamanho; j++)
@@ -105,7 +96,6 @@ int main(int argc, char *argv[]){
 
   // liberar memória se foi inserido o parametro -p
   if(parametroOpcional == 1){
-		/* LIBERAR Item Auxiliar da MEMORIA*/
 		for(i = 0; i < 20; i++)
 				free(Auxiliar[i]);
 			free(Auxiliar);
@@ -113,8 +103,8 @@ int main(int argc, char *argv[]){
 	// liberar memória se foi nao inserido o parametro -p
 	else{
 		for(i = 0; i < 20; i++)
-				free(Auxiliar[i]); // esta desalocando corretamente agora?
-			free(Auxiliar); // acho que sim
+				free(Auxiliar[i]);
+			free(Auxiliar);
 	}
 
   return 0;

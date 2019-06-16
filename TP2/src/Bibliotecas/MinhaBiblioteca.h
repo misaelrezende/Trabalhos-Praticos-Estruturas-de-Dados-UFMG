@@ -6,6 +6,22 @@
 #include <string.h>
 #include <time.h>
 
+// tipo que armazenará os elementos
+typedef struct {
+	int Chave;
+} Item;
+
+void Insercao(long int*);
+void escolheMediana(long int*, long int*);
+
+void gerarVetor(Item*, int, char*, Item*, int);
+
+void imprimeResultados(char*, char*, int, int, int, long int);
+
+
+/*
+	COMECO dos Prototipos de funcoes e estruturas relacionadas a Pilha
+*/
 typedef struct {
 	int dir, esq;
 } TipoItem;
@@ -22,23 +38,6 @@ typedef struct {
 	int Tamanho;
 } TipoPilha;
 
-
-
-typedef struct {
-	int Chave;
-} Item;
-
-void Insercao(long int*);
-void escolheMediana(long int*, long int*);
-
-void gerarVetor(Item*, int, char*, Item*, int);
-
-void imprimeResultados(char*, char*, int, int, int, long int);
-
-
-/*
-	COMECO dos Prototipos de funcoes relacionadas a Pilha
-*/
 void FPVazia(TipoPilha*);
 int Vazia(const TipoPilha*);
 void Empilha(TipoItem, TipoPilha*);

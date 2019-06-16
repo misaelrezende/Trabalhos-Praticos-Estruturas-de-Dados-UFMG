@@ -11,7 +11,7 @@ void Insercao(long int *v){
 			v[j+1] = v[j];
 			j--;
 		}
-		v[j+1] = aux;
+		v[j + 1] = aux;
 	}
 }
 
@@ -49,22 +49,28 @@ void gerarVetor(Item *Itens, int tamanho, char *tipo, Item *Auxiliar,
 	}
 }
 
-
+// função imprime os resultados do teste do algoritmo
 void imprimeResultados(char *variacao, char *tipo, int tamanho,
 		int mediaQtdeComparacao, int mediaqtdeMovimentacao, long int medianaTempo){
-		printf("%s %s %d %d %d %ld\n", variacao, tipo, tamanho, mediaQtdeComparacao, mediaqtdeMovimentacao, medianaTempo);
+		printf("%s %s %d %d %d %ld\n", variacao, tipo, tamanho, mediaQtdeComparacao,
+		mediaqtdeMovimentacao, medianaTempo);
 }
 
+
+/*
+	COMECO das funcoes relacionadas a Pilha
+*/
+// ** referencia ** (slide Raquel)
 void FPVazia(TipoPilha *Pilha) {
 	Pilha->Topo = (Apontador) malloc(sizeof(Celula));
 	Pilha->Fundo = Pilha->Topo;
 	Pilha->Topo->Prox = NULL;
 	Pilha->Tamanho = 0;
-} /* FPVazia */
+}
 
 int Vazia(const TipoPilha *Pilha){
 	return (Pilha->Topo == Pilha->Fundo);
-} /* Vazia */
+}
 
 void Empilha(TipoItem x, TipoPilha *Pilha) {
 	Apontador Aux;
@@ -77,13 +83,13 @@ void Empilha(TipoItem x, TipoPilha *Pilha) {
 }
 
 int Desempilha(TipoPilha *Pilha, TipoItem *item) {
-	Apontador q;
+	Apontador aux;
 	if (Vazia(Pilha)) {
 		printf("Erro: pilha vazia\n"); return 0;
 	}
-	q = Pilha->Topo;
-	Pilha->Topo = q->Prox;
-	free(q);
+	aux = Pilha->Topo;
+	Pilha->Topo = aux->Prox;
+	free(aux);
 	Pilha->Tamanho--;
 	*item = Pilha->Topo->item;
 	return 1;
@@ -91,5 +97,8 @@ int Desempilha(TipoPilha *Pilha, TipoItem *item) {
 
 int Tamanho(const TipoPilha *Pilha){
 	return (Pilha->Tamanho);
-} /* Tamanho */
+}
 
+/*
+	FIM das funcoes relacionadas a Pilha
+*/
