@@ -19,8 +19,10 @@ typedef struct no{
 } No;
 
 Apontador criaNo();
-  
+
 void Insere(Registro atual, Apontador no, int posicao);
+
+void imprimePreOrdem(Apontador arvoreMorse);
 
 // Apontador criaNo(Registro*);
 
@@ -31,7 +33,6 @@ void Insere(Registro atual, Apontador no, int posicao);
 // Registro* pesquisaRamos(struct no* t, char *chave, int p);
 // Registro* pesquisa(struct no* trie, char *chave);
 
-// void imprimePreOrdem(Apontador arvoreMorse);
 // void esvaziaArvore(Apontador*);
 
 #endif

@@ -1,7 +1,6 @@
 #include "Bibliotecas/arvore.h"
 
 /*    MUDANÇAS RECENTES
-  ** leitura do arquivo morse.txt funcionando normalmente
   ** aparentemente criação da arvore esta ok
   ** falta testar a impressão em preordem
 
@@ -31,13 +30,13 @@ int main(int argc, char *argv[]) {
 
   Apontador arvoreMorse = NULL; // ponteiro ou ponteiro de ponteiro?
 
-  printf("%p\n", arvoreMorse);
-  fflush(stdout);
+  // printf("%p\n", arvoreMorse);
+  // fflush(stdout);
   arvoreMorse = (Apontador) malloc (sizeof(No));
   arvoreMorse->esquerda = NULL;
   arvoreMorse->direita = NULL;
-  printf("%p %lu\n", arvoreMorse, sizeof(arvoreMorse));
-  fflush(stdout);
+  // printf("%p %lu\n", arvoreMorse, sizeof(arvoreMorse));
+  // fflush(stdout);
 
   // enquanto não chega no fim do arquivo
   while(!(feof(fp))){
@@ -46,6 +45,8 @@ int main(int argc, char *argv[]) {
     //se não for fim do arquivo, faça...
     if(!(feof(fp))){
       Insere(auxiliar, arvoreMorse, 0);
+      // imprimePreOrdem(arvoreMorse);
+      // printf("--------------------\n");
       fprintf(fp2, "%s %s\n", auxiliar.caractere, auxiliar.codigoMorse);
       // printf("terminei de inserir");
       // fflush(stdout);
@@ -55,9 +56,9 @@ int main(int argc, char *argv[]) {
   }
 
   // se foi passado o parâmetro -a
-  // if(argc == 2 && strcmp(argv[1], "-a") == 0){
-  //   //imprimePreOrdem(arvoreMorse);
-  // }
+  if(argc > 1 && strcmp(argv[1], "-a") == 0){
+    imprimePreOrdem(arvoreMorse);
+  }
 
   /* Não esqueça de DESALOCAR A ÁRVORE NO FIM DO PROGRAMA */
   //esvaziaArvore(&arvoreMorse);

@@ -12,7 +12,7 @@ void Insere(Registro atual, Apontador no, int posicao){
 
   // se estou no ultimo simbolo do codigo morse a ser inserido
   if(atual.codigoMorse[posicao+1] == '\0'){
-    if(atual.simbolo == '.'){
+    if(atual.codigoMorse[posicao] == '.'){
       if( no->esquerda == NULL ){
         // cria no na esquerda e insere atual
         no->esquerda = criaNo(); // no->esq passa a apontar para novo no
@@ -21,7 +21,7 @@ void Insere(Registro atual, Apontador no, int posicao){
       no->esquerda->registro.simbolo = atual.simbolo; // guarda o simbolo ( '.' ou '-' )
       strcpy( no->esquerda->registro.codigoMorse, atual.codigoMorse ); // guarda o codigo morse (ex: "-.--")
       strcpy( no->esquerda->registro.caractere, atual.caractere );
-
+      // printf("%s\n", no->esquerda->registro.caractere);
     }else{ // senao eh '-'
       if( no->direita == NULL ){
         // cria no na direita e insere atual
@@ -31,8 +31,9 @@ void Insere(Registro atual, Apontador no, int posicao){
       no->direita->registro.simbolo = atual.simbolo; // guarda o simbolo ( '.' ou '-' )
       strcpy( no->direita->registro.codigoMorse, atual.codigoMorse ); // guarda o codigo morse (ex: "-.--")
       strcpy( no->direita->registro.caractere, atual.caractere );
-
+      // printf("%s\n", no->direita->registro.caractere);
     }
+
     // printf("cheguei no fim do codigoMorse ");
     // fflush(stdout);
     // no->registro.simbolo = atual.simbolo; // guarda o simbolo ( '.' ou '-' )
@@ -102,6 +103,27 @@ void Insere(Registro atual, Apontador no, int posicao){
   }
 
 }
+
+void imprimePreOrdem(Apontador arvoreMorse){
+  // imprime assim que passa no nó
+  if(arvoreMorse != NULL){
+
+      printf("%s %s\n", arvoreMorse->registro.caractere,
+      arvoreMorse->registro.codigoMorse);
+
+    imprimePreOrdem(arvoreMorse->esquerda);
+    imprimePreOrdem(arvoreMorse->direita);
+  }
+}
+// //
+// // void esvaziaArvore(No* arvore){
+// //   if(arvore != NULL){
+// //     esvaziaArvore(&(*arvore)->esquerda);
+// //     esvaziaArvore(&(*arvore)->direita);
+// //     free(arvore);
+// //   }
+// // }
+
 
 
 // fonte slide Raquel - Arvore de Pesquisa Binária
