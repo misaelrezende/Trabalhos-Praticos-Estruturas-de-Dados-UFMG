@@ -1,56 +1,45 @@
 #include "Bibliotecas/arvore.h"
 
 /*    MUDANÇAS RECENTES
-  ** aparentemente criação da arvore esta ok
-  ** falta testar a impressão em preordem
+  ** Criação da arvore esta funcionando corretamente
+  ** Impressão em preordem funcionando corretamente
+  ** retirada de alguns trechos de códigos de teste que não sao mais necessários
+  ** legibilidade do código melhorada
+  ** Desalocando a arvore corretamente
 
       PROBLEMAS/DÚVIDAS
-  **
-
-  ** Como INICIALIZAR a TRIE?
-  ** testar a impressão em PREORDEM
-  ** COMO DESALOCAR?
+  ** Como imprimir em préordem sem imprimir os nós vazios???
+  ** 
 */
 
 int main(int argc, char *argv[]) {
-  FILE *fp = NULL, *fp2 = NULL;
+  FILE *apontadorArquivo = NULL;
   Registro auxiliar;
 
-  fp = fopen("morse.txt", "r");
-  if(fp == NULL){
+  apontadorArquivo = fopen("morse.txt", "r");
+  if(apontadorArquivo == NULL){
     printf("ERRO ao abrir o arquivo\n");
     exit(1);
   }
   // teste para checar se a leitura do morse.txt está correta
-  fp2 = fopen("leitura.txt", "w+");
-  if(fp2 == NULL){
+  /* apontadorArquivo2 = fopen("leitura.txt", "w+");
+  if(apontadorArquivo2 == NULL){
     printf("ERRO ao abrir o arquivo\n");
     exit(1);
-  }
+  } */
 
-  Apontador arvoreMorse = NULL; // ponteiro ou ponteiro de ponteiro?
-
-  // printf("%p\n", arvoreMorse);
-  // fflush(stdout);
-  arvoreMorse = (Apontador) malloc (sizeof(No));
-  arvoreMorse->esquerda = NULL;
-  arvoreMorse->direita = NULL;
-  // printf("%p %lu\n", arvoreMorse, sizeof(arvoreMorse));
-  // fflush(stdout);
+  Apontador arvoreMorse = NULL;
+  // Inicializa a árvore com um nó vazio (nó raiz)
+  arvoreMorse = inicializaArvore(arvoreMorse);
 
   // enquanto não chega no fim do arquivo
-  while(!(feof(fp))){
+  while( !(feof(apontadorArquivo)) ){
 
-    fscanf(fp, "%s%s", auxiliar.caractere, auxiliar.codigoMorse);
-    //se não for fim do arquivo, faça...
-    if(!(feof(fp))){
+    fscanf(apontadorArquivo, "%s%s", auxiliar.caractere, auxiliar.codigoMorse);
+    // condição criada para evitar um bug após a leitura da ultima linha
+    if( !(feof(apontadorArquivo)) )
       Insere(auxiliar, arvoreMorse, 0);
-      // imprimePreOrdem(arvoreMorse);
-      // printf("--------------------\n");
-      fprintf(fp2, "%s %s\n", auxiliar.caractere, auxiliar.codigoMorse);
-      // printf("terminei de inserir");
-      // fflush(stdout);
-    }
+      // fprintf(apontadorArquivo2, "%s %s\n", auxiliar.caractere, auxiliar.codigoMorse);
     else
       break;
   }
@@ -60,11 +49,12 @@ int main(int argc, char *argv[]) {
     imprimePreOrdem(arvoreMorse);
   }
 
-  /* Não esqueça de DESALOCAR A ÁRVORE NO FIM DO PROGRAMA */
-  //esvaziaArvore(&arvoreMorse);
+  // Desaloca os nós da arvore
+  esvaziaArvore(arvoreMorse);
+  arvoreMorse = NULL;
 
-  fclose(fp);
-  fclose(fp2);
+  fclose(apontadorArquivo);
+  // fclose(apontadorArquivo2);
 
   return 0;
 }
