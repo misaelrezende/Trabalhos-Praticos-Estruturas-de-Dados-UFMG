@@ -16,9 +16,10 @@ Apontador criaNo(){
   return aux;
 }
 
-// fonte slide Raquel - Arvore de Pesquisa Binária
+// fonte de consulta slide Raquel - Arvore de Pesquisa Binária
+// que é do livro do Nívio Ziviani
 // Insere um nó na arvore
-void Insere(Registro atual, Apontador no, int posicao){
+void insere(Apontador no, Registro atual, int posicao){
 
   // se estou no ultimo simbolo do codigo morse a ser inserido
   if(atual.codigoMorse[posicao+1] == '\0'){
@@ -55,7 +56,7 @@ void Insere(Registro atual, Apontador no, int posicao){
       no->esquerda->registro.simbolo = '.';
     }
 
-    Insere(atual, no->esquerda, posicao+1);
+    insere(no->esquerda, atual, posicao+1);
   }
 
   // se a posicao = '-'
@@ -66,10 +67,53 @@ void Insere(Registro atual, Apontador no, int posicao){
       no->direita->registro.simbolo = '-';
     }
 
-    Insere(atual, no->direita, posicao+1);
+    insere(no->direita, atual, posicao+1);
   }
 
 }
+
+
+void decodificaMensagem(Apontador arvoreMorse, char *matrizMensagemDecodificada,
+     int linha, char *mensagemCodificada){
+
+  Apontador percorreArvore = arvoreMorse; // recebe o endereço do nó raiz da arvore
+  int i, j, tamanho = strlen(mensagemCodificada);
+
+  for(i = 0, j = 0; i < tamanho; i++){
+
+    percorreArvore = arvoreMorse; // recebe o endereço do nó raiz da arvore
+
+    if(mensagemCodificada[i] != ' ' && mensagemCodificada[i] != '\n'){
+      // percorre a string até encontrar um espaço ou barra
+      while(mensagemCodificada[i] != ' ' && mensagemCodificada[i] != '\n'){
+        if(mensagemCodificada[i] == '.')
+          percorreArvore = percorreArvore->esquerda;
+        else if(mensagemCodificada[i] == '-')
+          percorreArvore = percorreArvore->direita;
+
+        i++;
+      }
+      matrizMensagemDecodificada[j] = percorreArvore->registro.caractere[0];
+      j++;
+    }
+
+    if(mensagemCodificada[i] == '\n'){
+      matrizMensagemDecodificada[j] = '\n';
+      matrizMensagemDecodificada[j+1] = '\0';
+      j = 0;
+    }
+
+    if(mensagemCodificada[i+1] == '/'){
+      matrizMensagemDecodificada[j] = ' ';
+      j++;
+      i += 2;
+    }
+
+
+  }// fim do laço for
+
+} // fim da função decodifica
+
 
 // Imprime a árvore com caminhamento em pré-ordem
 void imprimePreOrdem(Apontador arvoreMorse){
@@ -90,16 +134,3 @@ void esvaziaArvore(Apontador arvore){
     free(arvore);
   }
 }
-
-
-// fonte slide Raquel - Arvore de Pesquisa Binária
-// void Pesquisa(Registro *x, Apontador p) {
-//   if(p == NULL) {
-//     printf("Registro nao esta presente \n");
-//   else if (x->Chave < p->Reg.Chave)
-//     Pesquisa(x, p->esquerda);
-//   else if (x->Chave > p->Reg.Chave)
-//     Pesquisa(x, p->direita);
-//   else
-//     *x = p->Reg;
-// }

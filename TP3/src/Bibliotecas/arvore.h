@@ -23,12 +23,13 @@ typedef struct no{
 Apontador inicializaArvore(Apontador);
 Apontador criaNo();
 
-void Insere(Registro, Apontador, int);
+void insere(Apontador, Registro, int);
 
 void imprimePreOrdem(Apontador);
 void esvaziaArvore(Apontador);
 
-// Registro* pesquisaRamos(struct no* t, char *chave, int p);
-// Registro* pesquisa(struct no* trie, char *chave);
+void decodificaMensagem(Apontador arvoreMorse, char *matrizMensagemDecodificada,
+     int linha, char *mensagemCodificada);
+
 
 #endif
