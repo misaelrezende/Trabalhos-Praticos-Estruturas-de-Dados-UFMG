@@ -25,11 +25,12 @@ Apontador criaNo();
 
 void insere(Apontador, Registro, int);
 
+void decodificaMensagem(Apontador arvoreMorse, char *matrizMensagemDecodificada,
+     int linha, char *mensagemCodificada);
+
 void imprimePreOrdem(Apontador);
 void esvaziaArvore(Apontador);
 
-void decodificaMensagem(Apontador arvoreMorse, char *matrizMensagemDecodificada,
-     int linha, char *mensagemCodificada);
 
 
 #endif

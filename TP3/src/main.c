@@ -1,18 +1,9 @@
 #include "Bibliotecas/arvore.h"
 
-/*    MUDANÇAS RECENTES
-  ** Criação da função que decodifica mensagem encriptada inserida
-  ** função decodificadora funcionando normalmente
-
-      PROBLEMAS/DÚVIDAS
-  ** Como imprimir em préordem sem imprimir os nós vazios???
-  ** 
-*/
-
 int main(int argc, char *argv[]){
   int linha = 0, quantidadeMensagens = 0;
   Registro auxiliar;
-  char matrizMensagemDecodificada[50][250];
+  char matrizMensagemDecodificada[50][250]; // guarda as mensagens decodificadas
   FILE *apontadorArquivo = NULL;
 
   apontadorArquivo = fopen("morse.txt", "r");
@@ -52,10 +43,10 @@ int main(int argc, char *argv[]){
     quantidadeMensagens++;
   }
 
-  // imprime a mensagem decodificada
+  // imprime a mensagem decodificada 
   for(int i = 0; i < quantidadeMensagens; i++)
-    printf("%s", matrizMensagemDecodificada[i]);
-  printf("\n");
+      printf("%s", matrizMensagemDecodificada[i]);
+    printf("\n");
 
   // se foi passado o parâmetro -a
   if(argc > 1 && strcmp(argv[1], "-a") == 0){
@@ -65,7 +56,7 @@ int main(int argc, char *argv[]){
   // Desaloca os nós da arvore
   esvaziaArvore(arvoreMorse);
   arvoreMorse = NULL;
-
+  free(mensagemCodificada);
   fclose(apontadorArquivo);
 
   return 0;

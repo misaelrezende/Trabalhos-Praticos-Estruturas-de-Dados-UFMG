@@ -13,11 +13,11 @@ Apontador criaNo(){
   Apontador aux = (Apontador) malloc (sizeof(No));
   aux->esquerda = NULL;
   aux->direita = NULL;
+  strcpy(aux->registro.caractere, " \0"); // inicializando com espaço
   return aux;
 }
 
 // fonte de consulta slide Raquel - Arvore de Pesquisa Binária
-// que é do livro do Nívio Ziviani
 // Insere um nó na arvore
 void insere(Apontador no, Registro atual, int posicao){
 
@@ -33,7 +33,7 @@ void insere(Apontador no, Registro atual, int posicao){
       strcpy( no->esquerda->registro.codigoMorse, atual.codigoMorse ); // guarda o codigo morse (ex: "-.--")
       strcpy( no->esquerda->registro.caractere, atual.caractere ); // guarda o caractere (ex: A, B, 8, etc)
 
-    }else{ // senao eh '-'
+    }else{ // se nao, então eh '-'
       if( no->direita == NULL ){
         // cria no na direita e insere atual
         no->direita = criaNo(); // no->esq passa a apontar para novo no
@@ -45,7 +45,7 @@ void insere(Apontador no, Registro atual, int posicao){
 
     }
 
-    return; // para não rodar restante do código
+    return; // para não executar o restante do código
   }
 
   // se a posicao = '.'
@@ -72,7 +72,7 @@ void insere(Apontador no, Registro atual, int posicao){
 
 }
 
-
+// Decodifica a mensagem passada e guarda em uma matriz
 void decodificaMensagem(Apontador arvoreMorse, char *matrizMensagemDecodificada,
      int linha, char *mensagemCodificada){
 
@@ -115,16 +115,19 @@ void decodificaMensagem(Apontador arvoreMorse, char *matrizMensagemDecodificada,
 } // fim da função decodifica
 
 
+
 // Imprime a árvore com caminhamento em pré-ordem
 void imprimePreOrdem(Apontador arvoreMorse){
   if(arvoreMorse != NULL){
-    printf("%s %s\n", arvoreMorse->registro.caractere,
-    arvoreMorse->registro.codigoMorse);
+    if(arvoreMorse->registro.caractere[0] != ' ') // para não imprimir os três nós vazios
+      printf("%s %s\n", arvoreMorse->registro.caractere,
+      arvoreMorse->registro.codigoMorse);
 
     imprimePreOrdem(arvoreMorse->esquerda);
     imprimePreOrdem(arvoreMorse->direita);
   }
 }
+
 
 // Desaloca os nós alocados dinamicamente
 void esvaziaArvore(Apontador arvore){
