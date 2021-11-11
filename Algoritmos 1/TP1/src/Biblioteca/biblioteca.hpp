@@ -2,19 +2,25 @@
 #define BIBLIOTECA_H
 
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 class Cliente{
     private:
-        int id, idade, x, y;
-        char estado_de_origem[2], tipo_pgto[8];
+        int _id, _idade, _x, _y;
+        string _estado_de_origem, _tipo_pgto;
     
     public:
+        Cliente();
+        Cliente(int, int, string, string, int, int);
+
+        void imprime();
         void setId(int);
         void setIdade(int);
         void setLocalizacao(int, int);
         void setEstado(char*);
-        void setTipoPgto(char*);    
+        void setTipoPgto(char*);
+        ~Cliente();
 };
 
 class Loja{
@@ -24,9 +30,12 @@ class Loja{
     public:
         Loja();
         Loja(int, int, int, int);
+
+        void imprime();
         void setId(int);
         void setEstoque(int);
         void setLocalizacao(int, int);
+        ~Loja();
 };
 
 #endif
