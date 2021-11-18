@@ -3,11 +3,13 @@
 
 #include <iostream>
 #include <cstring>
+#include <cmath>
 using namespace std;
 
 class Cliente{
     private:
         int _id, _idade, _x, _y;
+        float _ticket;
         string _estado_de_origem, _tipo_pgto;
     
     public:
@@ -20,6 +22,9 @@ class Cliente{
         void setLocalizacao(int, int);
         void setEstado(char*);
         void setTipoPgto(char*);
+        int getScoreEstado(string);
+        int getScoreTipoPagamento(string);
+        void calculaTicket();
         ~Cliente();
 };
 
