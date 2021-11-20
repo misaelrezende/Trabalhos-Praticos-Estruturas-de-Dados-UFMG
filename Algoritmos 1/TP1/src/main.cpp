@@ -22,17 +22,24 @@ int main(){
         clientes[i] = Cliente(i, idade, estado, pgto, x, y);
     }
 
-    for (int i = 0; i < m; i++){
-        lojas[i].Imprime();
-    }
-    for (int i = 0; i < n; i++){
-        clientes[i].Imprime();
-    }
+    // Obtenha os tickets de cada cliente
+    vector<pair<int, float>> lista_auxiliar;
+    for(int i = 0; i < n; i++)
+       lista_auxiliar.push_back( make_pair(i, clientes[i].GetTicket()) );
 
+    // Cria a lista de prioridade para cada loja
+    for(int i = 0; i < m; i++)
+        lojas[i].CriarListaPrioridade(lista_auxiliar);
+
+    for(int i = 0; i < m; i++)
+        lojas[i].Imprimir();
+
+    for(int i = 0; i < n; i++)
+        clientes[i].Imprimir();
+    
     return 0;
 }
 
 /*
-- Criar lista de prioridade de cada loja
 - 
 */

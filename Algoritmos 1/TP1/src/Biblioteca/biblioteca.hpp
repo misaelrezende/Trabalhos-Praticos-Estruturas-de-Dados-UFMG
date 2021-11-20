@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cmath>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 class Cliente{
@@ -17,7 +18,7 @@ class Cliente{
         Cliente();
         Cliente(int, int, string, string, int, int);
 
-        void Imprime();
+        void Imprimir();
         void setId(int);
         void setIdade(int);
         void setLocalizacao(int, int);
@@ -25,7 +26,8 @@ class Cliente{
         void setTipoPgto(char*);
         int getScoreEstado(string);
         int getScoreTipoPagamento(string);
-        void calculaTicket();
+        float GetTicket();
+        void CalcularTicket();
         ~Cliente();
 };
 
@@ -38,11 +40,11 @@ class Loja{
         Loja();
         Loja(int, int, int, int);
 
-        void Imprime();
+        void Imprimir();
         void setId(int);
         void setEstoque(int);
         void setLocalizacao(int, int);
-        void CriarListaPrioridade(int);
+        void CriarListaPrioridade(vector<pair<int, float>>);
         ~Loja();
 };
 
