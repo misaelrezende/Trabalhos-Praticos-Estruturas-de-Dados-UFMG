@@ -11,8 +11,8 @@ Cliente::Cliente(int id, int idade, string estado_de_origem, string tipo_pgto, i
 
     calculaTicket();
 }
-void Cliente::imprime(){
-    cout << this->_id << " " << this->_idade << " " << this->_estado_de_origem << " " << this->_tipo_pgto << " " << this->_x << " " << this->_y << "ticket: " << this->_ticket << endl;
+void Cliente::Imprime(){
+    cout << this->_id << " " << this->_idade << " " << this->_estado_de_origem << " " << this->_tipo_pgto << " " << this->_x << " " << this->_y << " ticket: " << this->_ticket << endl;
 }
 int Cliente::getScoreEstado(string estado){
     if(estado.compare("MG\0") == 0)
@@ -39,7 +39,7 @@ int Cliente::getScoreTipoPagamento(string pgto){
         return 3;
 }
 void Cliente::calculaTicket(){
-    this->_ticket = ( abs(60 - this->_idade) + getScoreEstado(this->_estado_de_origem) ) / getScoreTipoPagamento(this->_tipo_pgto);
+    this->_ticket = ( abs(60 - this->_idade) + getScoreEstado(this->_estado_de_origem) ) / float(getScoreTipoPagamento(this->_tipo_pgto));
 }
 Cliente::~Cliente(){}
 
@@ -52,7 +52,7 @@ Loja::Loja(int id, int estoque, int x, int y){
     this->_x = x;
     this->_y = y;
 }
-void Loja::imprime(){
+void Loja::Imprime(){
     cout << this->_id << " " << this->_estoque << " " << this->_x << " " << this->_y << endl;
 }
 

@@ -23,17 +23,16 @@ int main(){
     }
 
     for (int i = 0; i < m; i++){
-        lojas[i].imprime();
+        lojas[i].Imprime();
     }
     for (int i = 0; i < n; i++){
-        clientes[i].imprime();
+        clientes[i].Imprime();
     }
 
     return 0;
 }
 
 /*
-- Calcular o valor de ticket de cada cliente
 - Criar lista de prioridade de cada loja
 - 
 */

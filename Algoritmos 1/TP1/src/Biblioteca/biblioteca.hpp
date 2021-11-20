@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <cmath>
+#include <vector>
 using namespace std;
 
 class Cliente{
@@ -16,7 +17,7 @@ class Cliente{
         Cliente();
         Cliente(int, int, string, string, int, int);
 
-        void imprime();
+        void Imprime();
         void setId(int);
         void setIdade(int);
         void setLocalizacao(int, int);
@@ -31,15 +32,17 @@ class Cliente{
 class Loja{
     private:
         int _id, _estoque, _x, _y;
+        vector<pair<int, float>> _lista_prioridade;
 
     public:
         Loja();
         Loja(int, int, int, int);
 
-        void imprime();
+        void Imprime();
         void setId(int);
         void setEstoque(int);
         void setLocalizacao(int, int);
+        void CriarListaPrioridade(int);
         ~Loja();
 };
 
