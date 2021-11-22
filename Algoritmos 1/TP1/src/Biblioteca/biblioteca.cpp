@@ -1,4 +1,8 @@
 #include "biblioteca.hpp"
+// Função auxiliar para ordenar pelo segundo elemento
+bool sortbysec(const pair<int,float> &a, const pair<int,float> &b){
+    return (a.second < b.second);
+}
 
 Cliente::Cliente(){}
 Cliente::Cliente(int id, int idade, string estado_de_origem, string tipo_pgto, int x, int y){
@@ -12,7 +16,11 @@ Cliente::Cliente(int id, int idade, string estado_de_origem, string tipo_pgto, i
     CalcularTicket();
 }
 void Cliente::Imprimir(){
-    cout << this->_id << " " << this->_idade << " " << this->_estado_de_origem << " " << this->_tipo_pgto << " " << this->_x << " " << this->_y << " ticket: " << this->_ticket << endl;
+    // cout << this->_id << " " << this->_idade << " " << this->_estado_de_origem << " " << this->_tipo_pgto << " " << this->_x << " " << this->_y << " ticket: " << this->_ticket << endl;
+    cout << this->_id << ":";
+    for(vector<int>::iterator it = this->_lista_prioridade_distancias.begin(); it != _lista_prioridade_distancias.end(); ++it)
+        cout << " " << *it;
+    cout << endl;
 }
 int Cliente::getScoreEstado(string estado){
     if(estado.compare("MG\0") == 0)
@@ -44,6 +52,21 @@ float Cliente::GetTicket(){
 void Cliente::CalcularTicket(){
     this->_ticket = ( abs(60 - this->_idade) + getScoreEstado(this->_estado_de_origem) ) / float(getScoreTipoPagamento(this->_tipo_pgto));
 }
+int Cliente::CalcularDistancia(pair<int,int> localizacao){
+    int distancia = max( abs(this->_x - localizacao.first), abs(this->_y - localizacao.second) ) - 1;
+    return distancia;
+}
+void Cliente::CriarListaPrioridade(vector<pair<int,int>> lista){   
+    vector<pair<int,int>> lista_auxiliar;
+    int i = 0;
+    for(vector<pair<int,int>>::iterator it = lista.begin(); it != lista.end(); ++it, i++)
+        lista_auxiliar.push_back( make_pair(i, CalcularDistancia(*it)) );
+
+    stable_sort(lista_auxiliar.begin(), lista_auxiliar.end(), sortbysec);
+
+    for(vector<pair<int,int>>::iterator it = lista_auxiliar.begin(); it != lista_auxiliar.end(); ++it)
+        this->_lista_prioridade_distancias.push_back(it->first);
+}
 Cliente::~Cliente(){}
 
 
@@ -64,10 +87,6 @@ void Loja::Imprimir(){
     cout << endl;
 }
 
-// Função auxiliar para ordenar pelo segundo elemento
-bool sortbysec(const pair<int,float> &a, const pair<int,float> &b){
-    return (a.second < b.second);
-}
 // void ordenarPorId(pair<int,float> &it, pair<int,float> aux){
 //     pair<int,float> temp = it;
 //     it = aux;
@@ -96,6 +115,10 @@ void Loja::CriarListaPrioridade(vector<pair<int, float>> lista){
     // }
     
     this->_lista_prioridade = lista;
+}
+
+pair<int,int> Loja::GetLocalizacao(){
+    return make_pair(_x, _y);
 }
 
 Loja::~Loja(){}

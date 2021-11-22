@@ -31,6 +31,15 @@ int main(){
     for(int i = 0; i < m; i++)
         lojas[i].CriarListaPrioridade(lista_auxiliar);
 
+    // Obtenha a localização de cada loja
+    vector<pair<int,int>> lista_localizacao_lojas;
+    for(int i = 0; i < m; i++)
+        lista_localizacao_lojas.push_back(lojas[i].GetLocalizacao());
+
+    // Cria a lista de prioridade por distância
+    for(int i = 0; i < n; i++)
+       clientes[i].CriarListaPrioridade(lista_localizacao_lojas);
+
     for(int i = 0; i < m; i++)
         lojas[i].Imprimir();
 

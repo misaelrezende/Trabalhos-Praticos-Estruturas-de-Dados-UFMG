@@ -11,6 +11,7 @@ using namespace std;
 class Cliente{
     private:
         int _id, _idade, _x, _y;
+        vector<int> _lista_prioridade_distancias;
         float _ticket;
         string _estado_de_origem, _tipo_pgto;
     
@@ -28,6 +29,8 @@ class Cliente{
         int getScoreTipoPagamento(string);
         float GetTicket();
         void CalcularTicket();
+        int CalcularDistancia(pair<int,int>);
+        void CriarListaPrioridade(vector<pair<int,int>>);
         ~Cliente();
 };
 
@@ -44,6 +47,7 @@ class Loja{
         void setId(int);
         void setEstoque(int);
         void setLocalizacao(int, int);
+        pair<int,int> GetLocalizacao();
         void CriarListaPrioridade(vector<pair<int, float>>);
         ~Loja();
 };
