@@ -1,4 +1,4 @@
-#include "Biblioteca/biblioteca.cpp"
+#include "Biblioteca/MinhaBiblioteca.hpp"
 
 int main(){
     int N, M, m, n;

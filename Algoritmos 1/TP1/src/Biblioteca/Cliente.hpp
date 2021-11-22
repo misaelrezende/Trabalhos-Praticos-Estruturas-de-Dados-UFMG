@@ -1,5 +1,5 @@
-#ifndef BIBLIOTECA_H
-#define BIBLIOTECA_H
+#ifndef CLIENTE_H
+#define CLIENTE_H
 
 #include <iostream>
 #include <cstring>
@@ -32,24 +32,6 @@ class Cliente{
         int CalcularDistancia(pair<int,int>);
         void CriarListaPrioridade(vector<pair<int,int>>);
         ~Cliente();
-};
-
-class Loja{
-    private:
-        int _id, _estoque, _x, _y;
-        vector<pair<int, float>> _lista_prioridade;
-
-    public:
-        Loja();
-        Loja(int, int, int, int);
-
-        void Imprimir();
-        void setId(int);
-        void setEstoque(int);
-        void setLocalizacao(int, int);
-        pair<int,int> GetLocalizacao();
-        void CriarListaPrioridade(vector<pair<int, float>>);
-        ~Loja();
 };
 
 #endif
