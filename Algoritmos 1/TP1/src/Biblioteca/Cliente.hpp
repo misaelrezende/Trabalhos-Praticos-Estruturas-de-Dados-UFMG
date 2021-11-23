@@ -11,11 +11,11 @@ using namespace std;
 class Cliente{
     private:
         int _id, _idade, _x, _y;
-        vector<int> _lista_prioridade_distancias;
         float _ticket;
         string _estado_de_origem, _tipo_pgto;
     
     public:
+        vector<int> _lista_prioridade_distancias; // lista de prioridade (proximidade) para cada cliente
         Cliente();
         Cliente(int, int, string, string, int, int);
 

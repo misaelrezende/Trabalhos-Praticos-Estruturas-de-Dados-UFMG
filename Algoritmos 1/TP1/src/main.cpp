@@ -1,7 +1,7 @@
-#include "Biblioteca/MinhaBiblioteca.hpp"
+#include "Biblioteca/MinhaBiblioteca.cpp"
 
 int main(){
-    int N, M, m, n;
+    int N, M, m, n, capacidade_total = 0;
     scanf("%d %d", &N, &M);
     scanf("%d", &m);
     Loja *lojas = new Loja[m];
@@ -10,6 +10,7 @@ int main(){
     for(int i = 0; i < m; i++){
         scanf("%d %d %d", &estoque, &x, &y);
         lojas[i] = Loja(i, estoque, x, y);
+        capacidade_total += estoque;
     }
 
     scanf("%d", &n);
@@ -40,11 +41,13 @@ int main(){
     for(int i = 0; i < n; i++)
        clientes[i].CriarListaPrioridade(lista_localizacao_lojas);
 
-    for(int i = 0; i < m; i++)
-        lojas[i].Imprimir();
+    // for(int i = 0; i < m; i++)
+    //     lojas[i].Imprimir();
 
-    for(int i = 0; i < n; i++)
-        clientes[i].Imprimir();
+    // for(int i = 0; i < n; i++)
+    //     clientes[i].Imprimir();
+
+    EmparelhamentoEstavel(m, n, capacidade_total, lojas, clientes);
     
     return 0;
 }

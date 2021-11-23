@@ -11,9 +11,9 @@ using namespace std;
 class Loja{
     private:
         int _id, _estoque, _x, _y;
-        vector<pair<int, float>> _lista_prioridade;
 
     public:
+        vector<pair<int, float>> _lista_prioridade;
         Loja();
         Loja(int, int, int, int);
 
