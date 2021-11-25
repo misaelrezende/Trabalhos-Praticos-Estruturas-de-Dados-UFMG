@@ -20,11 +20,6 @@ class Cliente{
         Cliente();
         Cliente(int, int, string, string, int, int);
 
-        void setId(int);
-        void setIdade(int);
-        void setLocalizacao(int, int);
-        void setEstado(char*);
-        void setTipoPgto(char*);
         int getScoreEstado(string);
         int getScoreTipoPagamento(string);
         float GetTicket();

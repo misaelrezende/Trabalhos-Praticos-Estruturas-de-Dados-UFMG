@@ -38,8 +38,6 @@ bool Loja::TemEstoque(){
 }
 
 void Loja::AgendarCliente(int id){
-    // Checa se tem estoque
-    // Agenda o cliente
     // cout<<"Loja::tem estoque (antes): "<<this->TemEstoque()<<endl;
     for(int i = 0; i < this->_estoque; i++){
         if(this->_agendamentos[i] == -1){
@@ -100,33 +98,8 @@ void Loja::Imprimir(){
 
 }
 
-// void ordenarPorId(pair<int,float> &it, pair<int,float> aux){
-//     pair<int,float> temp = it;
-//     it = aux;
-//     aux = temp;
-// }
-
 void Loja::CriarListaPrioridade(vector<pair<int, float>> lista){
-    stable_sort(lista.begin(), lista.end(), Lojasortbysec);
-    // pair<int, float> anterior = lista[0];
-    // for (vector<pair<int, float>>::iterator it = lista.begin(); it != lista.end(); ++it){
-    //     if(it->second == anterior.second){
-    //         if(it->first > anterior.first){
-    //             ordenarPorId(*it, anterior);
-    //         }
-    //     }
-    // }
-    // Faz o desempate por ID
-    // for(int tamanho = lista.size(), i = 1; i < tamanho; i++){
-    //     if(lista[i].second == anterior.second)
-    //         if(lista[i].first > anterior.first){
-    //             pair<int, float> temp = lista[i];
-    //             lista[i] = anterior;
-    //             lista[i-1] = temp;
-    //         }
-    //     anterior = lista[i];
-    // }
-    
+    stable_sort(lista.begin(), lista.end(), Lojasortbysec);   
     this->_lista_prioridade = lista;
 }
 
