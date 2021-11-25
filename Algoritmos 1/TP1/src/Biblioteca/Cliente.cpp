@@ -68,4 +68,17 @@ void Cliente::CriarListaPrioridade(vector<pair<int,int>> lista){
     for(vector<pair<int,int>>::iterator it = lista_auxiliar.begin(); it != lista_auxiliar.end(); ++it)
         this->_lista_prioridade_distancias.push_back(it->first);
 }
+
+int Cliente::GetClienteAgendado(){
+    return this->_cliente_agendado;
+}
+
+void Cliente::SetClienteAgendado(int id){
+    this->_cliente_agendado = id;
+}
+
+void Cliente::TrocaClienteAgendado(int id){
+    this->SetClienteAgendado(id);
+}
+
 Cliente::~Cliente(){}

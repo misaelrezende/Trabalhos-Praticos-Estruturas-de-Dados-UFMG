@@ -41,17 +41,13 @@ int main(){
     for(int i = 0; i < n; i++)
        clientes[i].CriarListaPrioridade(lista_localizacao_lojas);
 
-    // for(int i = 0; i < m; i++)
-    //     lojas[i].Imprimir();
-
     // for(int i = 0; i < n; i++)
     //     clientes[i].Imprimir();
 
     EmparelhamentoEstavel(m, n, capacidade_total, lojas, clientes);
     
+    for(int i = 0; i < m; i++)
+        lojas[i].Imprimir();
+
     return 0;
 }
-
-/*
-- 
-*/
