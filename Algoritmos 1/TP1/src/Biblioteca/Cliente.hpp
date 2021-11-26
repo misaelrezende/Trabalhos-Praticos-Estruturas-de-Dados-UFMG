@@ -25,11 +25,10 @@ class Cliente{
         float GetTicket();
         int GetClienteAgendado();
         void SetClienteAgendado(int);
-        void TrocaClienteAgendado(int);
         void Imprimir();
         void CalcularTicket();
         int CalcularDistancia(pair<int,int>);
-        void CriarListaPrioridade(vector<pair<int,int>>);
+        void CriarListaPrioridade(vector<pair<int,pair<int, int>>>);
         ~Cliente();
 };
 

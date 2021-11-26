@@ -57,11 +57,10 @@ int Cliente::CalcularDistancia(pair<int,int> localizacao){
     int distancia = max( abs(this->_x - localizacao.first), abs(this->_y - localizacao.second) ) - 1;
     return distancia;
 }
-void Cliente::CriarListaPrioridade(vector<pair<int,int>> lista){   
+void Cliente::CriarListaPrioridade(vector<pair<int,pair<int, int>>> lista){   
     vector<pair<int,int>> lista_auxiliar;
-    int i = 0;
-    for(vector<pair<int,int>>::iterator it = lista.begin(); it != lista.end(); ++it, i++)
-        lista_auxiliar.push_back( make_pair(i, CalcularDistancia(*it)) );
+    for(vector<pair<int,pair<int, int>>>::iterator it = lista.begin(); it != lista.end(); ++it)
+        lista_auxiliar.push_back( make_pair(it->first, CalcularDistancia(it->second)) );
 
     stable_sort(lista_auxiliar.begin(), lista_auxiliar.end(), Clientesortbysec);
 
@@ -75,10 +74,6 @@ int Cliente::GetClienteAgendado(){
 
 void Cliente::SetClienteAgendado(int id){
     this->_cliente_agendado = id;
-}
-
-void Cliente::TrocaClienteAgendado(int id){
-    this->SetClienteAgendado(id);
 }
 
 Cliente::~Cliente(){}

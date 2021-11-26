@@ -99,12 +99,12 @@ void Loja::Imprimir(){
 }
 
 void Loja::CriarListaPrioridade(vector<pair<int, float>> lista){
-    stable_sort(lista.begin(), lista.end(), Lojasortbysec);   
-    this->_lista_prioridade = lista;
+    stable_sort(lista.begin(), lista.end(), Lojasortbysec);
+    this->_lista_prioridade_tickets = lista;
 }
 
 pair<int,int> Loja::GetLocalizacao(){
-    return make_pair(_x, _y);
+    return make_pair(this->_x, this->_y);
 }
 
 Loja::~Loja(){}

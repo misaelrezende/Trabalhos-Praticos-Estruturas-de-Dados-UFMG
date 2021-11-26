@@ -20,8 +20,26 @@ bool clienteAtualPrefereQuem(Loja* lojas, Cliente* clientes, int c, int l, int l
 
         // Se l vem antes de l1 na lista de c, então libere o agendamento atual de c
         // e agora agende o cliente c a loja l
-        if( !QualVemPrimeiro(clientes[c]._lista_prioridade_distancias, l, l1) )
-            return false;
+        if( !QualVemPrimeiro(clientes[c]._lista_prioridade_distancias, l, l1) ){
+            // return false;
+            // Se a loja a ser trocada tem estoque
+            if(lojas[l].TemEstoque() == true)
+                return false;
+            else{
+                // Se a loja, mesmo sem estoque disponı́vel, tiver um agendamento
+                // de algum cliente q com ticket menor que c.                
+                // Olhe todos clientes agendados de l, se houver algum com ticket
+                // menor, libere esse cliente da lista de agendados de l
+                for(vector<int>::iterator it = lojas[l]._agendamentos.begin(); it != lojas[l]._agendamentos.end(); ++it){
+                    if(clientes[*it].GetTicket() < clientes[c].GetTicket()){
+                        lojas[l].LiberarCliente(*it);
+                        clientes[*it].SetClienteAgendado(-1);
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
     }
 }
 
@@ -44,7 +62,7 @@ void EmparelhamentoEstavel(int num_lojas, int num_clientes, int capacidade_total
         // ----->>>> OBSERVAR QUE CADA LOJA TEM UM ESTOQUE DEFINIDO <<<<------
         for (int i = 0; i < num_clientes && lojas[l].TemEstoque() == true; i++){
             cout<<"l:"<<l<<" i: "<<i<<" tem estoque: "<<lojas[l].TemEstoque()<<flush<<endl;
-            int c = lojas[l]._lista_prioridade[i].first; // um cliente (id) da lista de preferencias de l
+            int c = lojas[l]._lista_prioridade_tickets[i].first; // um cliente (id) da lista de preferencias de l
             cout << "c: " << c << flush << endl;
             // O cliente da lista de preferência está disponível (?). Então c é agendado para l.
             if( clientes[c].GetClienteAgendado() == -1 ){
@@ -64,11 +82,10 @@ void EmparelhamentoEstavel(int num_lojas, int num_clientes, int capacidade_total
                 if( clienteAtualPrefereQuem(lojas, clientes, c, l, l1, num_lojas) == false ){
                     lojas[l].AgendarCliente(c);
                     lojas[l1].LiberarCliente(c);
-                    clientes[c].TrocaClienteAgendado(l);
+                    clientes[c].SetClienteAgendado(l);
                     cout << "trocou cliente c: " << c << flush << endl;
                 }
             }
-            cout << "tem estoque: " << lojas[l].TemEstoque() << endl << endl;
 
         }
 
