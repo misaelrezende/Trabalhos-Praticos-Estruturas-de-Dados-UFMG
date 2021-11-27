@@ -18,7 +18,6 @@ Cliente::Cliente(int id, int idade, string estado_de_origem, string tipo_pgto, i
 }
 void Cliente::Imprimir(){
     // cout << this->_id << " " << this->_idade << " " << this->_estado_de_origem << " " << this->_tipo_pgto << " " << this->_x << " " << this->_y << " ticket: " << this->_ticket << endl;
-    cout << this->_id << ":";
     for(vector<int>::iterator it = this->_lista_prioridade_distancias.begin(); it != _lista_prioridade_distancias.end(); ++it)
         cout << " " << *it;
     cout << endl;

@@ -12,9 +12,9 @@ class Loja{
     private:
         int _id, _estoque, _x, _y;
         bool _tem_estoque = true;
+        vector<int> _agendamentos;
 
     public:
-        vector<int> _agendamentos;
         vector<pair<int, float>> _lista_prioridade_tickets;
         Loja();
         Loja(int, int, int, int);

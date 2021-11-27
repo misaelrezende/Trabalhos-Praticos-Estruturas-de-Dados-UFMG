@@ -18,11 +18,9 @@ Loja::Loja(int id, int estoque, int x, int y){
     this->_y = y;
 
     InicializarAgendamentos();
-    // cout<<"tam _agendamentos: "<<this->_agendamentos.size() << endl;
 }
 void Loja::InicializarAgendamentos(){
     for (int i = 0; i < this->_estoque; i++)
-        // this->_agendamentos[i] = -1;
         this->_agendamentos.push_back(-1);
 }
 int Loja::GetId(){
@@ -38,7 +36,6 @@ bool Loja::TemEstoque(){
 }
 
 void Loja::AgendarCliente(int id){
-    // cout<<"Loja::tem estoque (antes): "<<this->TemEstoque()<<endl;
     for(int i = 0; i < this->_estoque; i++){
         if(this->_agendamentos[i] == -1){
             this->_agendamentos[i] = id;
@@ -46,15 +43,11 @@ void Loja::AgendarCliente(int id){
         }
     }
     // seta _tem_estoque para false se acabou o estoque
-    // for(int i = 0; i < this->_estoque; i++)
-    //     cout << this->_agendamentos[i] << " ";
-    // cout<<endl;
     bool aux = false;
     for(int i = 0; i < this->_estoque; i++)
         if(this->_agendamentos[i] == -1)
             aux = true;
     this->_tem_estoque = aux;
-    // cout<<"Loja::tem estoque (depois): "<<this->TemEstoque()<<endl;
 }
 
 void Loja::LiberarCliente(int id){

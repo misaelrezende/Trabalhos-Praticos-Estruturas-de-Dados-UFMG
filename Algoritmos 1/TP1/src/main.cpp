@@ -1,5 +1,8 @@
 #include "Biblioteca/MinhaBiblioteca.cpp"
-
+/*
+    Trabalho prático não concluído
+    Algoritmo de agendamentos com erros de lógica
+*/
 int main(){
     int N, M, m, n, capacidade_total = 0;
     scanf("%d %d", &N, &M);
