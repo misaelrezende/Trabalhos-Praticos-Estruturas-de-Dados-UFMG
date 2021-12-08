@@ -2,7 +2,7 @@
 #define GRAFO_H
 
 #include <iostream>
-#include <vector>
+#include <cmath>
 using namespace std;
 
 struct {
@@ -13,11 +13,12 @@ class Grafo{
     private:
         int _n;
         Vertice* _vertices;
-        vector<vector<int>> grafo;
+        float** _distancias;
 
     public:
         Grafo(/* args */);
         Grafo(Vertice*, int);
+        void CalcularDistancias();
         void Imprimir();
         ~Grafo();
 };
