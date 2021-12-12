@@ -11,21 +11,18 @@ struct {
 
 class Grafo{
     private:
-        int _n;
+        int _num_vertices;
         Vertice* _vertices;
-        float** _distancias;
+        float** _grafo_com_pesos;
 
     public:
         Grafo(/* args */);
         Grafo(Vertice*, int);
+        int GetNumVertices();
+        float** GetGrafo();
         void CalcularDistancias();
         void Imprimir();
         ~Grafo();
 };
 
-/*
-- Para calcular custo, tenho que checar a distância de um vértice para todos os outros
-  - Posso salvar as distâncias em um vetor
-- Posso criar uma matriz de adjacências com as distâncias
-*/
 #endif
