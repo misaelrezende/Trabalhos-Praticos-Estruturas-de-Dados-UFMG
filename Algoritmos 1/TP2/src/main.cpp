@@ -1,4 +1,5 @@
 #include "Biblioteca/Grafo.cpp"
+#include "Biblioteca/Biblioteca.cpp"
 
 int main(){
     int N, K, D, M, C;
@@ -14,7 +15,9 @@ int main(){
     }
 
     Grafo grafo(vertices, N);
-    grafo.Imprimir();
+    // grafo.Imprimir();
+    int* vertices_raiz;
+    vertices_raiz = AlgoritmoPrim(grafo.GetGrafo(), grafo.GetNumVertices());
 
     return 0;
 }

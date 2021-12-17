@@ -1,4 +1,5 @@
 #include "Grafo.hpp"
+#include <iomanip>
 
 Grafo::Grafo(Vertice* entrada, int n){
     this->_vertices = entrada;
@@ -31,13 +32,13 @@ void Grafo::CalcularDistancias(){
         }
     }
 
-    // for(int i = 0; i < this->_num_vertices; i++){
-    //     cout<<"id: "<<i<<"-> ";
-    //     for(int j = 0; j < this->_num_vertices; j++)
-    //         cout<<this->_grafo_com_pesos[i][j]<<" ";
-    //     cout<<endl;
-    // }
-    // cout<<endl<<endl;
+    for(int i = 0; i < this->_num_vertices; i++){
+        cout<<"id: "<<i<<"-> ";
+        for(int j = 0; j < this->_num_vertices; j++)
+            cout<<setw(8)<<this->_grafo_com_pesos[i][j]<<" ";
+        cout<<endl;
+    }
+    cout<<endl<<endl;
 }
 
 void Grafo::Imprimir(){
