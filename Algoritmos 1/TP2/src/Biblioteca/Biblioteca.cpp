@@ -91,12 +91,12 @@ vector<pair<pair<int,int>,pair<float,bool>>>* ObterMaioresCustos(float** grafo, 
 	return agm_ordenada;
 }
 
-void AlocarDrone(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, int* drones_alocados, int num_drones, int* FLAG){
+void AlocarDrone(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, int* drones_alocados, int num_drones, int* lojas_conectadas){
 	cout<<"Alocar Drones"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = agm_ordenada->begin(); it != agm_ordenada->end(); ++it){
 		if(it->second.second == false && (*drones_alocados) < num_drones){
 			cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-			it->second.second = true; *FLAG += 2;
+			it->second.second = true; *lojas_conectadas += 1;
 			// if((*drones_alocados) + 1 == num_drones){
 			// 	*drones_alocados += 1;
 			// 	break;
@@ -106,25 +106,25 @@ void AlocarDrone(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, 
 	}
 }
 
-void AlocarMoto(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, float* km_motos, int limite_km_moto, int* FLAG){
+void AlocarMoto(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, float* km_motos, int limite_km_moto, int* lojas_conectadas){
 	cout<<"Alocar Motos"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = agm_ordenada->begin(); it != agm_ordenada->end(); ++it){
 		if(it->second.second == false){
 			if(limite_km_moto >= it->second.first){
 				cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-				it->second.second = true; *FLAG += 2;
+				it->second.second = true; *lojas_conectadas += 1;
 				*km_motos += it->second.first;
 			}
 		}
 	}
 }
 
-void AlocarCaminhao(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, float* km_caminhoes, int* FLAG){
+void AlocarCaminhao(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, float* km_caminhoes, int* lojas_conectadas){
 	cout<<"Alocar Caminhoes"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = agm_ordenada->begin(); it != agm_ordenada->end(); ++it){
 		if(it->second.second == false){
 			cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-			it->second.second = true; *FLAG += 2;
+			it->second.second = true; *lojas_conectadas += 1;
 			*km_caminhoes += it->second.first;
 		}
 	}
@@ -139,46 +139,38 @@ void MinimizarCustoTrajeto(float** grafo, int* vertices_raiz, int num_lojas, int
 		vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada;
 		agm_ordenada = ObterMaioresCustos(grafo, vertices_raiz, num_lojas);
 
-		int drones_alocados = 0, FLAG = 0;
+		int drones_alocados = 0, lojas_conectadas = 0;
 		float km_motos = 0, km_caminhoes;
 
 		// Alocar todos drones
 		if(num_drones >= 2){
 			// for(int i = 0; i < ; i++){
 				// agm_ordenada[i]->second->second = true;
-			AlocarDrone(agm_ordenada, &drones_alocados, num_drones, &FLAG);
+			AlocarDrone(agm_ordenada, &drones_alocados, num_drones, &lojas_conectadas);
 
 			// Falta mais lojas para alocar
-			if(FLAG <= num_lojas){
-				if(custo_moto <= custo_caminhao)
-					AlocarMoto(agm_ordenada, &km_motos, limite_km_moto, &FLAG);
-				else
-					AlocarCaminhao(agm_ordenada, &km_caminhoes, &FLAG);
-				// if(FLAG <= num_lojas)
-				AlocarCaminhao(agm_ordenada, &km_caminhoes, &FLAG);
+			if(lojas_conectadas < num_lojas){
+				if(custo_moto <= custo_caminhao){
+					AlocarMoto(agm_ordenada, &km_motos, limite_km_moto, &lojas_conectadas);
+					if(lojas_conectadas < num_lojas)
+						AlocarCaminhao(agm_ordenada, &km_caminhoes, &lojas_conectadas);
+				}else
+					AlocarCaminhao(agm_ordenada, &km_caminhoes, &lojas_conectadas);
 			}
 			
 		}else{
-			if(custo_moto <= custo_caminhao)
-				AlocarMoto(agm_ordenada, &km_motos, limite_km_moto, &FLAG);
+			if(custo_moto <= custo_caminhao){
+				AlocarMoto(agm_ordenada, &km_motos, limite_km_moto, &lojas_conectadas);
+				if(lojas_conectadas < num_lojas)
+					AlocarCaminhao(agm_ordenada, &km_caminhoes, &lojas_conectadas);
+			}
 			else
-				AlocarCaminhao(agm_ordenada, &km_caminhoes, &FLAG);
-			// if(FLAG <= num_lojas)
-			AlocarCaminhao(agm_ordenada, &km_caminhoes, &FLAG);
+				AlocarCaminhao(agm_ordenada, &km_caminhoes, &lojas_conectadas);
 		}
 
-		// Colocar o restante p/ motos e caminhões --> Limite diário de KM motos
-		// Se custo_moto for > custo_caminhao, prefira caminhão
-
+		// Imprime custo total da utilização de motos e caminhões
 		// cout<<custo_moto*km_motos<<" "<<custo_caminhao*km_caminhoes; // CORRETO
 		cout<<endl<<custo_moto*km_motos<<" "<<custo_caminhao*km_caminhoes<<endl; // ERRADO
 	}
 
 }
-
-/*
-    # Depois de encontrar uma AGM:
-    - Checar se é possível percorrer tudo com drones
-        - Se não, setar os maiores caminhos aos drones
-        - Procurar os menores caminhos para motos e caminhões
-*/
