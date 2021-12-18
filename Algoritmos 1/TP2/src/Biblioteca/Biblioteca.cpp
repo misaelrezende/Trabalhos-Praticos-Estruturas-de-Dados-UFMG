@@ -1,4 +1,6 @@
-#include "Grafo.hpp"
+#include "Grafo.cpp"
+#include <vector>
+#include <algorithm>
 
 #define INFINITO  100000
 
@@ -58,6 +60,49 @@ int* AlgoritmoPrim(float** grafo, int num_vertices){
 	}
 
 	return vertices_raiz;
+}
+
+// Função auxiliar para ordenar pelo segundo elemento (custo)
+bool OrdenarPorCusto(pair< pair<int,int>, pair<float, bool>> a, pair< pair<int,int>, pair<float, bool>> b){
+	return (a.second.first > b.second.first);
+}
+
+// Ordena a AGM pelo valor dos custos
+vector<pair<pair<int,int>,pair<float,bool>>>* ObterMaioresCustos(float** grafo, int* vertices_raiz, int num_vertices){
+
+	// < <loja1, loja2>, <custo, ocupado?> >
+	vector< pair< pair<int,int>, pair<float,bool> > >* agm_ordenada = new vector<pair<pair<int,int>,pair<float,bool>>>;
+	for(int i = 1; i < num_vertices; i++){
+		agm_ordenada->push_back(
+			make_pair(
+				make_pair(vertices_raiz[i], i),
+				make_pair(grafo[i][vertices_raiz[i]], false)
+				)
+						  );
+	}
+
+	sort(agm_ordenada->begin(), agm_ordenada->end(), OrdenarPorCusto);
+	// cout<<fixed<<setprecision(3);
+	// cout<<"Ordenado:"<<endl;
+	// for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = agm_ordenada->begin(); it != agm_ordenada->end(); ++it){
+	// 	cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
+	// }
+	return agm_ordenada;
+}
+
+void MinimizarCustoTrajeto(float** grafo, int* vertices_raiz, int num_lojas, int num_drones, int custo_moto, int custo_caminhao){
+	cout<<fixed<<setprecision(3);
+	if(num_drones == num_lojas){
+		cout << 0.000 << " " << 0.000; // Custo zero para motos e caminhões
+	}else{
+		// Obter maiores custos
+		vector< pair<pair<int,int>,pair<float,bool>> >* agm_ordenada;
+		agm_ordenada = ObterMaioresCustos(grafo, vertices_raiz, num_lojas);
+		// Colocar drones neles
+		// Colocar o restante p/ motos e caminhões --> Limite diário de KM motos
+		// Se custo_moto for > custo_caminhao, prefira caminhão
+	}
+
 }
 
 /*

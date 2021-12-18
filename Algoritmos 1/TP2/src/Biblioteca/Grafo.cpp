@@ -1,5 +1,4 @@
 #include "Grafo.hpp"
-#include <iomanip>
 
 Grafo::Grafo(Vertice* entrada, int n){
     this->_vertices = entrada;
