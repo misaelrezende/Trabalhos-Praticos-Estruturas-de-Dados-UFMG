@@ -18,6 +18,6 @@ int main(){
     int* vertices_raiz;
     vertices_raiz = AlgoritmoPrim(grafo.GetGrafo(), grafo.GetNumVertices());
 
-    MinimizarCustoTrajeto(grafo.GetGrafo(), vertices_raiz, N, D, M, C);
+    MinimizarCustoTrajeto(grafo.GetGrafo(), vertices_raiz, N, K, D, M, C);
     return 0;
 }

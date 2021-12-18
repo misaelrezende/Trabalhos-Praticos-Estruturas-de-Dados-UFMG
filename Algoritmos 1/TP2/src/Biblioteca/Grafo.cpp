@@ -37,7 +37,7 @@ void Grafo::CalcularDistancias(){
             cout<<setw(8)<<this->_grafo_com_pesos[i][j]<<" ";
         cout<<endl;
     }
-    cout<<endl<<endl;
+    cout<<endl;
 }
 
 void Grafo::Imprimir(){
