@@ -1,8 +1,15 @@
-#include "Grafo.cpp"
-#include <vector>
-#include <algorithm>
+#include "MinhaBiblioteca.hpp"
 
 #define INFINITO  100000
+
+MinhaBiblioteca::MinhaBiblioteca(float** grafo, int num_lojas, int limite_km_moto, int num_drones, int custo_moto, int custo_caminhao){
+	_grafo = grafo;
+	_num_lojas = num_lojas;
+	_limite_km_moto = limite_km_moto;
+	_num_drones = num_drones;
+	_custo_moto = custo_moto;
+	_custo_caminhao = custo_caminhao;
+}
 
 // Encontra o vértice com menor valor de chave, do set de vértices fora da AGM
 int EncontrarMenorPeso(float* chave, bool* corte_agm, int num_vertices){
@@ -174,3 +181,5 @@ void MinimizarCustoTrajeto(float** grafo, int* vertices_raiz, int num_lojas, int
 	}
 
 }
+
+MinhaBiblioteca::~MinhaBiblioteca(){}

@@ -1,4 +1,4 @@
-#include "Biblioteca/Biblioteca.cpp"
+#include "Biblioteca/MinhaBiblioteca.cpp"
 
 int main(){
     int N, K, D, M, C;
@@ -19,5 +19,8 @@ int main(){
     vertices_raiz = AlgoritmoPrim(grafo.GetGrafo(), grafo.GetNumVertices());
 
     MinimizarCustoTrajeto(grafo.GetGrafo(), vertices_raiz, N, K, D, M, C);
+
+    MinhaBiblioteca(grafo.GetGrafo(), N, K, D, M, C);
+
     return 0;
 }
