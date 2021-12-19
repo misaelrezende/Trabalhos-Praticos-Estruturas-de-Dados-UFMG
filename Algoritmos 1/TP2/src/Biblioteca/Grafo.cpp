@@ -13,7 +13,7 @@ float ** Grafo::GetGrafo(){
     return this->_grafo_com_pesos;
 }
 
-// Calcula distâncias de cada loja as outras lojas
+// Calcula distâncias de cada loja as outras lojas - O(n^2)
 void Grafo::CalcularDistancias(){
     this->_grafo_com_pesos = new float*[this->_num_vertices];
     for(int i = 0; i < this->_num_vertices; i++)

@@ -17,7 +17,7 @@ int MinhaBiblioteca::EncontrarMenorPeso(float* chave, bool* corte_agm){
 	float menor = INFINITO;
 	int menor_indice = 0;
 
-	for(int v = 0; v < _num_lojas; v++){
+	for(int v = 0; v < _num_lojas; v++){ // O(n)
 		if(corte_agm[v] == false && chave[v] < menor){
 			menor = chave[v];
 			menor_indice = v;
@@ -26,7 +26,7 @@ int MinhaBiblioteca::EncontrarMenorPeso(float* chave, bool* corte_agm){
 	return menor_indice;
 }
 
-// Encontra a árvore geradora mínima (AGM) com menor custo
+// Encontra a árvore geradora mínima (AGM) com menor custo - O(n^2)
 void MinhaBiblioteca::AlgoritmoPrim(){
 	// Armazena vertices raiz da AGM a ser construída
 	int* vertices_raiz = new int[_num_lojas];
@@ -47,7 +47,7 @@ void MinhaBiblioteca::AlgoritmoPrim(){
 	chave[0] = 0;
 	vertices_raiz[0] = -1;
 
-	for(int i = 0; i < _num_lojas - 1; i++){
+	for(int i = 0; i < _num_lojas - 1; i++){ // O(n)
 		int m = EncontrarMenorPeso(chave, corte_agm);
 
 		// Adicione o vértice escolhido ao set da AGM
@@ -55,7 +55,7 @@ void MinhaBiblioteca::AlgoritmoPrim(){
 
 		// Atualize chave/valor e índice vertices_raiz dos vértices adj ao vértice escolhido
 		// Considere apenas vértices fora da AGM
-		for(int v = 0; v < _num_lojas; v++)
+		for(int v = 0; v < _num_lojas; v++) // O(n)
 			// grafo[m][v] é !=0 apenas para vértices adjacentes de m
 			// corte_agm[v] é falso para vertices fora da AGM
 			// Atualize a chave apenas se grafo[m][v] é menor que chave[v]
@@ -73,12 +73,12 @@ bool OrdenarPorCusto(pair< pair<int,int>, pair<float, bool>> a, pair< pair<int,i
 	return (a.second.first > b.second.first);
 }
 
-// Ordena a AGM pelo valor dos custos
+// Ordena a AGM pelo valor dos custos - O(n)
 void MinhaBiblioteca::ObterMaioresCustos(){
 
 	// < <loja1, loja2>, <custo, ocupado?> >
 	vector< pair< pair<int,int>, pair<float,bool> > >* agm_ordenada = new vector<pair<pair<int,int>,pair<float,bool>>>;
-	for(int i = 1; i < _num_lojas; i++){
+	for(int i = 1; i < _num_lojas; i++){ // O(n)
 		agm_ordenada->push_back(
 			make_pair(
 				make_pair(_vertices_raiz_agm[i], i),
@@ -87,7 +87,7 @@ void MinhaBiblioteca::ObterMaioresCustos(){
 						  );
 	}
 
-	sort(agm_ordenada->begin(), agm_ordenada->end(), OrdenarPorCusto);
+	sort(agm_ordenada->begin(), agm_ordenada->end(), OrdenarPorCusto); // O(n log n)
 	cout<<fixed<<setprecision(3);
 	cout<<"Ordenado:"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = agm_ordenada->begin(); it != agm_ordenada->end(); ++it){
@@ -101,7 +101,7 @@ void MinhaBiblioteca::ObterMaioresCustos(){
 // Aloca drones as lojas
 void MinhaBiblioteca::AlocarDrone(int* drones_alocados, int* lojas_conectadas){
 	cout<<"Alocar Drones"<<endl;
-	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
+	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){ // O(n)
 		if(it->second.second == false && *drones_alocados < _num_drones){
 			cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
 			it->second.second = true; (*lojas_conectadas) += 1;
@@ -117,7 +117,7 @@ void MinhaBiblioteca::AlocarDrone(int* drones_alocados, int* lojas_conectadas){
 // Aloca motos as lojas
 void MinhaBiblioteca::AlocarMoto(float* km_motos, int* lojas_conectadas){
 	cout<<"Alocar Motos"<<endl;
-	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
+	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){ // O(n)
 		if(it->second.second == false){
 			if(_limite_km_moto >= it->second.first){
 				cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
@@ -131,7 +131,7 @@ void MinhaBiblioteca::AlocarMoto(float* km_motos, int* lojas_conectadas){
 // Aloca caminhões as lojas
 void MinhaBiblioteca::AlocarCaminhao(float* km_caminhoes, int* lojas_conectadas){
 	cout<<"Alocar Caminhoes"<<endl;
-	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
+	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){ // O(n)
 		if(it->second.second == false){
 			cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
 			it->second.second = true; (*lojas_conectadas) += 1;
@@ -140,7 +140,7 @@ void MinhaBiblioteca::AlocarCaminhao(float* km_caminhoes, int* lojas_conectadas)
 	}
 }
 
-// Encontra a forma eficiente de distribuir os produtos
+// Encontra a forma eficiente de distribuir os produtos - O(n)
 void MinhaBiblioteca::MinimizarCustoTrajeto(){
 	cout<<fixed<<setprecision(3);
 
@@ -148,7 +148,7 @@ void MinhaBiblioteca::MinimizarCustoTrajeto(){
 		cout << 0.000 << " " << 0.000; // Custo zero para motos e caminhões
 	}else{
 		// Obter maiores custos
-		ObterMaioresCustos();
+		ObterMaioresCustos(); // O(n)
 
 		int drones_alocados = 0, lojas_conectadas = 0;
 		float km_motos = 0, km_caminhoes = 0;
