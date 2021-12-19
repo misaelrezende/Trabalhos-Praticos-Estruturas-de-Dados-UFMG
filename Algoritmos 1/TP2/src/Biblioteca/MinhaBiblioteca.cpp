@@ -98,41 +98,41 @@ void MinhaBiblioteca::ObterMaioresCustos(){
 	_agm_ordenada = agm_ordenada;
 }
 
-void MinhaBiblioteca::AlocarDrone(){
+void MinhaBiblioteca::AlocarDrone(int* drones_alocados, int* lojas_conectadas){
 	cout<<"Alocar Drones"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
-		if(it->second.second == false && _drones_alocados < _num_drones){
+		if(it->second.second == false && *drones_alocados < _num_drones){
 			cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-			it->second.second = true; _lojas_conectadas += 1;
+			it->second.second = true; (*lojas_conectadas) += 1;
 			// if((*drones_alocados) + 1 == num_drones){
 			// 	*drones_alocados += 1;
 			// 	break;
 			// }
-			_drones_alocados += 2;
+			(*drones_alocados) += 2;
 		}
 	}
 }
 
-void MinhaBiblioteca::AlocarMoto(){
+void MinhaBiblioteca::AlocarMoto(float* km_motos, int* lojas_conectadas){
 	cout<<"Alocar Motos"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
 		if(it->second.second == false){
 			if(_limite_km_moto >= it->second.first){
 				cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-				it->second.second = true; _lojas_conectadas += 1;
-				_km_motos += it->second.first;
+				it->second.second = true; (*lojas_conectadas) += 1;
+				(*km_motos) += it->second.first;
 			}
 		}
 	}
 }
 
-void MinhaBiblioteca::AlocarCaminhao(){
+void MinhaBiblioteca::AlocarCaminhao(float* km_caminhoes, int* lojas_conectadas){
 	cout<<"Alocar Caminhoes"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
 		if(it->second.second == false){
 			cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-			it->second.second = true; _lojas_conectadas += 1;
-			_km_caminhoes += it->second.first;
+			it->second.second = true; (*lojas_conectadas) += 1;
+			(*km_caminhoes) += it->second.first;
 		}
 	}
 }
@@ -145,35 +145,38 @@ void MinhaBiblioteca::MinimizarCustoTrajeto(){
 		// Obter maiores custos
 		ObterMaioresCustos();
 
+		int drones_alocados = 0, lojas_conectadas = 0;
+		float km_motos = 0, km_caminhoes = 0;
+
 		// Alocar todos drones
 		if(_num_drones >= 2){
 			// for(int i = 0; i < ; i++){
 				// agm_ordenada[i]->second->second = true;
-			AlocarDrone();
+			AlocarDrone(&drones_alocados, &lojas_conectadas);
 
 			// Falta mais lojas para alocar
-			if(_lojas_conectadas < _num_lojas){
+			if(lojas_conectadas < _num_lojas){
 				if(_custo_moto <= _custo_caminhao){
-					AlocarMoto();
-					if(_lojas_conectadas < _num_lojas)
-						AlocarCaminhao();
+					AlocarMoto(&km_motos, &lojas_conectadas);
+					if(lojas_conectadas < _num_lojas)
+						AlocarCaminhao(&km_caminhoes, &lojas_conectadas);
 				}else
-					AlocarCaminhao();
+					AlocarCaminhao(&km_caminhoes, &lojas_conectadas);
 			}
 			
 		}else{
 			if(_custo_moto <= _custo_caminhao){
-				AlocarMoto();
-				if(_lojas_conectadas < _num_lojas)
-					AlocarCaminhao();
+				AlocarMoto(&km_motos, &lojas_conectadas);
+				if(lojas_conectadas < _num_lojas)
+					AlocarCaminhao(&km_caminhoes, &lojas_conectadas);
 			}
 			else
-				AlocarCaminhao();
+				AlocarCaminhao(&km_caminhoes, &lojas_conectadas);
 		}
 
 		// Imprime custo total da utilização de motos e caminhões
-		// cout<<_custo_moto*_km_motos<<" "<<_custo_caminhao*_km_caminhoes; // CORRETO
-		cout<<endl<<_custo_moto*_km_motos<<" "<<_custo_caminhao*_km_caminhoes<<endl; // ERRADO
+		// cout<<_custo_moto*km_motos<<" "<<_custo_caminhao*km_caminhoes; // CORRETO
+		cout<<endl<<_custo_moto*km_motos<<" "<<_custo_caminhao*km_caminhoes<<endl; // ERRADO
 	}
 
 }
