@@ -15,7 +15,7 @@ MinhaBiblioteca::MinhaBiblioteca(float** grafo, int num_lojas, int limite_km_mot
 int MinhaBiblioteca::EncontrarMenorPeso(float* chave, bool* corte_agm){
 	// Inicializa o menor valor
 	float menor = INFINITO;
-	int menor_indice;
+	int menor_indice = 0;
 
 	for(int v = 0; v < _num_lojas; v++){
 		if(corte_agm[v] == false && chave[v] < menor){
@@ -43,7 +43,7 @@ void MinhaBiblioteca::AlgoritmoPrim(){
 	}
 
 	// Inicialize com um vértice arbitrário
-	// Vamos escolher o vértice 0s
+	// Vamos escolher o vértice 0
 	chave[0] = 0;
 	vertices_raiz[0] = -1;
 

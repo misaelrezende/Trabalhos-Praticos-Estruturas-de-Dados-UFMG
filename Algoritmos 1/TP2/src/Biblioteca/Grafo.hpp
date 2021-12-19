@@ -13,14 +13,16 @@ struct {
 class Grafo{
     private:
         int _num_vertices;
+        // Armazena os vertices do grafo
         Vertice* _vertices;
+        // Grafo gerado com as distâncias de cada loja
         float** _grafo_com_pesos;
 
     public:
         Grafo(Vertice*, int);
         ~Grafo();
 
-        int GetNumVertices();
+        // int GetNumVertices();
         float** GetGrafo();
         void CalcularDistancias();
         void Imprimir();

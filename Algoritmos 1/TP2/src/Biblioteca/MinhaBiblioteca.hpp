@@ -17,8 +17,8 @@ class MinhaBiblioteca{
         MinhaBiblioteca(float**,int,int,int,int,int);
         ~MinhaBiblioteca();
 
-        void AlgoritmoPrim();
         int EncontrarMenorPeso(float*,bool*);
+        void AlgoritmoPrim();
         void ObterMaioresCustos();
         void AlocarDrone(int*,int*);
         void AlocarMoto(float*,int*);
