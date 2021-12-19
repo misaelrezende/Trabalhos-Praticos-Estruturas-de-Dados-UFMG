@@ -22,7 +22,6 @@ class Grafo{
         Grafo(Vertice*, int);
         ~Grafo();
 
-        // int GetNumVertices();
         float** GetGrafo();
         void CalcularDistancias();
         void Imprimir();

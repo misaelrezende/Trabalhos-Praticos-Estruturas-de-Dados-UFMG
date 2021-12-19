@@ -14,7 +14,6 @@ int main(){
     }
 
     Grafo grafo(vertices, N);
-    // grafo.Imprimir();
 
     MinhaBiblioteca biblioteca = MinhaBiblioteca(grafo.GetGrafo(), N, K, D, M, C);
     // Encontra AGM no grafo
