@@ -7,14 +7,18 @@ Grafo::Grafo(Vertice* entrada, int n){
     CalcularDistancias();
 }
 
+// Retorna o número de vértices (lojas)
 int Grafo::GetNumVertices(){
     return this->_num_vertices;
 }
 
+// Retorna o grafo completo construído
+// com as respectivas distâncias das lojas
 float ** Grafo::GetGrafo(){
     return this->_grafo_com_pesos;
 }
 
+// Calcula distâncias de cada loja as outras lojas
 void Grafo::CalcularDistancias(){
     this->_grafo_com_pesos = new float*[this->_num_vertices];
     for(int i = 0; i < this->_num_vertices; i++)
@@ -40,6 +44,7 @@ void Grafo::CalcularDistancias(){
     cout<<endl;
 }
 
+// Imprime o grafo gerado
 void Grafo::Imprimir(){
     for(int i = 0; i < this->_num_vertices; i++){
         cout<<this->_vertices[i].id<<" "<<this->_vertices[i].x<<" "<<this->_vertices[i].y<<endl;

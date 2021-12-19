@@ -14,7 +14,6 @@ class MinhaBiblioteca{
         vector< pair< pair<int,int>, pair<float,bool> > >* _agm_ordenada;
 
     public:
-
         MinhaBiblioteca(float**,int,int,int,int,int);
         ~MinhaBiblioteca();
 

@@ -16,9 +16,11 @@ int main(){
     Grafo grafo(vertices, N);
     // grafo.Imprimir();
 
-    MinhaBiblioteca meu = MinhaBiblioteca(grafo.GetGrafo(), N, K, D, M, C);
-    meu.AlgoritmoPrim();
-    meu.MinimizarCustoTrajeto();
+    MinhaBiblioteca biblioteca = MinhaBiblioteca(grafo.GetGrafo(), N, K, D, M, C);
+    // Encontra AGM no grafo
+    biblioteca.AlgoritmoPrim();
+    // Encontra a melhor combinação de meios de transporte para cada rota
+    biblioteca.MinimizarCustoTrajeto();
 
     return 0;
 }

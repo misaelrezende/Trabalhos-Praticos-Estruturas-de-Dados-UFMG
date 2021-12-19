@@ -98,6 +98,7 @@ void MinhaBiblioteca::ObterMaioresCustos(){
 	_agm_ordenada = agm_ordenada;
 }
 
+// Aloca drones as lojas
 void MinhaBiblioteca::AlocarDrone(int* drones_alocados, int* lojas_conectadas){
 	cout<<"Alocar Drones"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
@@ -113,6 +114,7 @@ void MinhaBiblioteca::AlocarDrone(int* drones_alocados, int* lojas_conectadas){
 	}
 }
 
+// Aloca motos as lojas
 void MinhaBiblioteca::AlocarMoto(float* km_motos, int* lojas_conectadas){
 	cout<<"Alocar Motos"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
@@ -126,6 +128,7 @@ void MinhaBiblioteca::AlocarMoto(float* km_motos, int* lojas_conectadas){
 	}
 }
 
+// Aloca caminhões as lojas
 void MinhaBiblioteca::AlocarCaminhao(float* km_caminhoes, int* lojas_conectadas){
 	cout<<"Alocar Caminhoes"<<endl;
 	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
@@ -137,9 +140,11 @@ void MinhaBiblioteca::AlocarCaminhao(float* km_caminhoes, int* lojas_conectadas)
 	}
 }
 
+// Encontra a forma eficiente de distribuir os produtos
 void MinhaBiblioteca::MinimizarCustoTrajeto(){
 	cout<<fixed<<setprecision(3);
-	if(_num_drones == _num_lojas){
+
+	if(_num_drones == _num_lojas-1){
 		cout << 0.000 << " " << 0.000; // Custo zero para motos e caminhões
 	}else{
 		// Obter maiores custos
@@ -150,8 +155,6 @@ void MinhaBiblioteca::MinimizarCustoTrajeto(){
 
 		// Alocar todos drones
 		if(_num_drones >= 2){
-			// for(int i = 0; i < ; i++){
-				// agm_ordenada[i]->second->second = true;
 			AlocarDrone(&drones_alocados, &lojas_conectadas);
 
 			// Falta mais lojas para alocar
@@ -175,8 +178,7 @@ void MinhaBiblioteca::MinimizarCustoTrajeto(){
 		}
 
 		// Imprime custo total da utilização de motos e caminhões
-		// cout<<_custo_moto*km_motos<<" "<<_custo_caminhao*km_caminhoes; // CORRETO
-		cout<<endl<<_custo_moto*km_motos<<" "<<_custo_caminhao*km_caminhoes<<endl; // ERRADO
+		cout<<_custo_moto*km_motos<<" "<<_custo_caminhao*km_caminhoes;
 	}
 
 }

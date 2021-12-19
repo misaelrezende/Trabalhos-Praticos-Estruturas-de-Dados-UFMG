@@ -17,13 +17,13 @@ class Grafo{
         float** _grafo_com_pesos;
 
     public:
-        Grafo(/* args */);
         Grafo(Vertice*, int);
+        ~Grafo();
+
         int GetNumVertices();
         float** GetGrafo();
         void CalcularDistancias();
         void Imprimir();
-        ~Grafo();
 };
 
 #endif
