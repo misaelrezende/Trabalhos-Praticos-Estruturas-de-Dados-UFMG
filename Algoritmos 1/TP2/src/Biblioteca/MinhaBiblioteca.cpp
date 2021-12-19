@@ -12,12 +12,12 @@ MinhaBiblioteca::MinhaBiblioteca(float** grafo, int num_lojas, int limite_km_mot
 }
 
 // Encontra o vértice com menor valor de chave, do set de vértices fora da AGM
-int EncontrarMenorPeso(float* chave, bool* corte_agm, int num_vertices){
+int MinhaBiblioteca::EncontrarMenorPeso(float* chave, bool* corte_agm){
 	// Inicializa o menor valor
 	float menor = INFINITO;
 	int menor_indice;
 
-	for(int v = 0; v < num_vertices; v++){
+	for(int v = 0; v < _num_lojas; v++){
 		if(corte_agm[v] == false && chave[v] < menor){
 			menor = chave[v];
 			menor_indice = v;
@@ -27,16 +27,15 @@ int EncontrarMenorPeso(float* chave, bool* corte_agm, int num_vertices){
 }
 
 // Encontra a árvore geradora mínima (AGM) com menor custo
-int* AlgoritmoPrim(float** grafo, int num_vertices){
+void MinhaBiblioteca::AlgoritmoPrim(){
 	// Armazena vertices raiz da AGM a ser construída
-	int* vertices_raiz =new int[num_vertices];
-	// int vertices_raiz[num_vertices];
+	int* vertices_raiz = new int[_num_lojas];
 	// Valores chave para guardar a aresta de menor peso em um corte
-	float chave[num_vertices];
+	float chave[_num_lojas];
 	// Conjunto de vértices incluídos na AGM
-	bool corte_agm[num_vertices];
+	bool corte_agm[_num_lojas];
 
-	for(int i = 0; i < num_vertices; i++){
+	for(int i = 0; i < _num_lojas; i++){
 		// Inicializa todas chaves para infinito
 		chave[i] = INFINITO,
 		// Conjunto de vertices na AGM começa vazio
@@ -48,25 +47,25 @@ int* AlgoritmoPrim(float** grafo, int num_vertices){
 	chave[0] = 0;
 	vertices_raiz[0] = -1;
 
-	for(int i = 0; i < num_vertices - 1; i++){
-		int m = EncontrarMenorPeso(chave, corte_agm, num_vertices);
+	for(int i = 0; i < _num_lojas - 1; i++){
+		int m = EncontrarMenorPeso(chave, corte_agm);
 
 		// Adicione o vértice escolhido ao set da AGM
 		corte_agm[m] = true;
 
 		// Atualize chave/valor e índice vertices_raiz dos vértices adj ao vértice escolhido
 		// Considere apenas vértices fora da AGM
-		for(int v = 0; v < num_vertices; v++)
+		for(int v = 0; v < _num_lojas; v++)
 			// grafo[m][v] é !=0 apenas para vértices adjacentes de m
 			// corte_agm[v] é falso para vertices fora da AGM
 			// Atualize a chave apenas se grafo[m][v] é menor que chave[v]
-			if(grafo[m][v] && corte_agm[v] == false && grafo[m][v] < chave[v]){
+			if(_grafo[m][v] && corte_agm[v] == false && _grafo[m][v] < chave[v]){
 				vertices_raiz[v] = m;
-				chave[v] = grafo[m][v];
+				chave[v] = _grafo[m][v];
 			}
 	}
 
-	return vertices_raiz;
+	_vertices_raiz_agm = vertices_raiz;
 }
 
 // Função auxiliar para ordenar pelo segundo elemento (custo)
@@ -75,15 +74,15 @@ bool OrdenarPorCusto(pair< pair<int,int>, pair<float, bool>> a, pair< pair<int,i
 }
 
 // Ordena a AGM pelo valor dos custos
-vector<pair<pair<int,int>,pair<float,bool>>>* ObterMaioresCustos(float** grafo, int* vertices_raiz, int num_vertices){
+void MinhaBiblioteca::ObterMaioresCustos(){
 
 	// < <loja1, loja2>, <custo, ocupado?> >
 	vector< pair< pair<int,int>, pair<float,bool> > >* agm_ordenada = new vector<pair<pair<int,int>,pair<float,bool>>>;
-	for(int i = 1; i < num_vertices; i++){
+	for(int i = 1; i < _num_lojas; i++){
 		agm_ordenada->push_back(
 			make_pair(
-				make_pair(vertices_raiz[i], i),
-				make_pair(grafo[i][vertices_raiz[i]], false)
+				make_pair(_vertices_raiz_agm[i], i),
+				make_pair(_grafo[i][_vertices_raiz_agm[i]], false)
 				)
 						  );
 	}
@@ -95,89 +94,86 @@ vector<pair<pair<int,int>,pair<float,bool>>>* ObterMaioresCustos(float** grafo, 
 		cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
 	}
 	cout<<endl;
-	return agm_ordenada;
+
+	_agm_ordenada = agm_ordenada;
 }
 
-void AlocarDrone(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, int* drones_alocados, int num_drones, int* lojas_conectadas){
+void MinhaBiblioteca::AlocarDrone(){
 	cout<<"Alocar Drones"<<endl;
-	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = agm_ordenada->begin(); it != agm_ordenada->end(); ++it){
-		if(it->second.second == false && (*drones_alocados) < num_drones){
+	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
+		if(it->second.second == false && _drones_alocados < _num_drones){
 			cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-			it->second.second = true; *lojas_conectadas += 1;
+			it->second.second = true; _lojas_conectadas += 1;
 			// if((*drones_alocados) + 1 == num_drones){
 			// 	*drones_alocados += 1;
 			// 	break;
 			// }
-			*drones_alocados += 2;
+			_drones_alocados += 2;
 		}
 	}
 }
 
-void AlocarMoto(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, float* km_motos, int limite_km_moto, int* lojas_conectadas){
+void MinhaBiblioteca::AlocarMoto(){
 	cout<<"Alocar Motos"<<endl;
-	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = agm_ordenada->begin(); it != agm_ordenada->end(); ++it){
+	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
 		if(it->second.second == false){
-			if(limite_km_moto >= it->second.first){
+			if(_limite_km_moto >= it->second.first){
 				cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-				it->second.second = true; *lojas_conectadas += 1;
-				*km_motos += it->second.first;
+				it->second.second = true; _lojas_conectadas += 1;
+				_km_motos += it->second.first;
 			}
 		}
 	}
 }
 
-void AlocarCaminhao(vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada, float* km_caminhoes, int* lojas_conectadas){
+void MinhaBiblioteca::AlocarCaminhao(){
 	cout<<"Alocar Caminhoes"<<endl;
-	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = agm_ordenada->begin(); it != agm_ordenada->end(); ++it){
+	for(vector<pair< pair<int,int>, pair<float,bool>>>::iterator it = _agm_ordenada->begin(); it != _agm_ordenada->end(); ++it){
 		if(it->second.second == false){
 			cout<<it->first.first<<" "<<it->first.second<<" "<<it->second.first<<endl;
-			it->second.second = true; *lojas_conectadas += 1;
-			*km_caminhoes += it->second.first;
+			it->second.second = true; _lojas_conectadas += 1;
+			_km_caminhoes += it->second.first;
 		}
 	}
 }
 
-void MinimizarCustoTrajeto(float** grafo, int* vertices_raiz, int num_lojas, int limite_km_moto, int num_drones, int custo_moto, int custo_caminhao){
+void MinhaBiblioteca::MinimizarCustoTrajeto(){
 	cout<<fixed<<setprecision(3);
-	if(num_drones == num_lojas){
+	if(_num_drones == _num_lojas){
 		cout << 0.000 << " " << 0.000; // Custo zero para motos e caminhões
 	}else{
 		// Obter maiores custos
-		vector< pair<pair<int,int>, pair<float,bool>> >* agm_ordenada;
-		agm_ordenada = ObterMaioresCustos(grafo, vertices_raiz, num_lojas);
-
-		int drones_alocados = 0, lojas_conectadas = 0;
-		float km_motos = 0, km_caminhoes;
+		ObterMaioresCustos();
 
 		// Alocar todos drones
-		if(num_drones >= 2){
+		if(_num_drones >= 2){
 			// for(int i = 0; i < ; i++){
 				// agm_ordenada[i]->second->second = true;
-			AlocarDrone(agm_ordenada, &drones_alocados, num_drones, &lojas_conectadas);
+			AlocarDrone();
 
 			// Falta mais lojas para alocar
-			if(lojas_conectadas < num_lojas){
-				if(custo_moto <= custo_caminhao){
-					AlocarMoto(agm_ordenada, &km_motos, limite_km_moto, &lojas_conectadas);
-					if(lojas_conectadas < num_lojas)
-						AlocarCaminhao(agm_ordenada, &km_caminhoes, &lojas_conectadas);
+			if(_lojas_conectadas < _num_lojas){
+				if(_custo_moto <= _custo_caminhao){
+					AlocarMoto();
+					if(_lojas_conectadas < _num_lojas)
+						AlocarCaminhao();
 				}else
-					AlocarCaminhao(agm_ordenada, &km_caminhoes, &lojas_conectadas);
+					AlocarCaminhao();
 			}
 			
 		}else{
-			if(custo_moto <= custo_caminhao){
-				AlocarMoto(agm_ordenada, &km_motos, limite_km_moto, &lojas_conectadas);
-				if(lojas_conectadas < num_lojas)
-					AlocarCaminhao(agm_ordenada, &km_caminhoes, &lojas_conectadas);
+			if(_custo_moto <= _custo_caminhao){
+				AlocarMoto();
+				if(_lojas_conectadas < _num_lojas)
+					AlocarCaminhao();
 			}
 			else
-				AlocarCaminhao(agm_ordenada, &km_caminhoes, &lojas_conectadas);
+				AlocarCaminhao();
 		}
 
 		// Imprime custo total da utilização de motos e caminhões
-		// cout<<custo_moto*km_motos<<" "<<custo_caminhao*km_caminhoes; // CORRETO
-		cout<<endl<<custo_moto*km_motos<<" "<<custo_caminhao*km_caminhoes<<endl; // ERRADO
+		// cout<<_custo_moto*_km_motos<<" "<<_custo_caminhao*_km_caminhoes; // CORRETO
+		cout<<endl<<_custo_moto*_km_motos<<" "<<_custo_caminhao*_km_caminhoes<<endl; // ERRADO
 	}
 
 }

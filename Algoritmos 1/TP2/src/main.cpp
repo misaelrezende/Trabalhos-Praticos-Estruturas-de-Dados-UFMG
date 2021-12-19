@@ -15,12 +15,10 @@ int main(){
 
     Grafo grafo(vertices, N);
     // grafo.Imprimir();
-    int* vertices_raiz;
-    vertices_raiz = AlgoritmoPrim(grafo.GetGrafo(), grafo.GetNumVertices());
 
-    MinimizarCustoTrajeto(grafo.GetGrafo(), vertices_raiz, N, K, D, M, C);
-
-    MinhaBiblioteca(grafo.GetGrafo(), N, K, D, M, C);
+    MinhaBiblioteca meu = MinhaBiblioteca(grafo.GetGrafo(), N, K, D, M, C);
+    meu.AlgoritmoPrim();
+    meu.MinimizarCustoTrajeto();
 
     return 0;
 }
