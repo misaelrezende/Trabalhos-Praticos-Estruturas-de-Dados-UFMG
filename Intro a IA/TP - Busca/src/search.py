@@ -88,7 +88,26 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+
+    no = problem.getStartState()
+    fronteira = util.Stack()
+    fronteira.push((no, []))
+    nos_visitados = []
+
+    while not fronteira.isEmpty():
+        no_atual, caminho = fronteira.pop()
+        if no_atual not in nos_visitados:
+            nos_visitados.append(no_atual)
+
+            if problem.isGoalState(no_atual):
+                return caminho
+
+            for proximo_no, acao, _ in problem.getSuccessors(no_atual):
+                novo_caminho = caminho + [acao]
+                fronteira.push((proximo_no, novo_caminho))
+
+    return None    
 
 
 def breadthFirstSearch(problem):
@@ -99,12 +118,12 @@ def breadthFirstSearch(problem):
     no = problem.getStartState()
     fronteira = util.Queue()
     fronteira.push((no, []))
-    visitado = []
+    nos_visitados = []
 
     while not fronteira.isEmpty():
         no_atual, caminho = fronteira.pop()
-        if no_atual not in visitado:
-            visitado.append(no_atual)
+        if no_atual not in nos_visitados:
+            nos_visitados.append(no_atual)
 
             if problem.isGoalState(no_atual):
                 return caminho
