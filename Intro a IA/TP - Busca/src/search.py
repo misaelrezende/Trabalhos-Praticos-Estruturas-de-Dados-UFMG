@@ -94,8 +94,26 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+    
+    no = problem.getStartState()
+    fronteira = util.Queue()
+    fronteira.push((no, []))
+    visitado = []
 
+    while not fronteira.isEmpty():
+        no_atual, caminho = fronteira.pop()
+        if no_atual not in visitado:
+            visitado.append(no_atual)
+
+            if problem.isGoalState(no_atual):
+                return caminho
+
+            for proximo_no, acao, _ in problem.getSuccessors(no_atual):
+                novo_caminho = caminho + [acao]
+                fronteira.push((proximo_no, novo_caminho))
+
+    return None
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
