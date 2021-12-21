@@ -188,6 +188,8 @@ def greedySearch(problem, heuristic=nullHeuristic):
                 novo_caminho = caminho + [acao]
                 fronteira.update((proximo_no, novo_caminho, problem.getCostOfActions(novo_caminho)), heuristic(proximo_no, problem))
 
+    return None
+
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
@@ -211,6 +213,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 novo_caminho = caminho + [acao]
                 novo_custo_heuristica = problem.getCostOfActions(novo_caminho) + heuristic(proximo_no, problem)
                 fronteira.update((proximo_no, novo_caminho, problem.getCostOfActions(novo_caminho)), novo_custo_heuristica)
+    
+    return None
 
 
 def foodHeuristic(state, problem):
