@@ -3,7 +3,7 @@ from view import View
 
 class Controller:
     is_voting_sistem_on = False
-    list_of_candidates = ['Presidente', 'Senador']
+    list_of_candidates = ['Presidente', 'Senador'] # dep federal, dep estadual, senador, governador, presidente
     def __init__(self):
         # self.model = Model()
         self.view = View()
@@ -11,15 +11,19 @@ class Controller:
     def start(self):
         option = self.view.start()
 
-        if option == 1:
+        if option == 1: # Login como mesário 
             result = self.login()
             if result == True:
                 self.view.show_login_detail(result)
-            self.is_voting_sistem_on = True
+                self.is_voting_sistem_on = True
+            else:
+                self.view.end(False) # Finish system
+                return
         else:
-            self.view.end(result)
-            # self.view.end(False) # FIXME
+            self.view.end(False) # Finish system
+            return
 
+        # Voting system started
         if self.is_voting_sistem_on == True:
             # Initialize computing the votes
             self.view.start_voting_machine()
@@ -30,14 +34,27 @@ class Controller:
             while(voter_registration_number != 0):
                 voter_registration_number = int(input("Digite o número do título de eleitor: "))
                 voter_verification = self.model.verify_voter() # 1: eleitor está apto a votar; 2: não pode votar; 3: núm incorreto; 4: já votou
-                if voter_verification == 1:
+                if voter_verification == 0:
+                    result = self.finish_voting_machine()
+                    if result == True:
+                        break
+                    else:
+                        continue
+                elif voter_verification == 1:
                     self.start_voting()
+                else:
+                    self.view.voter_error(voter_verification)
 
-            # TODO Finish implementation
-            is_finishing = self.view.finish_voting_machine()
-            if is_finishing == True:
-                self.view.finish_voting_machine()
-            # TODO Finish implementation
+    def finish_voting_machine(self):
+        is_finishing = self.view.finish_voting_machine()
+        if is_finishing == 1:
+            result = self.login()
+            if result == True:
+                self.view.show_login_detail(result)
+                self.is_voting_sistem_on = False
+                self.view.end(True) # Finish system
+                return True # User was authenticated and system can finish
+        return False # User was not authenticated, system can not finish
 
     def login(self):
         login_number, login_password = self.view.get_login_detail()
