@@ -29,10 +29,10 @@ class Controller:
             self.view.start_voting_machine()
             voter_registration_number = 1
 
-            # While voting number is not zero
+            # While voter_registration_number is not zero
             # (zero would conclude the voting session)
             while(voter_registration_number != 0):
-                voter_registration_number = int(input("Digite o número do título de eleitor: "))
+                voter_registration_number = self.view.get_voter_registration_number()
                 voter_verification = self.model.verify_voter() # 1: eleitor está apto a votar; 2: não pode votar; 3: núm incorreto; 4: já votou
                 if voter_verification == 0:
                     result = self.finish_voting_machine()

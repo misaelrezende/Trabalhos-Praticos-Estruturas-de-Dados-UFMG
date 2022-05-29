@@ -43,6 +43,9 @@ class View:
         print()
         print("Digite o login e senha do mesário para finalizar a votação")
         return self.menu()
+    
+    def get_voter_registration_number(self):
+        return int(input("Digite o número do título de eleitor: "))
 
     def voter_error(self, error):
         if error == 2:
