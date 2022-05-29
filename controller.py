@@ -54,7 +54,10 @@ class Controller:
                 self.is_voting_sistem_on = False
                 self.view.end(True) # Finish system
                 return True # User was authenticated and system can finish
-        return False # User was not authenticated, system can not finish
+
+        # User was not authenticated, system can not finish
+        # OR user wants to continue the voting process
+        return False
 
     def login(self):
         login_number, login_password = self.view.get_login_detail()

@@ -35,7 +35,8 @@ class View:
         print("0 - Continuar votação")
         print("1 - Finalizar votação")
         option = int(input("\nDigite a opção: "))
-        if option == 1:
+        if option == 0:
+            print()
             return 0
 
         # User wants to finish voting system
