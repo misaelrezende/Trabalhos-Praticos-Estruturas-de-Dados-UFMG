@@ -86,3 +86,17 @@ class View:
         else:
             print()
             print("### Sistema de votação finalizado com erro ###")
+
+    def show_election_results(self, running_candidate, election_results, valid_votes):
+        print("### Resultados para candidato a {} ###".format(running_candidate))
+        print()
+        for candidate, votes in election_results.items():
+            print("{}, {} votos, {:.2f%} dos votos válidos"
+            .format(candidate, votes, valid_votes/votes)
+            )
+
+        print()
+        sort_election_results = sorted(election_results.items(), key=lambda y: y[1][0])
+        print("-----------------------------------")
+        print("Candidato eleito {}".format(sort_election_results[0]))
+        print("-----------------------------------")

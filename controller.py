@@ -34,9 +34,23 @@ class Controller:
             while(voter_registration_number != 0):
                 voter_registration_number = self.view.get_voter_registration_number()
                 voter_verification = self.model.verify_voter() # 1: eleitor está apto a votar; 2: não pode votar; 3: núm incorreto; 4: já votou
+
                 if voter_verification == 0:
                     result = self.finish_voting_machine()
                     if result == True:
+                        candidates_length = len(self.list_of_candidates)
+                        current_candidate = 0
+
+                        # Prints election results
+                        while True: 
+                            candidate = self.list_of_candidates[current_candidate]
+                            election_results, valid_votes = self.model.get_election_results(candidate)
+                            self.view.show_election_results(candidate, election_results, valid_votes)
+
+                            current_candidate += 1
+                            if current_candidate == candidates_length-1:
+                                break
+
                         break
                     else:
                         continue
