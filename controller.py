@@ -49,11 +49,14 @@ class Controller:
         is_finishing = self.view.finish_voting_machine()
         if is_finishing == 1:
             result = self.login()
-            if result == True:
+            while result != True:
                 self.view.show_login_detail(result)
-                self.is_voting_sistem_on = False
-                self.view.end(True) # Finish system
-                return True # User was authenticated and system can finish
+                result = self.login()
+
+            self.view.show_login_detail(result)
+            self.is_voting_sistem_on = False
+            self.view.end(True) # Finish system
+            return True # User was authenticated and system can finish
 
         # User was not authenticated, system can not finish
         # OR user wants to continue the voting process
