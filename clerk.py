@@ -1,6 +1,6 @@
 from users import User
 class Clerk(User):
-    def _initi_(self, startDate, endDate, name, reg_number, zona, secao,listOfCandidate):
+    def _init_(self, startDate, endDate, name, reg_number, zona, secao,listOfCandidate):
         self.starDate = startDate
         self.endDate = endDate
         self.listCandidate = listOfCandidate
