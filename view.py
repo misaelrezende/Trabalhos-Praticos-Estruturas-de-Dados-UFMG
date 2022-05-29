@@ -47,6 +47,18 @@ class View:
     def get_voter_registration_number(self):
         return int(input("Digite o número do título de eleitor: "))
 
+    def show_candidate_chosen(self, candidate_chosen):
+        print()
+        print("{}\n{}"
+        .format(candidate_chosen['name'], candidate_chosen['political_party']))
+        option = self.get_voter_candidate_option()
+        return option
+
+    def get_voter_candidate_option(self):
+        print("Digite VERDE para CONFIRMAR este voto")
+        print("Digite LARANJA para REINICIAR este voto")
+        return input().lower()
+
     def voter_error(self, error):
         if error == 2:
             print()
@@ -61,7 +73,7 @@ class View:
             print("Eleitor já votou nessa eleição.")
 
     def voter_is_voting(self, candidate):
-        print("{}".format(candidate))
+        print("{}: ".format(candidate))
         return int(input())
 
     def voter_is_finished(self):

@@ -41,6 +41,7 @@ class Controller:
                     else:
                         continue
                 elif voter_verification == 1:
+                    # Voter starts to choose his/her candidates
                     self.start_voting()
                 else:
                     self.view.voter_error(voter_verification)
@@ -68,16 +69,26 @@ class Controller:
         # is_logged = True # FIXME
         return is_logged
 
+    # Voter chooses his/her candidates
     def start_voting(self):
-        for candidate in self.list_of_candidates:
-            candidate_chosen = self.view.voter_is_voting(candidate)
-            # Check if voter has chosen correctly a valid candidate
-            voter_candidate_verification = self.model.verify_voter(candidate_chosen)
-            while(voter_candidate_verification != 1):
-                # TODO Deal with ERROR issue
-                voter_candidate_verification = self.model.verify_voter(candidate)
+        candidates_length = len(self.list_of_candidates)
+        current_candidate = 0
 
-            self.model.compute_vote(candidate_chosen)
+        while True:
+            candidate = self.list_of_candidates[current_candidate]
+            candidate_chosen = self.view.voter_is_voting(candidate)
+
+            option = self.view.show_candidate_chosen(
+                self.model.get_candidate_info(candidate_chosen)
+                )
+
+            if option == 'verde':
+                self.model.compute_vote(candidate_chosen)
+                current_candidate += 1
+                if current_candidate == candidates_length-1:
+                    break
+            else:
+                continue
 
         self.view.voter_is_finished()
 
