@@ -57,7 +57,38 @@ class Model:
         # 2: não pode votar;
         # 3: núm incorreto;
         # 4: já votou
-
-
-    def compute_vote(candidate_chosen):
         pass
+    # candidate_name, # of votes received
+    # null votes,     # of votes received
+
+    def compute_vote(candidate_type, candidate_chosen):
+        results_data = {}
+        is_null_vote = True
+
+        # Read results saved
+        results_file = "files/results_{}.txt".format(candidate_type)
+        with open(results_file, 'r') as results:
+            line = results.readline()
+            while line != '':
+                candidate_name,number_of_votes=line.split(',')
+                if candidate_name == candidate_chosen:
+                    number_of_votes = int(number_of_votes) + 1
+                    number_of_votes = str(number_of_votes)
+                    is_null_vote = False
+
+                results_data[candidate_name] = candidate_name
+                results_data[number_of_votes] = number_of_votes
+
+                line = results.readline()
+
+        if is_null_vote == True:
+            results_data['nulo'] = str( int(number_of_votes) + 1 )
+
+        # Write new results
+        with open(results_file, 'w') as writer:
+            for candidate_name, number_of_votes in results_data.items():
+                writer.writelines(
+                    "{},{}\n".format(
+                    candidate_name,
+                    number_of_votes
+                ))

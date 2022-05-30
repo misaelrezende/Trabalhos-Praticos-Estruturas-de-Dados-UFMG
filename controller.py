@@ -98,7 +98,7 @@ class Controller:
                 )
 
             if option == 'verde':
-                self.model.compute_vote(candidate_chosen)
+                self.model.compute_vote(candidate, candidate_chosen)
                 current_candidate += 1
                 if current_candidate == candidates_length-1:
                     break
