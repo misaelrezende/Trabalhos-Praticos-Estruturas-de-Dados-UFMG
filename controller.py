@@ -60,6 +60,7 @@ class Controller:
                     if voter_verification == 1:
                         # Voter starts to choose his/her candidates
                         self.start_voting()
+                        self.model.compute_voter_has_voted(voter_registration_number)
                     else:
                         self.view.voter_error(voter_verification)
 

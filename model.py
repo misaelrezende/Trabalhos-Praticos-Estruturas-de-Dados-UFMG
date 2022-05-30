@@ -58,7 +58,7 @@ class Model:
         return candidate_info
 
     # Verify if voter is able to vote
-    def verify_voter(voter_registration_number):
+    def verify_voter(self, voter_registration_number):
         # 1: eleitor está apto a votar;
         # 2: não pode votar;
         # 3: núm incorreto;
@@ -73,6 +73,28 @@ class Model:
                 line = reader.readline()
 
         return is_voter_able
+    
+    def compute_voter_has_voted(self, voter_registration_number):
+        voters_data = {}
+        with open("voters.txt", 'r') as reader:
+            line = reader.readline()
+            while line != '':
+                reg_number,name,voter_condition = line.split(',')
+                voters_data['name'] = name
+                voters_data['reg_number'] = reg_number
+                if voter_registration_number == int(reg_number):
+                    voters_data['voter_condition'] = str(4)
+                else:
+                    voters_data['voter_condition'] = voter_condition
+
+        with open("voters.txt", 'w') as writer:
+            for reg_number,name,voter_condition in voters_data.items():
+                writer.writelines(
+                    "{},{},{}\n".format(
+                    reg_number,
+                    name,
+                    voter_condition
+                ))
 
     def compute_vote(candidate_type, candidate_chosen):
         results_data = {}
