@@ -111,8 +111,8 @@ class Model:
                     number_of_votes = str(number_of_votes)
                     is_null_vote = False
 
-                results_data[candidate_name] = candidate_name
-                results_data[number_of_votes] = number_of_votes
+                results_data['candidate_name'] = candidate_name
+                results_data['number_of_votes'] = number_of_votes
 
                 line = results.readline()
 
