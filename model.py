@@ -50,6 +50,8 @@ class Model:
                     candidate_info['name'] = candidate_name
                     candidate_info['political_party'] = party
 
+                line = reader.readline()
+
         return candidate_info
 
     def verify_voter():
