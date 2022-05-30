@@ -34,7 +34,6 @@ class Controller:
             # (zero would conclude the voting session)
             while(voter_registration_number != 0):
                 voter_registration_number = self.view.get_voter_registration_number()
-                voter_verification = self.model.verify_voter() # 1: eleitor está apto a votar; 2: não pode votar; 3: núm incorreto; 4: já votou
 
                 if voter_registration_number == 0:
                     result = self.finish_voting_machine()
@@ -55,11 +54,14 @@ class Controller:
                         break
                     else:
                         continue
-                elif voter_verification == 1:
-                    # Voter starts to choose his/her candidates
-                    self.start_voting()
+
                 else:
-                    self.view.voter_error(voter_verification)
+                    voter_verification = self.model.verify_voter(voter_registration_number)
+                    if voter_verification == 1:
+                        # Voter starts to choose his/her candidates
+                        self.start_voting()
+                    else:
+                        self.view.voter_error(voter_verification)
 
     def finish_voting_machine(self):
         is_finishing = self.view.finish_voting_machine()

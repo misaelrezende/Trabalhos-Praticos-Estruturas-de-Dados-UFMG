@@ -9,6 +9,9 @@ from clerk import Clerk
 # candidates file header
 # candidate_name, number, name of party
 
+# voter file header
+# voter_registration_number, name, is_able_to_vote
+
 class Model:
 
     # Return election_results, valid_votes
@@ -54,14 +57,22 @@ class Model:
 
         return candidate_info
 
-    def verify_voter():
+    # Verify if voter is able to vote
+    def verify_voter(voter_registration_number):
         # 1: eleitor está apto a votar;
         # 2: não pode votar;
         # 3: núm incorreto;
         # 4: já votou
-        pass
-    # candidate_name, # of votes received
-    # null votes,     # of votes received
+        with open("voters.txt", 'r') as reader:
+            line = reader.readline()
+            while line != '':
+                reg_number,name,voter_condition = line.split(',')
+                if voter_registration_number == int(reg_number):
+                    is_voter_able = int(voter_condition)
+                    break
+                line = reader.readline()
+
+        return is_voter_able
 
     def compute_vote(candidate_type, candidate_chosen):
         results_data = {}
