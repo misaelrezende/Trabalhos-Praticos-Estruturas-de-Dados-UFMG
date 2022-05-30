@@ -36,7 +36,7 @@ class Controller:
                 voter_registration_number = self.view.get_voter_registration_number()
                 voter_verification = self.model.verify_voter() # 1: eleitor está apto a votar; 2: não pode votar; 3: núm incorreto; 4: já votou
 
-                if voter_verification == 0:
+                if voter_registration_number == 0:
                     result = self.finish_voting_machine()
                     if result == True:
                         candidates_length = len(self.list_of_candidates)
