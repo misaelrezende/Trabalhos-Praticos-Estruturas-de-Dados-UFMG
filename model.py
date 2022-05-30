@@ -17,35 +17,41 @@ class Model:
     # Return election_results, valid_votes
     def get_election_results(self, candidate):
         election_results = {}
-
+        total_valid_votes = 0
         # open results file
         results_file = "files/results_{}.txt".format(candidate)
         with open(results_file, 'r') as results:
             line = results.readline()
-            candidate_name, votes = line.split(',')
-            election_results[candidate_name] = votes
+            while line != '':
+                candidate_name, votes = line.split(',')
+                election_results[candidate_name] = int(votes)
+                if candidate_name != "nulo":
+                    total_valid_votes += int(votes)
 
-        return election_results
+                line = results.readline()
+
+        return election_results, total_valid_votes
 
     # Return if user is able to login the voting system
     def login(self, login_number, login_password):
         is_user_allowed = False
-        with open("users_login.txt", 'r') as reader:
+        with open("files/users_login.txt", 'r') as reader:
             line = reader.readline()
             while line != '':
                 user, password = line.split(',')
                 if int(login_number) == int(user):
                     if int(password) == int(login_password):
                         is_user_allowed = True
+
                 line = reader.readline()
 
         return is_user_allowed
 
     # Return name and political party of candidate
     # NOTE Assume input is correct and candidate exists
-    def get_candidate_info(self, candidate_chosen):
+    def get_candidate_info(self, candidate, candidate_chosen):
         candidate_info = {}
-        with open("files/candidates_{}.txt".format(candidate_chosen)) as reader:
+        with open("files/candidates_{}.txt".format(candidate)) as reader:
             line = reader.readline()
             while line != '':
                 candidate_name,number,party = line.split(',')
@@ -63,7 +69,8 @@ class Model:
         # 2: não pode votar;
         # 3: núm incorreto;
         # 4: já votou
-        with open("voters.txt", 'r') as reader:
+        is_voter_able = 3
+        with open("files/voters.txt", 'r') as reader:
             line = reader.readline()
             while line != '':
                 reg_number,name,voter_condition = line.split(',')
@@ -73,10 +80,10 @@ class Model:
                 line = reader.readline()
 
         return is_voter_able
-    
+
     def compute_voter_has_voted(self, voter_registration_number):
         voters_data = {}
-        with open("voters.txt", 'r') as reader:
+        with open("files/voters.txt", 'r') as reader:
             line = reader.readline()
             while line != '':
                 reg_number,name,voter_condition = line.split(',')
@@ -87,7 +94,7 @@ class Model:
                 else:
                     voters_data['voter_condition'] = voter_condition
 
-        with open("voters.txt", 'w') as writer:
+        with open("files/voters.txt", 'w') as writer:
             for reg_number,name,voter_condition in voters_data.items():
                 writer.writelines(
                     "{},{},{}\n".format(
@@ -96,7 +103,7 @@ class Model:
                     voter_condition
                 ))
 
-    def compute_vote(candidate_type, candidate_chosen):
+    def compute_vote(self, candidate_type, candidate_chosen):
         results_data = {}
         is_null_vote = True
 

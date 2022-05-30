@@ -29,6 +29,7 @@ class View:
         print()
         print("### Sistema de votação iniciada ###")
         print("### Para terminar a votação, digite o número 0 para o titulo de eleitor ###")
+        print()
 
     def finish_voting_machine(self):
         print("Você quer finalizar a votação?")
@@ -41,7 +42,9 @@ class View:
 
         # User wants to finish voting system
         print()
-        print("Digite o login e senha do mesário para finalizar a votação")
+        print("Para finalizar a votação, escolha a opção 1")
+        print("Logo após, será necessário digitar o login e senha do mesário")
+        print()
         return self.menu()
     
     def get_voter_registration_number(self):
@@ -57,6 +60,7 @@ class View:
     def get_voter_candidate_option(self):
         print("Digite VERDE para CONFIRMAR este voto")
         print("Digite LARANJA para REINICIAR este voto")
+        print()
         return input().lower()
 
     def voter_error(self, error):
@@ -64,13 +68,16 @@ class View:
             print()
             print("Eleitor não pode votar.")
             print("Eleitor tem cadastro irregular no TRE.")
+            print()
         elif error == 3:
             print()
             print("Número de título de eleitor não reconhecido.")
             print("Digite novamente.")
+            print()
         elif error == 4:
             print()
             print("Eleitor já votou nessa eleição.")
+            print()
 
     def voter_is_voting(self, candidate):
         print("{}: ".format(candidate))
@@ -88,15 +95,22 @@ class View:
             print("### Sistema de votação finalizado com erro ###")
 
     def show_election_results(self, running_candidate, election_results, valid_votes):
+        print()
         print("### Resultados para candidato a {} ###".format(running_candidate))
         print()
         for candidate, votes in election_results.items():
-            print("{}, {} votos, {:.2f%} dos votos válidos"
-            .format(candidate, votes, valid_votes/votes)
-            )
+            if ((candidate == 'nulo' and votes == 0)
+                or (candidate != 'nulo' and votes == 0)):
+                print("> {}, {} votos, {:.2%} dos votos"
+                .format(candidate, votes, votes)
+                )
+            else:
+                print("> {}, {} votos, {:.2%} dos votos válidos"
+                .format(candidate, votes, valid_votes/votes)
+                )
 
+        sort_election_results = sorted(election_results.items(), key=lambda y: y[1], reverse=True)
         print()
-        sort_election_results = sorted(election_results.items(), key=lambda y: y[1][0])
         print("-----------------------------------")
-        print("Candidato eleito {}".format(sort_election_results[0]))
+        print("Candidato eleito {}".format(sort_election_results[0][0]))
         print("-----------------------------------")

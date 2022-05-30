@@ -3,7 +3,7 @@ from view import View
 
 class Controller:
     is_voting_sistem_on = False
-    list_of_candidates = ['president', 'senator'] # dep federal, dep estadual, senador, governador, presidente
+    list_of_candidates = ['Presidente', 'Senador'] # dep federal, dep estadual, senador, governador, presidente
 
     def __init__(self):
         self.model = Model()
@@ -32,7 +32,7 @@ class Controller:
 
             # While voter_registration_number is not zero
             # (zero would conclude the voting session)
-            while(voter_registration_number != 0):
+            while True:
                 voter_registration_number = self.view.get_voter_registration_number()
 
                 if voter_registration_number == 0:
@@ -42,14 +42,14 @@ class Controller:
                         current_candidate = 0
 
                         # Prints election results
-                        while True: 
+                        while True:
                             candidate = self.list_of_candidates[current_candidate]
                             election_results, valid_votes = self.model.get_election_results(candidate)
                             self.view.show_election_results(candidate, election_results, valid_votes)
 
-                            current_candidate += 1
                             if current_candidate == candidates_length-1:
                                 break
+                            current_candidate += 1
 
                         break
                     else:
@@ -95,16 +95,15 @@ class Controller:
         while True:
             candidate = self.list_of_candidates[current_candidate]
             candidate_chosen = self.view.voter_is_voting(candidate)
-
-            option = self.view.show_candidate_chosen(
-                self.model.get_candidate_info(candidate_chosen)
-                )
+            candidate_info = self.model.get_candidate_info(candidate, candidate_chosen)
+            option = self.view.show_candidate_chosen(candidate_info)
 
             if option == 'verde':
                 self.model.compute_vote(candidate, candidate_chosen)
-                current_candidate += 1
                 if current_candidate == candidates_length-1:
                     break
+
+                current_candidate += 1
             else:
                 continue
 

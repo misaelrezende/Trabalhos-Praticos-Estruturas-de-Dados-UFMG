@@ -1,5 +1,3 @@
-from ctypes import _CArgObject
-import numbers
 from users import User
 class Candidate(User):
     def __init__(self, name, reg_number, zona, secao, number, electoralOffice):
