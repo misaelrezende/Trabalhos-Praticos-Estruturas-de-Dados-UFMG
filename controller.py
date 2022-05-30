@@ -1,11 +1,12 @@
-# from model import Model
+from model import Model
 from view import View
 
 class Controller:
     is_voting_sistem_on = False
-    list_of_candidates = ['Presidente', 'Senador'] # dep federal, dep estadual, senador, governador, presidente
+    list_of_candidates = ['president', 'senator'] # dep federal, dep estadual, senador, governador, presidente
+
     def __init__(self):
-        # self.model = Model()
+        self.model = Model()
         self.view = View()
 
     def start(self):
