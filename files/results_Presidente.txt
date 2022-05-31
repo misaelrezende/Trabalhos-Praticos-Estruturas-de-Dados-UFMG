@@ -1,0 +1,5 @@
+Luiz Inácio Lula da Silva,13,0
+Ciro Gomes,12,0
+Simone Nassar Tebet,15,0
+Jair Messias Bolsonaro,22,0
+nulo,0,0
