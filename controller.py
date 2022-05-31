@@ -84,7 +84,6 @@ class Controller:
     def login(self):
         login_number, login_password = self.view.get_login_detail()
         is_logged = self.model.login(login_number, login_password)
-        # is_logged = True # FIXME
         return is_logged
 
     # Voter chooses his/her candidates

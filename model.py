@@ -129,15 +129,13 @@ class Model:
                         'number': number,
                         'number_of_votes': int(number_of_votes)
                     })
-                # print("results_saved: ", results_data)
+
 
                 line = results.readline()
 
         # Write new results
-        print("results before writing", results_data)
         with open(results_file, 'w') as writer:
             for candidate_votes in results_data:
-                print("i.items: ", candidate_votes.items())
                 writer.writelines(
                     "{},{},{}\n".format(
                     candidate_votes['candidate_name'],
