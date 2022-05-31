@@ -104,7 +104,7 @@ class Model:
                 ))
 
     def compute_vote(self, candidate_type, candidate_chosen):
-        results_data = {}
+        results_data = []
         is_null_vote = True
 
         # Read results saved
@@ -112,25 +112,35 @@ class Model:
         with open(results_file, 'r') as results:
             line = results.readline()
             while line != '':
-                candidate_name,number_of_votes=line.split(',')
-                if candidate_name == candidate_chosen:
-                    number_of_votes = int(number_of_votes) + 1
-                    number_of_votes = str(number_of_votes)
+                candidate_name,number,number_of_votes=line.split(',')
+                if number == str(candidate_chosen):
+                    number_of_votes = str (int(number_of_votes) + 1 )
                     is_null_vote = False
 
-                results_data['candidate_name'] = candidate_name
-                results_data['number_of_votes'] = number_of_votes
+                if is_null_vote == True and candidate_name == 'nulo':
+                    results_data.append({
+                        'candidate_name': candidate_name,
+                        'number': number,
+                        'number_of_votes': str( int(number_of_votes) + 1 )
+                    })
+                else:
+                    results_data.append({
+                        'candidate_name': candidate_name,
+                        'number': number,
+                        'number_of_votes': int(number_of_votes)
+                    })
+                # print("results_saved: ", results_data)
 
                 line = results.readline()
 
-        if is_null_vote == True:
-            results_data['nulo'] = str( int(number_of_votes) + 1 )
-
         # Write new results
+        print("results before writing", results_data)
         with open(results_file, 'w') as writer:
-            for candidate_name, number_of_votes in results_data.items():
+            for candidate_votes in results_data:
+                print("i.items: ", candidate_votes.items())
                 writer.writelines(
-                    "{},{}\n".format(
-                    candidate_name,
-                    number_of_votes
+                    "{},{},{}\n".format(
+                    candidate_votes['candidate_name'],
+                    candidate_votes['number'],
+                    candidate_votes['number_of_votes']
                 ))
