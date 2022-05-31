@@ -17,7 +17,8 @@ class Model:
     # Return election_results, valid_votes
     def get_election_results(self, candidate):
         election_results = []
-        total_valid_votes = 0
+        total_votes = 0
+
         # open results file
         results_file = "files/results_{}.txt".format(candidate)
         with open(results_file, 'r') as results:
@@ -28,12 +29,12 @@ class Model:
                     'candidate_name': candidate_name,
                     'number_of_votes': int(number_of_votes)
                 })
-                if candidate_name != "nulo":
-                    total_valid_votes += int(number_of_votes)
+
+                total_votes += int(number_of_votes)
 
                 line = results.readline()
 
-        return election_results, total_valid_votes
+        return election_results, total_votes
 
     # Return if user is able to login the voting system
     def login(self, login_number, login_password):
@@ -54,6 +55,8 @@ class Model:
     # NOTE Assume input is correct and candidate exists
     def get_candidate_info(self, candidate, candidate_chosen):
         candidate_info = {}
+        is_candidate_valid = False
+
         with open("files/candidates_{}.txt".format(candidate)) as reader:
             line = reader.readline()
             while line != '':
@@ -61,8 +64,13 @@ class Model:
                 if int(number) == candidate_chosen:
                     candidate_info['name'] = candidate_name
                     candidate_info['political_party'] = party
+                    is_candidate_valid = True
 
                 line = reader.readline()
+
+        if is_candidate_valid == False:
+            candidate_info['name'] = ''
+            candidate_info['political_party'] = ''
 
         return candidate_info
 

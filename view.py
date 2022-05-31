@@ -101,12 +101,12 @@ class View:
         print()
         print("### Resultados para candidato a {} ###".format(running_candidate))
         print()
+
         for candidate_results in election_results:
             candidate = candidate_results['candidate_name']
             votes = candidate_results['number_of_votes']
 
-            if ((candidate == 'nulo' and votes == 0)
-                or (candidate != 'nulo' and votes == 0)):
+            if (votes == 0):
                 print("> {}, \t{} votos, \t{:.2%} dos votos"
                 .format(candidate, votes, votes)
                 )
