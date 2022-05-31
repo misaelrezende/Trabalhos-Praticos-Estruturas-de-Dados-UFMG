@@ -16,17 +16,20 @@ class Model:
 
     # Return election_results, valid_votes
     def get_election_results(self, candidate):
-        election_results = {}
+        election_results = []
         total_valid_votes = 0
         # open results file
         results_file = "files/results_{}.txt".format(candidate)
         with open(results_file, 'r') as results:
             line = results.readline()
             while line != '':
-                candidate_name, votes = line.split(',')
-                election_results[candidate_name] = int(votes)
+                candidate_name,_,number_of_votes = line.split(',')
+                election_results.append({
+                    'candidate_name': candidate_name,
+                    'number_of_votes': int(number_of_votes)
+                })
                 if candidate_name != "nulo":
-                    total_valid_votes += int(votes)
+                    total_valid_votes += int(number_of_votes)
 
                 line = results.readline()
 
@@ -77,6 +80,7 @@ class Model:
                 if voter_registration_number == int(reg_number):
                     is_voter_able = int(voter_condition)
                     break
+
                 line = reader.readline()
 
         return is_voter_able

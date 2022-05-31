@@ -58,6 +58,7 @@ class View:
         return option
 
     def get_voter_candidate_option(self):
+        print()
         print("Digite VERDE para CONFIRMAR este voto")
         print("Digite LARANJA para REINICIAR este voto")
         print()
@@ -84,7 +85,9 @@ class View:
         return int(input())
 
     def voter_is_finished(self):
+        print()
         print("FIM")
+        print()
 
     def end(self, result):
         if result == True:
@@ -98,19 +101,22 @@ class View:
         print()
         print("### Resultados para candidato a {} ###".format(running_candidate))
         print()
-        for candidate, votes in election_results.items():
+        for candidate_results in election_results:
+            candidate = candidate_results['candidate_name']
+            votes = candidate_results['number_of_votes']
+
             if ((candidate == 'nulo' and votes == 0)
                 or (candidate != 'nulo' and votes == 0)):
-                print("> {}, {} votos, {:.2%} dos votos"
+                print("> {}, \t{} votos, \t{:.2%} dos votos"
                 .format(candidate, votes, votes)
                 )
             else:
-                print("> {}, {} votos, {:.2%} dos votos válidos"
-                .format(candidate, votes, valid_votes/votes)
+                print("> {}, \t{} votos, \t{:.2%} dos votos"
+                .format(candidate, votes, votes/valid_votes)
                 )
 
-        sort_election_results = sorted(election_results.items(), key=lambda y: y[1], reverse=True)
+        sort_election_results = sorted(election_results, key=lambda y: y['number_of_votes'], reverse=True)
         print()
         print("-----------------------------------")
-        print("Candidato eleito {}".format(sort_election_results[0][0]))
+        print("Candidato eleito: {}".format(sort_election_results[0]['candidate_name']))
         print("-----------------------------------")
