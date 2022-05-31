@@ -82,25 +82,36 @@ class Model:
         return is_voter_able
 
     def compute_voter_has_voted(self, voter_registration_number):
-        voters_data = {}
-        with open("files/voters.txt", 'r') as reader:
+        voters_data = []
+        voters_file = "files/voters.txt"
+        with open(voters_file, 'r') as reader:
             line = reader.readline()
             while line != '':
                 reg_number,name,voter_condition = line.split(',')
-                voters_data['name'] = name
-                voters_data['reg_number'] = reg_number
-                if voter_registration_number == int(reg_number):
-                    voters_data['voter_condition'] = str(4)
-                else:
-                    voters_data['voter_condition'] = voter_condition
 
-        with open("files/voters.txt", 'w') as writer:
-            for reg_number,name,voter_condition in voters_data.items():
+                if voter_registration_number == int(reg_number):
+                    voters_data.append({
+                        'reg_number': reg_number,
+                        'name': name,
+                        'voter_condition': str(4)
+                    })
+                else:
+                    voters_data.append({
+                        'reg_number': reg_number,
+                        'name': name,
+                        'voter_condition': voter_condition
+                    })
+
+
+                line = reader.readline()
+
+        with open(voters_file, 'w') as writer:
+            for voters in voters_data:
                 writer.writelines(
                     "{},{},{}\n".format(
-                    reg_number,
-                    name,
-                    voter_condition
+                    voters['reg_number'],
+                    voters['name'],
+                    voters['voter_condition']
                 ))
 
     def compute_vote(self, candidate_type, candidate_chosen):
@@ -129,7 +140,6 @@ class Model:
                         'number': number,
                         'number_of_votes': int(number_of_votes)
                     })
-
 
                 line = results.readline()
 
