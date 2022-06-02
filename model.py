@@ -127,12 +127,17 @@ class Model:
                 ))
 
     def compute_vote(self, candidate_type, candidate_chosen):
+        results_filename = "files/results_{}.txt".format(candidate_type)
+
+        results_data = self.read_results_from_file(
+            self, candidate_chosen, results_filename, results_data
+            )
+        self.write_new_results_to_file(self, results_filename, results_data)
+
+    def read_results_from_file(self, candidate_chosen, results_filename):
         results_data = []
         is_null_vote = True
-
-        # Read results saved
-        results_file = "files/results_{}.txt".format(candidate_type)
-        with open(results_file, 'r') as results:
+        with open(results_filename, 'r') as results:
             line = results.readline()
             while line != '':
                 candidate_name,number,number_of_votes=line.split(',')
@@ -155,8 +160,10 @@ class Model:
 
                 line = results.readline()
 
-        # Write new results
-        with open(results_file, 'w') as writer:
+        return results_data
+
+    def write_new_results_to_file(self, results_filename, results_data):
+        with open(results_filename, 'w') as writer:
             for candidate_votes in results_data:
                 writer.writelines(
                     "{},{},{}\n".format(
