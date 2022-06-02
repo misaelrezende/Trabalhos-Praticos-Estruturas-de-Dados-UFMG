@@ -88,25 +88,26 @@ class Controller:
 
     # Voter chooses his/her candidates
     def start_voting(self):
-        candidates_length = len(self.list_of_candidates)
+        number_of_candidates = len(self.list_of_candidates)
         current_candidate = 0
 
         while True:
-            candidate = self.list_of_candidates[current_candidate]
-            candidate_chosen = self.view.voter_is_voting(candidate)
-            candidate_info = self.model.get_candidate_info(candidate, candidate_chosen)
-            option = self.view.show_candidate_chosen(candidate_info)
+            candidate_type = self.list_of_candidates[current_candidate]
+            candidate_chosen = self.view.get_voter_candidate(candidate_type)
+            candidate_info = self.model.get_candidate_info(candidate_type, candidate_chosen)
+            self.view.show_candidate_chosen(candidate_info)
+            option = self.view.get_voter_candidate_option()
 
             if option == 'verde':
-                self.model.compute_vote(candidate, candidate_chosen)
-                if current_candidate == candidates_length-1:
+                self.model.compute_vote(candidate_type, candidate_chosen)
+                if current_candidate == number_of_candidates-1:
                     break
 
                 current_candidate += 1
             else:
                 continue
 
-        self.view.voter_is_finished()
+        self.view.show_voter_has_finished()
 
 if __name__ == "__main__":
     main = Controller()
