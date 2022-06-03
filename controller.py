@@ -2,7 +2,7 @@ from model import Model
 from view import View
 
 class Controller:
-    is_voting_sistem_on = False
+    is_voting_sistem_authenticated = False
     list_of_candidates = ['Presidente', 'Senador'] # dep federal, dep estadual, senador, governador, presidente
 
     def __init__(self):
@@ -16,7 +16,7 @@ class Controller:
             result = self.login()
             if result == True:
                 self.view.show_login_detail(result)
-                self.is_voting_sistem_on = True
+                self.is_voting_sistem_authenticated = True
             else:
                 self.view.end(False) # Finish system
                 return
@@ -24,11 +24,11 @@ class Controller:
             self.view.end(False) # Finish system
             return
 
-        # Voting system started
-        if self.is_voting_sistem_on == True:
+    def run_voting_system(self):
+        if self.is_voting_sistem_authenticated == True:
             # Initialize computing the votes
             self.view.start_voting_machine()
-            voter_registration_number = 1
+            voter_registration_number = 1 # flag initialization
 
             # While voter_registration_number is not zero
             # (zero would conclude the voting session)
@@ -38,19 +38,7 @@ class Controller:
                 if voter_registration_number == 0:
                     result = self.finish_voting_machine()
                     if result == True:
-                        candidates_length = len(self.list_of_candidates)
-                        current_candidate = 0
-
-                        # Prints election results
-                        while True:
-                            candidate = self.list_of_candidates[current_candidate]
-                            election_results, valid_votes = self.model.get_election_results(candidate)
-                            self.view.show_election_results(candidate, election_results, valid_votes)
-
-                            if current_candidate == candidates_length-1:
-                                break
-                            current_candidate += 1
-
+                        self.show_election_results()
                         break
                     else:
                         continue
@@ -64,16 +52,29 @@ class Controller:
                     else:
                         self.view.voter_error(voter_verification)
 
+    def show_election_results(self):
+        number_of_candidates = len(self.list_of_candidates)
+        current_candidate = 0
+
+        while True:
+            candidate = self.list_of_candidates[current_candidate]
+            election_results, valid_votes = self.model.get_election_results(candidate)
+            self.view.show_election_results(candidate, election_results, valid_votes)
+
+            if current_candidate == number_of_candidates-1:
+                break
+            current_candidate += 1
+
     def finish_voting_machine(self):
-        is_finishing = self.view.finish_voting_machine()
-        if is_finishing == 1:
+        clerk_wants_to_finish = self.view.finish_voting_machine()
+        if clerk_wants_to_finish == 1:
             result = self.login()
             while result != True:
                 self.view.show_login_detail(result)
                 result = self.login()
 
             self.view.show_login_detail(result)
-            self.is_voting_sistem_on = False
+            self.is_voting_sistem_authenticated = False
             self.view.end(True) # Finish system
             return True # User was authenticated and system can finish
 
@@ -112,3 +113,4 @@ class Controller:
 if __name__ == "__main__":
     main = Controller()
     main.start()
+    main.run_voting_system()

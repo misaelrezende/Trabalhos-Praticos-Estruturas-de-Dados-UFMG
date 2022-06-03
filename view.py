@@ -31,6 +31,9 @@ class View:
         print("### Para terminar a votação, digite o número 0 para o titulo de eleitor ###")
         print()
 
+    def get_voter_registration_number(self):
+        return int(input("Digite o número do título de eleitor: "))
+
     def finish_voting_machine(self):
         print("Você quer finalizar a votação?")
         print("0 - Continuar votação")
@@ -46,9 +49,6 @@ class View:
         print("Logo após, será necessário digitar o login e senha do mesário")
         print()
         return self.menu()
-
-    def get_voter_registration_number(self):
-        return int(input("Digite o número do título de eleitor: "))
 
     def voter_error(self, error):
         if error == 2:
