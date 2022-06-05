@@ -1,4 +1,4 @@
-name: project
+name: SR_project
 channels:
 - conda-forge
 - defaults
@@ -7,8 +7,8 @@ dependencies:
 - python=3.9
 - opencv
 - matplotlib
-- scikit-image
-- pip
+- scikit-image # ssim
 
+- pip
 - pip:
-  - opencv-contrib-python
+  - opencv-contrib-python # opencv dnn_superres()
