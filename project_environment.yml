@@ -1,0 +1,14 @@
+name: project
+channels:
+- conda-forge
+- defaults
+dependencies:
+- nb_conda_kernels
+- python=3.9
+- opencv
+- matplotlib
+- scikit-image
+- pip
+
+- pip:
+  - opencv-contrib-python
