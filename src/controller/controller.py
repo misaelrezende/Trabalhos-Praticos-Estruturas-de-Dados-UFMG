@@ -1,4 +1,7 @@
-from model.model import Calculator
+import sys
+sys.path.append("../")
+
+from model.calculator import Calculator
 from view.view import View
 
 class Controller():
