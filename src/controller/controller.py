@@ -1,15 +1,21 @@
+"""Controller module"""
 import sys
 sys.path.append("../")
 
 from model.calculator import Calculator
 from view.view import View
 
+
 class Controller():
+    """
+        Controller class
+    """
     def __init__(self):
         self.model = Calculator()
         self.view = View()
 
     def start(self):
+        """Start and run system"""
         first_input = self.view.start()
 
         if first_input != 0:
@@ -24,12 +30,27 @@ class Controller():
         self.view.end()
 
     def parse_user_input(self, user_input):
+        """
+        Parse user input
+        Arguments:
+            user_input: string
+        Returns:
+            list_of_float_inputs: list of float
+        """
         list_of_inputs = user_input.split(',')
         list_of_string_inputs = [i.strip(' ') for i in list_of_inputs]
         list_of_float_inputs = [float(i) for i in list_of_string_inputs]
         return list_of_float_inputs
 
     def get_equation_result(self, operand, list_of_numbers):
+        """
+        Sums a list of numbers
+        Arguments:
+            operand: int
+            list_of_numbers: list of float
+        Returns:
+            Result of operation: float
+        """
         if operand == 1:
             return self.model.sum(list_of_numbers)
         elif operand == 2:

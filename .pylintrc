@@ -1,0 +1,5 @@
+# .pylintrc
+
+[MASTER]
+
+disable=consider-using-f-string
