@@ -1,9 +1,8 @@
 """Controller module"""
 import sys
-sys.path.append("../")
-
 from model.calculator import Calculator
 from view.view import View
+sys.path.append("../")
 
 
 class Controller():
@@ -14,7 +13,7 @@ class Controller():
         self.model = Calculator()
         self.view = View()
 
-    def start(self):
+    def start_and_run(self):
         """Start and run system"""
         first_input = self.view.start()
 
@@ -58,4 +57,4 @@ class Controller():
 
 if __name__ == "__main__":
     main = Controller()
-    main.start()
+    main.start_and_run()
