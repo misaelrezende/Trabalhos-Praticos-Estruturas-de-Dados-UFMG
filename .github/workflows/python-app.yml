@@ -36,4 +36,4 @@ jobs:
         python -m pytest --import-mode=append src/tests/
     - name: Lint with Pylint
       run: |
-        pylint --disable=consider-using-f-string, no-else-return, inconsistent-return-statements $(git ls-files 'src/*.py')
+        pylint --rcfile=.pylintrc $(git ls-files 'src/*.py')
