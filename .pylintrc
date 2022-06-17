@@ -2,4 +2,4 @@
 
 [MASTER]
 
-disable=consider-using-f-string
+disable=consider-using-f-string, no-else-return, inconsistent-return-statements
