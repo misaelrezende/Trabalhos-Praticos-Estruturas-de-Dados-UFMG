@@ -1,6 +1,7 @@
 from candidate import Candidate
 from voter import Voter
 from clerk import Clerk
+from db.access_db import AccessDB
 
 # results file header
 # candidate_name, # of votes received
@@ -13,6 +14,7 @@ from clerk import Clerk
 # voter_registration_number, name, is_able_to_vote
 
 class Model:
+    database_path = "db/voting_system.db"
 
     # Return election_results, valid_votes
     def get_election_results(self, candidate):
@@ -80,18 +82,10 @@ class Model:
         # 2: não pode votar;
         # 3: núm incorreto;
         # 4: já votou
-        is_voter_able = 3
-        with open("files/voters.txt", 'r') as reader:
-            line = reader.readline()
-            while line != '':
-                reg_number,name,voter_condition = line.split(',')
-                if voter_registration_number == int(reg_number):
-                    is_voter_able = int(voter_condition)
-                    break
+        db = AccessDB(self.database_path)
+        voter_condition = db.get_voter_status('voter', voter_registration_number)
 
-                line = reader.readline()
-
-        return is_voter_able
+        return voter_condition[0]
 
     def compute_voter_has_voted(self, voter_registration_number):
         voters_data = []
