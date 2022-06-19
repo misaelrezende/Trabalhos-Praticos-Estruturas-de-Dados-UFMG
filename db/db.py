@@ -19,13 +19,18 @@ sql_create_senator_candidate_table = """CREATE TABLE IF NOT EXISTS senator_candi
     political_party text NOT NULL
 );"""
 
-# sql_create_voting_resulting_table = """CREATE TABLE IF NOT EXISTS voting_result (
-
-# 	candidate_number integer NOT NULL,
-# 	name text NOT NULL,
-# 	number_of_votes integer NOT NULL,
-# 	FOREIGN KEY (candidate_number) REFERENCES candidate (number)
-# );"""
+sql_create_president_voting_resulting_table = """CREATE TABLE IF NOT EXISTS president_voting_result (
+    id integer PRIMARY KEY,
+	candidate_number integer NOT NULL,
+	name text NOT NULL,
+	number_of_votes integer NOT NULL
+);"""
+sql_create_senator_voting_resulting_table = """CREATE TABLE IF NOT EXISTS senator_voting_result (
+    id integer PRIMARY KEY,
+	candidate_number integer NOT NULL,
+	name text NOT NULL,
+	number_of_votes integer NOT NULL
+);"""
 
 class Database:
     def __init__(self, database_file):
@@ -80,6 +85,20 @@ class Database:
         self.connection.commit()
         return cursor.lastrowid
 
+    def create_voting_results_table(self, candidate, occupation):
+        """
+        Create a new candidate into the candidate table
+        :param candidate: tuple of data
+        :param occupation: occupation of candidate
+        :return: candidate id
+        """
+        sql = ''' INSERT INTO {}_voting_result(id,candidate_number,name,number_of_votes)
+                VALUES(?,?,?,?) '''.format(occupation)
+        cursor = self.connection.cursor()
+        cursor.execute(sql, candidate)
+        self.connection.commit()
+        return cursor.lastrowid
+
 
 # Test Database
 db = Database("pythonsqlite.db")
@@ -87,6 +106,8 @@ db = Database("pythonsqlite.db")
 db.create_table(sql_create_voter_table)
 db.create_table(sql_create_president_candidate_table)
 db.create_table(sql_create_senator_candidate_table)
+db.create_table(sql_create_president_voting_resulting_table)
+db.create_table(sql_create_senator_voting_resulting_table)
 
 voter = (1234567891011, 'Missandei', 1, 456)
 voter_id = db.create_voter(voter)
@@ -103,8 +124,28 @@ senator_candidates = [(451, 'Aécio Neves', 'PSDB'),
             (124, 'Duda Salabert', 'PDT')
             ]
 
+president_voting_results = [(1, 13, 'Luiz Inácio Lula da Silva', 0), 
+            (2, 22, 'Jair Messias Bolsonaro', 0),
+            (3, 12, 'Ciro Gomes', 0),
+            (4, 15, 'Simone Nassar Tebet', 0),
+            (5, 0, 'Nulo', 0)
+            ]
+
+senator_voting_results = [(1, 451, 'Aécio Neves', 0),
+            (2, 202, 'Cleitinho', 0),
+            (3, 553, 'Alexandre Silveira', 0),
+            (4, 124, 'Duda Salabert', 0),
+            (5, 0, 'Nulo', 0)
+            ]
+
 for candidate in president_candidates:
     db.create_candidate(candidate, 'President')
 
 for candidate in senator_candidates:
     db.create_candidate(candidate, 'Senator')
+
+for candidate in president_voting_results:
+    db.create_voting_results_table(candidate, 'President')
+
+for senator in senator_voting_results:
+    db.create_voting_results_table(senator, 'Senator')
