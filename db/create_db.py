@@ -32,7 +32,7 @@ sql_create_senator_voting_resulting_table = """CREATE TABLE IF NOT EXISTS senato
 	number_of_votes integer NOT NULL
 );"""
 
-class Database:
+class CreateDB:
     def __init__(self, database_file):
         self.connection = None
         self.create_connection(database_file)
@@ -100,8 +100,8 @@ class Database:
         return cursor.lastrowid
 
 
-# Test Database
-db = Database("pythonsqlite.db")
+# Create Database
+db = CreateDB("voting_system.db")
 
 db.create_table(sql_create_voter_table)
 db.create_table(sql_create_president_candidate_table)
@@ -109,8 +109,13 @@ db.create_table(sql_create_senator_candidate_table)
 db.create_table(sql_create_president_voting_resulting_table)
 db.create_table(sql_create_senator_voting_resulting_table)
 
-voter = (1234567891011, 'Missandei', 1, 456)
-voter_id = db.create_voter(voter)
+voters = [(1234567891011, "Conceição Evaristo", 1, 123),
+          (4567891011123, "Graciliano Ramos", 4, 456),
+          (7891011121314, "Joaquim Maria Machado de Assis", 4, 123)
+          ]
+
+for voter in voters:
+    db.create_voter(voter)
 
 president_candidates = [(13, 'Luiz Inácio Lula da Silva', 'PT'), 
             (22, 'Jair Messias Bolsonaro', 'PL'),
