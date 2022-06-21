@@ -34,3 +34,23 @@ class AccessDB:
             return rows
         except Error as error:
             print("Failed to read data from sqlite table", error)
+
+    def get_candidate(self, candidate_type, candidate_chosen):
+        """
+        Query candidate info from candidate table
+        Arguments:
+            candidate_type: position that candidate is running for
+            candidate_chosen: political number of candidate
+        Returns:
+            row: tuple with result
+        """
+        try:
+            cursor = self.connection.cursor()
+            query = '''SELECT name, political_party FROM {}_candidate
+                    WHERE number=?'''.format(candidate_type.lower())
+            cursor.execute(query, (candidate_chosen,))
+            row = cursor.fetchone()
+
+            return row
+        except Error as error:
+            print("Failed to read data from sqlite table", error)

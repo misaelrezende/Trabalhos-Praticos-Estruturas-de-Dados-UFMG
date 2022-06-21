@@ -53,26 +53,22 @@ class Model:
 
         return is_user_allowed
 
-    # Return name and political party of candidate
-    # NOTE Assume input is correct and candidate exists
     def get_candidate_info(self, candidate_type, candidate_chosen):
+        '''
+        Get name and political party of candidate
+        NOTE Assume input is correct, otherwise vote will be null
+        '''
         candidate_info = {}
-        is_candidate_valid = False
 
-        with open("files/candidates_{}.txt".format(candidate_type)) as reader:
-            line = reader.readline()
-            while line != '':
-                candidate_name,number,party = line.split(',')
-                if int(number) == candidate_chosen:
-                    candidate_info['name'] = candidate_name
-                    candidate_info['political_party'] = party
-                    is_candidate_valid = True
+        db = AccessDB(self.database_path)
+        candidate_info_from_db = db.get_candidate(candidate_type, candidate_chosen)
 
-                line = reader.readline()
-
-        if is_candidate_valid == False:
+        if candidate_info_from_db == None:
             candidate_info['name'] = ''
             candidate_info['political_party'] = ''
+        else:
+            candidate_info['name'] = candidate_info_from_db[0]
+            candidate_info['political_party'] = candidate_info_from_db[1]
 
         return candidate_info
 
