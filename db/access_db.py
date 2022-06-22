@@ -36,6 +36,21 @@ class AccessDB:
         except Error as error:
             print("Failed to read data from sqlite table", error)
 
+    def set_voter_status(self, table, registration):
+        """
+        Update voter status in voter table
+        Arguments:
+            table: name of db table
+            registration: registration number of voter
+        """
+        try:
+            sql = '''UPDATE {} SET status=? WHERE registration_number=?'''.format(table)
+            cursor = self.connection.cursor()
+            cursor.execute(sql, (4, registration,))
+            self.connection.commit()
+        except Error as error:
+            print("Failed to read data from sqlite table", error)
+
     def get_candidate(self, candidate_type, candidate_chosen):
         """
         Query candidate info from candidate table

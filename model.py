@@ -83,38 +83,14 @@ class Model:
 
         return voter_condition[0]
 
-    def compute_voter_has_voted(self, voter_registration_number):
-        voters_data = []
-        voters_file = "files/voters.txt"
-        with open(voters_file, 'r') as reader:
-            line = reader.readline()
-            while line != '':
-                reg_number,name,voter_condition = line.split(',')
-
-                if voter_registration_number == int(reg_number):
-                    voters_data.append({
-                        'reg_number': reg_number,
-                        'name': name,
-                        'voter_condition': str(4)
-                    })
-                else:
-                    voters_data.append({
-                        'reg_number': reg_number,
-                        'name': name,
-                        'voter_condition': voter_condition
-                    })
-
-
-                line = reader.readline()
-
-        with open(voters_file, 'w') as writer:
-            for voters in voters_data:
-                writer.writelines(
-                    "{},{},{}\n".format(
-                    voters['reg_number'],
-                    voters['name'],
-                    voters['voter_condition']
-                ))
+    def compute_voter_has_voted(self, registration):
+        """
+        Save info that voter has voted
+        Arguments:
+            registration: registration number of voter
+        """
+        db = AccessDB(self.database_path)
+        db.set_voter_status('voter', registration)
 
     def compute_vote(self, candidate_type, candidate_chosen):
         results_filename = "files/results_{}.txt".format(candidate_type)
