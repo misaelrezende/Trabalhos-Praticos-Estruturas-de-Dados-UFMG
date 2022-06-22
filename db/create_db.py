@@ -32,6 +32,12 @@ sql_create_senator_voting_resulting_table = """CREATE TABLE IF NOT EXISTS senato
 	number_of_votes integer NOT NULL
 );"""
 
+sql_create_user_table = """CREATE TABLE IF NOT EXISTS user (
+    id integer PRIMARY KEY,
+    login integer NOT NULL,
+    password text NOT NULL
+    );"""
+
 class CreateDB:
     def __init__(self, database_file):
         self.connection = None
@@ -99,6 +105,18 @@ class CreateDB:
         self.connection.commit()
         return cursor.lastrowid
 
+    def create_user(self, user):
+        """
+        Create a new user into the user table
+        :param user: tuple of data
+        :return: user id
+        """
+        sql = ''' INSERT INTO user(id,login,password)
+                VALUES(?,?,?) '''
+        cursor = self.connection.cursor()
+        cursor.execute(sql, user)
+        self.connection.commit()
+        return cursor.lastrowid
 
 # Create Database
 db = CreateDB("voting_system.db")
@@ -108,6 +126,12 @@ db.create_table(sql_create_president_candidate_table)
 db.create_table(sql_create_senator_candidate_table)
 db.create_table(sql_create_president_voting_resulting_table)
 db.create_table(sql_create_senator_voting_resulting_table)
+db.create_table(sql_create_user_table)
+
+users = [(1, 123456, '123456')]
+
+for user in users:
+    db.create_user(user)
 
 voters = [(1234567891011, "Conceição Evaristo", 1, 123),
           (4567891011123, "Graciliano Ramos", 4, 456),
