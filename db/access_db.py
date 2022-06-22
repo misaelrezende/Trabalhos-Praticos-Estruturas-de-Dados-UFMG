@@ -16,7 +16,13 @@ class AccessDB:
             self.connection = sqlite3.connect(database_file)
         except Error as error:
             print(error)
-    
+
+    def close_connection(self):
+        """
+        Close database connection
+        """
+        self.connection.close()
+
     def get_voter_status(self, table, registration):
         """
         Query voter status from voter table

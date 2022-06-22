@@ -62,6 +62,7 @@ class Model:
 
         db = AccessDB(self.database_path)
         candidate_info_from_db = db.get_candidate(candidate_type, candidate_chosen)
+        db.close_connection()
 
         if candidate_info_from_db == None:
             candidate_info['name'] = ''
@@ -80,6 +81,7 @@ class Model:
         # 4: já votou
         db = AccessDB(self.database_path)
         voter_condition = db.get_voter_status('voter', voter_registration_number)
+        db.close_connection()
 
         return voter_condition[0]
 
@@ -91,6 +93,7 @@ class Model:
         """
         db = AccessDB(self.database_path)
         db.set_voter_status('voter', registration)
+        db.close_connection()
 
     def compute_vote(self, candidate_type, candidate_chosen):
         results_filename = "files/results_{}.txt".format(candidate_type)
