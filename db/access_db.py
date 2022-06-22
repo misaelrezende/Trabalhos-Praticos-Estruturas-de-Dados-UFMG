@@ -17,21 +17,22 @@ class AccessDB:
         except Error as error:
             print(error)
     
-    def get_voter_status(self, table, system_query):
+    def get_voter_status(self, table, registration):
         """
         Query voter status from voter table
         Arguments:
-            query: voter condition
+            table: name of db table
+            registration: registration number of voter
         Returns:
-            rows: tuple
+            row: tuple with result
         """
         try:
             cursor = self.connection.cursor()
             query = '''SELECT status FROM {} WHERE registration_number=?'''.format(table)
-            cursor.execute(query, (system_query,))
-            rows = cursor.fetchone()
+            cursor.execute(query, (registration,))
+            row = cursor.fetchone()
 
-            return rows
+            return row
         except Error as error:
             print("Failed to read data from sqlite table", error)
 
