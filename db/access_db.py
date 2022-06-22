@@ -76,3 +76,20 @@ class AccessDB:
             return row
         except Error as error:
             print("Failed to read data from sqlite table", error)
+
+    def set_voter_choice(self, candidate_type, candidate_chosen):
+        """
+        Update the vote count with the voter's vote, i.e., increment
+        the number of votes for the chosen candidate by 1
+        Arguments:
+            candidate_type: position that candidate is running for
+            candidate_chosen: political number of candidate
+        """
+        try:
+            sql = '''UPDATE {}_voting_result SET number_of_votes=number_of_votes + 1
+                    WHERE candidate_number=?'''.format(candidate_type.lower())
+            cursor = self.connection.cursor()
+            cursor.execute(sql, (candidate_chosen,))
+            self.connection.commit()
+        except Error as error:
+            print("Failed to read data from sqlite table", error)

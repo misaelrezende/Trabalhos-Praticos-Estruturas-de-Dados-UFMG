@@ -96,12 +96,15 @@ class Model:
         db.close_connection()
 
     def compute_vote(self, candidate_type, candidate_chosen):
-        results_filename = "files/results_{}.txt".format(candidate_type)
-
-        results_data = self.read_results_from_file(
-            self, candidate_chosen, results_filename, results_data
-            )
-        self.write_new_results_to_file(self, results_filename, results_data)
+        """
+        Save voter choice to candidate result table
+        Arguments:
+            candidate_type: position that chosen candidate is running for
+            candidate_chosen: political number of chosen candidate
+        """
+        db = AccessDB(self.database_path)
+        db.set_voter_choice(candidate_type, candidate_chosen)
+        db.close_connection()
 
     def read_results_from_file(self, candidate_chosen, results_filename):
         results_data = []
@@ -130,13 +133,3 @@ class Model:
                 line = results.readline()
 
         return results_data
-
-    def write_new_results_to_file(self, results_filename, results_data):
-        with open(results_filename, 'w') as writer:
-            for candidate_votes in results_data:
-                writer.writelines(
-                    "{},{},{}\n".format(
-                    candidate_votes['candidate_name'],
-                    candidate_votes['number'],
-                    candidate_votes['number_of_votes']
-                ))
