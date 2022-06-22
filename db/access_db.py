@@ -23,6 +23,24 @@ class AccessDB:
         """
         self.connection.close()
 
+    def get_user_data(self, login_number):
+        """
+        Query user password from user table
+        Arguments:
+            login_number: user login
+        Returns:
+            row: tuple with result
+        """
+        try:
+            cursor = self.connection.cursor()
+            query = '''SELECT password FROM user WHERE login=?'''
+            cursor.execute(query, (login_number,))
+            row = cursor.fetchone()
+
+            return row
+        except Error as error:
+            print("Failed to read data from sqlite table", error)
+
     def get_voter_status(self, table, registration):
         """
         Query voter status from voter table

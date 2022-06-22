@@ -38,20 +38,20 @@ class Model:
 
         return election_results, total_votes
 
-    # Return if user is able to login the voting system
     def login(self, login_number, login_password):
-        is_user_allowed = False
-        with open("files/users_login.txt", 'r') as reader:
-            line = reader.readline()
-            while line != '':
-                user, password = line.split(',')
-                if int(login_number) == int(user):
-                    if int(password) == int(login_password):
-                        is_user_allowed = True
+        """
+        Check if user is able to login the voting system
+        Returns:
+            The return value: True if enabled. False if not enabled
+        """
+        db = AccessDB(self.database_path)
+        password = db.get_user_data(login_number)
+        db.close_connection()
 
-                line = reader.readline()
-
-        return is_user_allowed
+        if password[0] == str(login_password):
+            return True
+        else:
+            return False
 
     def get_candidate_info(self, candidate_type, candidate_chosen):
         '''
