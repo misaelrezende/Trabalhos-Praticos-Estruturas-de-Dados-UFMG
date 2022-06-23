@@ -3,16 +3,6 @@ from voter import Voter
 from clerk import Clerk
 from db.access_db import AccessDB
 
-# results file header
-# candidate_name, # of votes received
-# null votes,     # of votes received
-
-# candidates file header
-# candidate_name, number, name of party
-
-# voter file header
-# voter_registration_number, name, is_able_to_vote
-
 class Model:
     database_path = "db/voting_system.db"
 
@@ -104,31 +94,3 @@ class Model:
         db = AccessDB(self.database_path)
         db.set_voter_choice(candidate_type, candidate_chosen)
         db.close_connection()
-
-    def read_results_from_file(self, candidate_chosen, results_filename):
-        results_data = []
-        is_null_vote = True
-        with open(results_filename, 'r') as results:
-            line = results.readline()
-            while line != '':
-                candidate_name,number,number_of_votes=line.split(',')
-                if number == str(candidate_chosen):
-                    number_of_votes = str (int(number_of_votes) + 1 )
-                    is_null_vote = False
-
-                if is_null_vote == True and candidate_name == 'nulo':
-                    results_data.append({
-                        'candidate_name': candidate_name,
-                        'number': number,
-                        'number_of_votes': str( int(number_of_votes) + 1 )
-                    })
-                else:
-                    results_data.append({
-                        'candidate_name': candidate_name,
-                        'number': number,
-                        'number_of_votes': int(number_of_votes)
-                    })
-
-                line = results.readline()
-
-        return results_data
