@@ -16,25 +16,24 @@ from db.access_db import AccessDB
 class Model:
     database_path = "db/voting_system.db"
 
-    # Return election_results, valid_votes
-    def get_election_results(self, candidate):
-        election_results = []
+    def get_election_results(self, candidate_type):
+        """
+        Get vote count from candidate_voting_result table
+        Arguments:
+            candidate_type: position that candidate is running for
+        Returns:
+            election_results: list of tuple of candidate and number of votes received
+            total_votes: overall number of valid votes
+        """
+        db = AccessDB(self.database_path)
+        election_results = db.get_vote_count(candidate_type)
+        db.close_connection()
+
+        # Count valid votes
         total_votes = 0
-
-        # open results file
-        results_file = "files/results_{}.txt".format(candidate)
-        with open(results_file, 'r') as results:
-            line = results.readline()
-            while line != '':
-                candidate_name,_,number_of_votes = line.split(',')
-                election_results.append({
-                    'candidate_name': candidate_name,
-                    'number_of_votes': int(number_of_votes)
-                })
-
-                total_votes += int(number_of_votes)
-
-                line = results.readline()
+        for name, votes in election_results:
+            if name != "Nulo":
+                total_votes = total_votes + votes
 
         return election_results, total_votes
 

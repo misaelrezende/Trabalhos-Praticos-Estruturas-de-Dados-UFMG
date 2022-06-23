@@ -111,3 +111,22 @@ class AccessDB:
             self.connection.commit()
         except Error as error:
             print("Failed to read data from sqlite table", error)
+
+    def get_vote_count(self, candidate_type):
+        """
+        Query vote count from candidate_type_voting_result table
+        Arguments:
+            candidate_type: position that candidate is running for
+        Returns:
+            row: tuple with result
+        """
+        try:
+            cursor = self.connection.cursor()
+            query = '''SELECT name, number_of_votes
+                    FROM {}_voting_result'''.format(candidate_type.lower())
+            cursor.execute(query)
+            row = cursor.fetchall()
+
+            return row
+        except Error as error:
+            print("Failed to read data from sqlite table", error)
