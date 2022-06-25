@@ -8,24 +8,24 @@ sql_create_voter_table = """CREATE TABLE IF NOT EXISTS voter (
     pooling_station integer NOT NULL
 );"""
 
-sql_create_president_candidate_table = """CREATE TABLE IF NOT EXISTS president_candidate (
+sql_create_president_candidate_table = """CREATE TABLE IF NOT EXISTS presidente_candidate (
 	number integer PRIMARY KEY,
 	name text NOT NULL,
     political_party text NOT NULL
 );"""
-sql_create_senator_candidate_table = """CREATE TABLE IF NOT EXISTS senator_candidate (
+sql_create_senator_candidate_table = """CREATE TABLE IF NOT EXISTS senador_candidate (
 	number integer PRIMARY KEY,
 	name text NOT NULL,
     political_party text NOT NULL
 );"""
 
-sql_create_president_voting_resulting_table = """CREATE TABLE IF NOT EXISTS president_voting_result (
+sql_create_president_voting_resulting_table = """CREATE TABLE IF NOT EXISTS presidente_voting_result (
     id integer PRIMARY KEY,
 	candidate_number integer NOT NULL,
 	name text NOT NULL,
 	number_of_votes integer NOT NULL
 );"""
-sql_create_senator_voting_resulting_table = """CREATE TABLE IF NOT EXISTS senator_voting_result (
+sql_create_senator_voting_resulting_table = """CREATE TABLE IF NOT EXISTS senador_voting_result (
     id integer PRIMARY KEY,
 	candidate_number integer NOT NULL,
 	name text NOT NULL,
@@ -168,13 +168,13 @@ senator_voting_results = [(1, 451, 'Aécio Neves', 0),
             ]
 
 for candidate in president_candidates:
-    db.create_candidate(candidate, 'President')
+    db.create_candidate(candidate, 'Presidente')
 
 for candidate in senator_candidates:
-    db.create_candidate(candidate, 'Senator')
+    db.create_candidate(candidate, 'Senador')
 
 for candidate in president_voting_results:
-    db.create_voting_results_table(candidate, 'President')
+    db.create_voting_results_table(candidate, 'Presidente')
 
 for senator in senator_voting_results:
-    db.create_voting_results_table(senator, 'Senator')
+    db.create_voting_results_table(senator, 'Senador')

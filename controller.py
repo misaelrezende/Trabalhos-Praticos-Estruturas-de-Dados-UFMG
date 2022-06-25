@@ -3,8 +3,7 @@ from view import View
 
 class Controller:
     is_voting_sistem_authenticated = False
-    # list_of_candidates = ['Presidente', 'Senador'] # dep federal, dep estadual, senador, governador, presidente
-    list_of_candidates = ['President', 'Senator']
+    list_of_candidates = ['Presidente', 'Senador']
 
     def __init__(self):
         self.model = Model()
