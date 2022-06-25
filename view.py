@@ -100,9 +100,7 @@ class View:
         print("### Resultados para candidato a {} ###".format(running_candidate))
         print()
 
-        for candidate_results in election_results:
-            candidate = candidate_results['candidate_name']
-            votes = candidate_results['number_of_votes']
+        for candidate, votes in election_results:
 
             if (votes == 0):
                 print("> {}, \t{} votos, \t{:.2%} dos votos"
@@ -113,8 +111,8 @@ class View:
                 .format(candidate, votes, votes/valid_votes)
                 )
 
-        sort_election_results = sorted(election_results, key=lambda y: y['number_of_votes'], reverse=True)
+        sort_election_results = sorted(election_results, key=lambda y: y[1], reverse=True)
         print()
         print("-----------------------------------")
-        print("Candidato eleito: {}".format(sort_election_results[0]['candidate_name']))
+        print("Candidato eleito: {}".format(sort_election_results[0][0]))
         print("-----------------------------------")
