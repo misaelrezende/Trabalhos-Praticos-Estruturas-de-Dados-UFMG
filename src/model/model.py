@@ -95,3 +95,9 @@ class Model:
         db = AccessDB(self.database_path)
         db.set_voter_choice(candidate_type, candidate_chosen)
         db.close_connection()
+
+    def get_candidate_votes(self, candidate_type, candidate_number):
+        db = AccessDB(self.database_path)
+        candidate_votes = db.get_candidate_vote_count(candidate_type, candidate_number)
+        db.close_connection()
+        return candidate_votes[1]
