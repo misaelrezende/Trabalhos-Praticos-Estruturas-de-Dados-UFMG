@@ -38,6 +38,10 @@ class TestDBIntegration:
     database_path = "src/tests/test.db"
     @pytest.fixture(scope="session")
     def setup(self):
+        """
+        Create a new database to test the
+        integration with sqlite3 db
+        """
         db_in_memory = CreateDB(self.database_path)
         db_in_memory.create_table(sql_create_voter_table)
         db_in_memory.create_table(sql_create_president_candidate_table)
@@ -85,4 +89,35 @@ class TestDBIntegration:
         assert voter_verification == 4
 
     # Test vote is computed
+    def test_compute_vote(self, setup):
+        model = Model(self.database_path)
+        president_votes_before = model.get_candidate_votes('Presidente', 13)
+        senator_votes_before = model.get_candidate_votes('Senador', 124)
+
+        model.compute_vote('Presidente', 13)
+        model.compute_vote('Senador', 124)
+
+        president_votes_after = model.get_candidate_votes('Presidente', 13)
+        senator_votes_after = model.get_candidate_votes('Senador', 124)
+
+        assert(president_votes_before + 1 == president_votes_after)
+        assert(senator_votes_before + 1 == senator_votes_after)
+
+    # Test voter has voted
+    def test_compute_voter_has_voted(self, setup):
+        model = Model(self.database_path)
+        voter_registration_number = 4567891011123
+        model.compute_voter_has_voted(voter_registration_number)
+        voter_verification = model.verify_voter(voter_registration_number)
+        assert voter_verification == 4
+
     # Test vote is null
+    def test_president_null_vote(self):
+        model = Model(self.database_path)
+        null_votes_before = model.get_candidate_votes('Presidente', 0)
+
+        model.compute_vote('Presidente', 43)
+
+        null_votes_after = model.get_candidate_votes('Presidente', 0)
+
+        assert(null_votes_before + 1 == null_votes_after)
