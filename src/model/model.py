@@ -4,7 +4,8 @@
 from db.access_db import AccessDB
 
 class Model:
-    database_path = "../db/voting_system.db"
+    def __init__(self, db_path = "../db/voting_system.db"):
+        self.database_path = db_path
 
     def get_election_results(self, candidate_type):
         """
