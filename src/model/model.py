@@ -3,6 +3,11 @@
 # from clerk import Clerk
 from db.access_db import AccessDB
 
+valid_candidates = {
+    'Presidente': [12, 13, 15, 22],
+    'Senador': [124, 202, 553, 451]
+}
+
 class Model:
     def __init__(self, db_path = "../db/voting_system.db"):
         self.database_path = db_path
@@ -92,6 +97,9 @@ class Model:
             candidate_type: position that chosen candidate is running for
             candidate_chosen: political number of chosen candidate
         """
+        # Null vote if candidate does not exist
+        if candidate_chosen not in valid_candidates[candidate_type]:
+            candidate_chosen = 0
         db = AccessDB(self.database_path)
         db.set_voter_choice(candidate_type, candidate_chosen)
         db.close_connection()
