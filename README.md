@@ -21,7 +21,10 @@ O sistema da Urna eletrônica fornece algumas funcionalidades básicas de uma ur
 - Considere uma eleição com apenas um turno, isto é, não há segundo turno e o candidato que recebe mais votos ganha.
 
 ## Tecnologias utilizadas
-- O sistema foi escrito usando a linguagem _Python_. Como arquitetura, foi usado a _MVC_ (Model View Controller). Para armazenamento de dados, foi utilizado um arquivo _.txt_ simples.
+- O sistema foi escrito usando a linguagem _Python_
+- Como padrão de arquitetura de software, foi usado o _MVC_ (Model View Controller)
+- Para armazenamento de dados, foi utilizado o banco de dados _SQLite_
+- Para testes unitários, foi utilizado a framework _pytest_
 
 -------
 \* Inspirado em requisito de Trabalho Prático da matéria de Engenharia de Software I, do curso de Sistemas de Informação (UFMG), do professor Eduardo Figueiredo.
