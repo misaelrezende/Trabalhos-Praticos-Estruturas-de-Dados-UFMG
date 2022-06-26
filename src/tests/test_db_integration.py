@@ -91,16 +91,10 @@ class TestDBIntegration:
     # Test vote is computed
     def test_compute_vote(self, setup):
         model = Model(self.database_path)
-        president_votes_before = model.get_candidate_votes('Presidente', 13)
         senator_votes_before = model.get_candidate_votes('Senador', 124)
-
-        model.compute_vote('Presidente', 13)
         model.compute_vote('Senador', 124)
-
-        president_votes_after = model.get_candidate_votes('Presidente', 13)
         senator_votes_after = model.get_candidate_votes('Senador', 124)
 
-        assert(president_votes_before + 1 == president_votes_after)
         assert(senator_votes_before + 1 == senator_votes_after)
 
     # Test voter has voted
