@@ -1,10 +1,10 @@
-from candidate import Candidate
-from voter import Voter
-from clerk import Clerk
+# from candidate import Candidate
+# from voter import Voter
+# from clerk import Clerk
 from db.access_db import AccessDB
 
 class Model:
-    database_path = "db/voting_system.db"
+    database_path = "../db/voting_system.db"
 
     def get_election_results(self, candidate_type):
         """

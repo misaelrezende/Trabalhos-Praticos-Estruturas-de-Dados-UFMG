@@ -1,5 +1,7 @@
-from model import Model
-from view import View
+import sys
+sys.path.append("../")
+from model.model import Model
+from view.view import View
 
 class Controller:
     is_voting_sistem_authenticated = False
