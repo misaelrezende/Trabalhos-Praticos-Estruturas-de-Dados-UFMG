@@ -1,3 +1,4 @@
+# pylint: skip-file
 from users import User
 class Clerk(User):
     def _init_(self, startDate, endDate, name, reg_number, zona, secao,listOfCandidate):

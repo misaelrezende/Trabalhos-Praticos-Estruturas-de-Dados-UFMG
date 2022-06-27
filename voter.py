@@ -1,3 +1,4 @@
+# pylint: skip-file
 from users import User
 class Voter(User):
     def __init__(self, name, reg_number, poll_station):

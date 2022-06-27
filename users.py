@@ -1,3 +1,4 @@
+# pylint: skip-file
 class User:
     def __init__(self, name, reg_number, zona, secao):
         self.name = name
