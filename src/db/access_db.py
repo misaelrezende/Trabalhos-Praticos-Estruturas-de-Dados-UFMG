@@ -1,11 +1,16 @@
+"""AccessDB module"""
 import sqlite3
 from sqlite3 import Error
 
 class AccessDB:
+    """
+    AccessDB class. This class is responsible to directly interact
+    with the database
+    """
     def __init__(self, database_file):
         self.connection = None
         self.create_connection(database_file)
-    
+
     def create_connection(self, database_file):
         """
         Create a database connection to a SQLite database
