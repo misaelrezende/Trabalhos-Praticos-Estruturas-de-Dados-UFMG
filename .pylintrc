@@ -1,0 +1,5 @@
+# .pylintrc
+
+[MASTER]
+
+disable=consider-using-f-string, no-else-return, inconsistent-return-statements, unused-wildcard-import, unused-argument, wildcard-import, duplicate-string-formatting-argument, no-self-use, invalid-name
