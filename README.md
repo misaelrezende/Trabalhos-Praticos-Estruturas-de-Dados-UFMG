@@ -2,9 +2,10 @@
 
 > Este é um trabalho da disciplina de Engenharia de Software II, do curso de Sistemas de Informação, na Universidade Federal de Minas Gerais (UFMG).
 
-### Alunos:
+## Alunos:
 - Lucas Sousa
 - Misael Rezende
+- Higor Andrade
 
 ## Tema: Urna eletrônica*
 O sistema da Urna eletrônica fornece algumas funcionalidades básicas de uma urna eletrônica para votação em um candidato a presidente e dois candidatos a senadores. As funcionalidades são:
@@ -26,5 +27,14 @@ O sistema da Urna eletrônica fornece algumas funcionalidades básicas de uma ur
 - Para armazenamento de dados, foi utilizado o banco de dados _SQLite_
 - Para testes unitários, foi utilizado a framework _pytest_
 
+## Execução do sistema
+- Mova para o diretório src/controller:
+```
+cd src/controller
+```
+- Execute o comando:
+```
+python controller.py
+```
 -------
 \* Inspirado em requisito de Trabalho Prático da matéria de Engenharia de Software I, do curso de Sistemas de Informação (UFMG), do professor Eduardo Figueiredo.
