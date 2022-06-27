@@ -1,3 +1,4 @@
+"""Main CreateDB module"""
 from create_db import *
 
 users = [(1, 123456, '123456')]
@@ -23,7 +24,7 @@ senator_candidates = \
     ]
 
 president_voting_results = \
-    [(1, 13, 'Luiz Inácio Lula da Silva', 0), 
+    [(1, 13, 'Luiz Inácio Lula da Silva', 0),
     (2, 22, 'Jair Messias Bolsonaro', 0),
     (3, 12, 'Ciro Gomes', 0),
     (4, 15, 'Simone Nassar Tebet', 0),
@@ -39,7 +40,10 @@ senator_voting_results = \
     ]
 
 def create_db():
-    # Create Database
+    """
+    create_db method. This method contains the script
+    responsible to create the database
+    """
     db = CreateDB("voting_system.db")
 
     db.create_table(sql_create_voter_table)
