@@ -1,6 +1,7 @@
+"""Test DB Integration module"""
+import pytest
 from db.create_db import *
 from model.model import Model
-import pytest
 
 users = [(1, 123456, '123456')]
 
@@ -19,7 +20,7 @@ senator_candidates = \
     ]
 
 president_voting_results = \
-    [(1, 13, 'Luiz Inácio Lula da Silva', 0), 
+    [(1, 13, 'Luiz Inácio Lula da Silva', 0),
     (2, 22, 'Jair Messias Bolsonaro', 0),
     (3, 12, 'Ciro Gomes', 0),
     (4, 15, 'Simone Nassar Tebet', 0),
@@ -35,7 +36,12 @@ senator_voting_results = \
     ]
 
 class TestDBIntegration:
+    """
+    Test DB Integration class
+    """
+
     database_path = "src/tests/test.db"
+
     @pytest.fixture(scope="session")
     def setup(self):
         """
@@ -74,39 +80,49 @@ class TestDBIntegration:
         for senator in senator_voting_results:
             db_in_memory.create_voting_results_table(senator, 'Senador')
 
-    # Test voter is enabled to vote
     def test_voter_can_vote(self, setup):
+        """
+        Test if voter is enabled to vote
+        """
         model = Model(self.database_path)
         voter_registration_number = 4567891011123
         voter_verification = model.verify_voter(voter_registration_number)
         assert voter_verification == 1
 
-    # Test voter in not enabled to vote
     def test_voter_cannot_vote(self, setup):
+        """
+        Test voter is not enabled to vote
+        """
         model = Model(self.database_path)
         voter_registration_number = 7891011121314
         voter_verification = model.verify_voter(voter_registration_number)
         assert voter_verification == 4
 
-    # Test vote is computed
     def test_compute_vote(self, setup):
+        """
+        Test vote is saved in db
+        """
         model = Model(self.database_path)
         senator_votes_before = model.get_candidate_votes('Senador', 124)
         model.compute_vote('Senador', 124)
         senator_votes_after = model.get_candidate_votes('Senador', 124)
 
-        assert(senator_votes_before + 1 == senator_votes_after)
+        assert senator_votes_before + 1 == senator_votes_after
 
-    # Test voter has voted
     def test_compute_voter_has_voted(self, setup):
+        """
+        Test that voter status changes after user has voted
+        """
         model = Model(self.database_path)
         voter_registration_number = 4567891011123
         model.compute_voter_has_voted(voter_registration_number)
         voter_verification = model.verify_voter(voter_registration_number)
         assert voter_verification == 4
 
-    # Test vote is null
     def test_president_null_vote(self):
+        """
+        Test vote in non-existent candidate is null
+        """
         model = Model(self.database_path)
         null_votes_before = model.get_candidate_votes('Presidente', 0)
 
@@ -114,28 +130,38 @@ class TestDBIntegration:
 
         null_votes_after = model.get_candidate_votes('Presidente', 0)
 
-        assert(null_votes_before + 1 == null_votes_after)
+        assert null_votes_before + 1 == null_votes_after
 
-    # Test get candidate
-    def test_get_candidate_that_exists(self):
+    def test_get_candidate_that_exists(self, setup):
+        """
+        Test get candidate that exists
+        """
         model = Model(self.database_path)
         candidate_info = model.get_candidate_info('Senador', 124)
         assert candidate_info['name'] == 'Duda Salabert'
         assert candidate_info['political_party'] == 'PDT'
 
-    # Test get candidate that does not exist
-    def test_get_non_existent_candidate(self):
+    def test_get_non_existent_candidate(self, setup):
+        """
+        Test get candidate that does not exist
+        """
         model = Model(self.database_path)
         candidate_info = model.get_candidate_info('Senador', 420)
         assert candidate_info['name'] == ''
         assert candidate_info['political_party'] == ''
 
-    def test_user_can_login(self):
+    def test_user_can_login(self, setup):
+        """
+        Test user is able to login
+        """
         model = Model(self.database_path)
         result = model.login('123456', '123456')
-        assert result == True
+        assert result is True
 
-    def test_count_valid_votes(self):
+    def test_count_valid_votes(self, setup):
+        """
+        Test total vote count
+        """
         model = Model(self.database_path)
         model.compute_vote('Presidente', 13)
         model.compute_vote('Presidente', 15)
