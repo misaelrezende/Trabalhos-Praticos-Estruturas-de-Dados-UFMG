@@ -2,9 +2,10 @@
 
 > Este é um trabalho da disciplina de Engenharia de Software II, do curso de Sistemas de Informação, na Universidade Federal de Minas Gerais (UFMG).
 
-### Alunos:
+## Alunos:
 - Lucas Sousa
 - Misael Rezende
+- Higor Andrade
 
 ## Tema: Urna eletrônica*
 O sistema da Urna eletrônica fornece algumas funcionalidades básicas de uma urna eletrônica para votação em um candidato a presidente e dois candidatos a senadores. As funcionalidades são:

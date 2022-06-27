@@ -78,6 +78,9 @@ class Model:
         voter_condition = db.get_voter_status('voter', voter_registration_number)
         db.close_connection()
 
+        if voter_condition == None:
+            return 3
+
         return voter_condition[0]
 
     def compute_voter_has_voted(self, registration):

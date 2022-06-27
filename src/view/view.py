@@ -102,7 +102,7 @@ class View:
 
         for candidate, votes in election_results:
 
-            if (votes == 0):
+            if (valid_votes == 0):
                 print("> {}, \t{} votos, \t{:.2%} dos votos"
                 .format(candidate, votes, votes)
                 )
