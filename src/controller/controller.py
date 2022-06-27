@@ -1,9 +1,13 @@
+"""Controller module"""
 import sys
-sys.path.append("../")
 from model.model import Model
 from view.view import View
+sys.path.append("../")
 
 class Controller:
+    """
+    Controller class
+    """
     is_voting_sistem_authenticated = False
     list_of_candidates = ['Presidente', 'Senador']
 
@@ -12,11 +16,14 @@ class Controller:
         self.view = View()
 
     def start(self):
+        """
+        Start the system and login clerk
+        """
         option = self.view.start()
 
-        if option == 1: # Login como mesário 
+        if option == 1: # Login como mesário
             result = self.login()
-            if result == True:
+            if result is True:
                 self.view.show_login_detail(result)
                 self.is_voting_sistem_authenticated = True
             else:
@@ -27,7 +34,11 @@ class Controller:
             return
 
     def run_voting_system(self):
-        if self.is_voting_sistem_authenticated == True:
+        """
+        Start voting system if user is correctly authenticated
+        Runs while voter registration is not 0 (zero)
+        """
+        if self.is_voting_sistem_authenticated is True:
             # Initialize computing the votes
             self.view.start_voting_machine()
             voter_registration_number = 1 # flag initialization
@@ -39,11 +50,11 @@ class Controller:
 
                 if voter_registration_number == 0:
                     result = self.finish_voting_machine()
-                    if result == True:
+                    if result is True:
                         self.show_election_results()
                         break
-                    else:
-                        continue
+
+                    continue
 
                 else:
                     voter_verification = self.model.verify_voter(voter_registration_number)
@@ -55,6 +66,9 @@ class Controller:
                         self.view.voter_error(voter_verification)
 
     def show_election_results(self):
+        """
+        Show election results
+        """
         number_of_candidates = len(self.list_of_candidates)
         current_candidate = 0
 
@@ -68,10 +82,13 @@ class Controller:
             current_candidate += 1
 
     def finish_voting_machine(self):
+        """
+        Check if clerk wants to finish voting system
+        """
         clerk_wants_to_finish = self.view.finish_voting_machine()
         if clerk_wants_to_finish == 1:
             result = self.login()
-            while result != True:
+            while result is not True:
                 self.view.show_login_detail(result)
                 result = self.login()
 
@@ -85,12 +102,17 @@ class Controller:
         return False
 
     def login(self):
+        """
+        Login clerk
+        """
         login_number, login_password = self.view.get_login_detail()
         is_logged = self.model.login(login_number, login_password)
         return is_logged
 
-    # Voter chooses his/her candidates
     def start_voting(self):
+        """
+        Start voting. Here the voter chooses his/her candidates
+        """
         number_of_candidates = len(self.list_of_candidates)
         current_candidate = 0
 
