@@ -91,16 +91,10 @@ class TestDBIntegration:
     # Test vote is computed
     def test_compute_vote(self, setup):
         model = Model(self.database_path)
-        president_votes_before = model.get_candidate_votes('Presidente', 13)
         senator_votes_before = model.get_candidate_votes('Senador', 124)
-
-        model.compute_vote('Presidente', 13)
         model.compute_vote('Senador', 124)
-
-        president_votes_after = model.get_candidate_votes('Presidente', 13)
         senator_votes_after = model.get_candidate_votes('Senador', 124)
 
-        assert(president_votes_before + 1 == president_votes_after)
         assert(senator_votes_before + 1 == senator_votes_after)
 
     # Test voter has voted
@@ -121,3 +115,32 @@ class TestDBIntegration:
         null_votes_after = model.get_candidate_votes('Presidente', 0)
 
         assert(null_votes_before + 1 == null_votes_after)
+
+    # Test get candidate
+    def test_get_candidate_that_exists(self):
+        model = Model(self.database_path)
+        candidate_info = model.get_candidate_info('Senador', 124)
+        assert candidate_info['name'] == 'Duda Salabert'
+        assert candidate_info['political_party'] == 'PDT'
+
+    # Test get candidate that does not exist
+    def test_get_non_existent_candidate(self):
+        model = Model(self.database_path)
+        candidate_info = model.get_candidate_info('Senador', 420)
+        assert candidate_info['name'] == ''
+        assert candidate_info['political_party'] == ''
+
+    def test_user_can_login(self):
+        model = Model(self.database_path)
+        result = model.login('123456', '123456')
+        assert result == True
+
+    def test_count_valid_votes(self):
+        model = Model(self.database_path)
+        model.compute_vote('Presidente', 13)
+        model.compute_vote('Presidente', 15)
+        model.compute_vote('Presidente', 43)
+        model.compute_vote('Presidente', 13)
+
+        _, total_votes = model.get_election_results('Presidente')
+        assert total_votes == 3
