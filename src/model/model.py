@@ -1,6 +1,4 @@
-# from candidate import Candidate
-# from voter import Voter
-# from clerk import Clerk
+"""Model module"""
 from db.access_db import AccessDB
 
 valid_candidates = {
@@ -9,6 +7,10 @@ valid_candidates = {
 }
 
 class Model:
+    """
+    Model class. This class is responsible to interact
+    with AccessDB, which is the class responsible to access the database
+    """
     def __init__(self, db_path = "../db/voting_system.db"):
         self.database_path = db_path
 
@@ -16,10 +18,10 @@ class Model:
         """
         Get vote count from candidate_voting_result table
         Arguments:
-            candidate_type: position that candidate is running for
+            candidate_type (str): position that candidate is running for
         Returns:
-            election_results: list of tuple of candidate and number of votes received
-            total_votes: overall number of valid votes
+            election_results (list): list of tuple of candidate and number of votes received
+            total_votes (int): overall number of valid votes
         """
         db = AccessDB(self.database_path)
         election_results = db.get_vote_count(candidate_type)
@@ -36,8 +38,11 @@ class Model:
     def login(self, login_number, login_password):
         """
         Check if user is able to login the voting system
+        Arguments:
+            login_number (int): login
+            login_password (int): password
         Returns:
-            The return value: True if enabled. False if not enabled
+            The return value (bool): True if enabled. False if not enabled
         """
         db = AccessDB(self.database_path)
         password = db.get_user_data(login_number)
@@ -52,6 +57,11 @@ class Model:
         '''
         Get name and political party of candidate
         NOTE Assume input is correct, otherwise vote will be null
+        Arguments:
+            candidate_type (str): position that candidate is running for
+            candidate_chosen (int): political number of candidate
+        Returns:
+            candidate_info (dict): candidate name and political party
         '''
         candidate_info = {}
 
@@ -59,7 +69,7 @@ class Model:
         candidate_info_from_db = db.get_candidate(candidate_type, candidate_chosen)
         db.close_connection()
 
-        if candidate_info_from_db == None:
+        if candidate_info_from_db is None:
             candidate_info['name'] = ''
             candidate_info['political_party'] = ''
         else:
@@ -68,17 +78,27 @@ class Model:
 
         return candidate_info
 
-    # Verify if voter is able to vote
     def verify_voter(self, voter_registration_number):
-        # 1: eleitor está apto a votar;
-        # 2: não pode votar;
-        # 3: núm incorreto;
-        # 4: já votou
+        """
+        Verify if voter is able to vote
+        Arguments:
+            voter_registration_number (int): registration number
+        Returns:
+            3 if voter condition is None
+
+            Or else
+
+            voter status (int):
+                1: eleitor está apto a votar;
+                2: não pode votar;
+                3: núm incorreto;
+                4: já votou
+        """
         db = AccessDB(self.database_path)
         voter_condition = db.get_voter_status('voter', voter_registration_number)
         db.close_connection()
 
-        if voter_condition == None:
+        if voter_condition is None:
             return 3
 
         return voter_condition[0]
@@ -108,6 +128,14 @@ class Model:
         db.close_connection()
 
     def get_candidate_votes(self, candidate_type, candidate_number):
+        """
+        Get the quantity of votes from a specific candidate
+        Arguments:
+            candidate_type: position that chosen candidate is running for
+            candidate_chosen: political number of chosen candidate
+        Returns:
+            (int): quantity of votes
+        """
         db = AccessDB(self.database_path)
         candidate_votes = db.get_candidate_vote_count(candidate_type, candidate_number)
         db.close_connection()
