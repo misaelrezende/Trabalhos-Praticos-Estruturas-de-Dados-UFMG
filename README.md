@@ -2,4 +2,3 @@ Este repositório contém alguns Trabalhos Práticos das disciplinas da Universi
 
 - Estrutura de Dados
 - Algoritmos 1
-- Introdução à Inteligência Artificial
