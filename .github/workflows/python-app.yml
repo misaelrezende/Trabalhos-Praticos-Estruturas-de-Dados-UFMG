@@ -1,0 +1,38 @@
+name: Python application CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.9"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+        pip install pylint
+    - name: Test Database integration with pytest
+      run: |
+        python -m pytest src/tests/test_db_integration.py
+
+    - name: Lint with Pylint
+      run: |
+        pylint --rcfile=.pylintrc $(git ls-files 'src/*.py')
