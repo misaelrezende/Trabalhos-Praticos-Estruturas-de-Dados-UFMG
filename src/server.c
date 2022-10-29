@@ -14,7 +14,7 @@ typedef struct{
 
 typedef struct{
     int id_rack; // rack number
-    int quantidade_racks_alocados;
+    int quantidade_switches_alocados;
     Switch switchs[MAX_SWITCH];
 } Rack;
 
@@ -27,7 +27,7 @@ void informa_erro_e_termina_programa(char *mensagem){
 void inicializar_racks(Rack *racks){
     for(int i = 0; i < MAX_RACK; i++){
         racks[i].id_rack = i + 1;
-        racks[i].quantidade_racks_alocados = 0;
+        racks[i].quantidade_switches_alocados = 0;
         for(int j = 0; j < MAX_SWITCH; j++)
             racks[i].switchs[j].id_switch = -1;
     }
@@ -52,21 +52,42 @@ int criar_conexao_tcp(char* tipo_de_endereco){
 }
 
 void adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
-    if(racks[rack_da_operacao - 1].quantidade_racks_alocados + contador_switches > MAX_SWITCH)
+    if(racks[rack_da_operacao - 1].quantidade_switches_alocados + contador_switches > MAX_SWITCH)
         informa_erro_e_termina_programa("error rack limit exceeded");
 
     // Cria espaço para adicionar switch(es)
     printf(">> Chegou ate aqui\n");
     for(int i = 0; i < contador_switches; i++){
         if(switches_para_operar[i] != 0){
+
             // Checa se switch já está instalado neste rack
             if(racks[rack_da_operacao - 1].switchs[ switches_para_operar[i] ].id_switch == switches_para_operar[i])
                 // TODO: Falta enviar o nome do switch e do rack
                 informa_erro_e_termina_programa("error switch <switch_id> already installed in <rack_id>");
 
-            racks[rack_da_operacao - 1].switchs->id_switch = switches_para_operar[i];
-            racks[rack_da_operacao - 1].quantidade_racks_alocados += 1;
+            racks[rack_da_operacao - 1].switchs[ switches_para_operar[i] ].id_switch = switches_para_operar[i];
+            racks[rack_da_operacao - 1].quantidade_switches_alocados += 1;
             printf(">> Passou aqui tambem!\n");
+        }
+    }
+
+}
+
+void listar_switches(Rack *racks, int rack_da_operacao){
+    if(racks[rack_da_operacao - 1].quantidade_switches_alocados == 0)
+        informa_erro_e_termina_programa("empty rack");
+
+    int switches_impressos = 0;
+    for(int i = 0; i < MAX_SWITCH; i++){
+        if(racks[rack_da_operacao - 1].switchs[i].id_switch != -1){
+
+            if(switches_impressos == racks[rack_da_operacao - 1].quantidade_switches_alocados - 1){
+                printf("%d\n", racks[rack_da_operacao - 1].switchs[i].id_switch);
+                break;
+            }else{
+                printf("%d ", racks[rack_da_operacao - 1].switchs[i].id_switch);
+                switches_impressos += 1;
+            }
         }
     }
 
@@ -98,9 +119,10 @@ void processar_comando(char *mensagem, Rack *racks){
             if(strcmp(palavra, "in") == 0){
                 palavra = strtok(NULL, " ");
                 rack_da_operacao = atoi(palavra);
-                if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK)
+                if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK){
                     informa_erro_e_termina_programa("error rack doesn't exist\n");
-                break; // pode ser desnecessário
+                    break; // pode ser desnecessário
+                }
             }
             else if(strcmp(palavra, "sw") == 0){ // NOTE: Não vai entrar aqui mais não - pode apagar esse 'else if'
                 printf("\n\n>>>UAI, NAO EH PRA ENTRAR AQUI NAO SOO!\n\n");
@@ -136,9 +158,26 @@ void processar_comando(char *mensagem, Rack *racks){
         printf("comando digitado: %s\n", palavra);
     }else if(strcmp(palavra, "ls") == 0){
         printf("comando digitado: %s\n", palavra);
+
+        while(palavra != NULL){
+            palavra = strtok(NULL, " ");
+            printf("palavra atual: %s\n", palavra);
+
+            if(palavra == NULL)
+                break;
+
+            rack_da_operacao = atoi(palavra);
+            if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK){
+                informa_erro_e_termina_programa("error rack doesn't exist\n");
+                break; // pode ser desnecessário
+            }
+        }
+
+        listar_switches(racks, rack_da_operacao);
+
     }else{
         // TODO: Se receber mensagem desconhecida, ENCERRAR CONEXÃO
-        printf(">> mensagem [%s] desconhecida\nENCERRAR CONEXÃO", palavra);
+        printf(">> mensagem [%s] desconhecida\nENCERRAR CONEXÃO\n", palavra);
     }
 }
 
