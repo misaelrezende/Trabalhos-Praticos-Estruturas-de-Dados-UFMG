@@ -5,13 +5,9 @@
 // #include <netinet/in.h>
 // #include <sys/socket.h>
 
-void informa_erro_e_termina_programa(char *mensagem){
-    printf("%s", mensagem);
-    exit(1);
-}
+#define MAX_RACK   4 // número máximo de racks
+#define MAX_SWITCH 3 // número máximo de switchs
 
-const int MAX_RACK = 4; // número máximo de racks
-const int MAX_SWITCH = 3; // número máximo de switchs
 typedef struct{
     int id_switch; // switch id
 } Switch;
@@ -19,15 +15,21 @@ typedef struct{
 typedef struct{
     int id_rack; // rack number
     int quantidade_racks_alocados;
-    Switch *switchs;
+    Switch switchs[MAX_SWITCH];
 } Rack;
+
+void informa_erro_e_termina_programa(char *mensagem){
+    printf("%s", mensagem);
+    exit(1);
+}
 
 // Inicializa racks
 void inicializar_racks(Rack *racks){
     for(int i = 0; i < MAX_RACK; i++){
         racks[i].id_rack = i + 1;
         racks[i].quantidade_racks_alocados = 0;
-        racks[i].switchs = NULL;
+        for(int j = 0; j < MAX_SWITCH; j++)
+            racks[i].switchs[j].id_switch = -1;
     }
 }
 
@@ -54,52 +56,19 @@ void adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_oper
         informa_erro_e_termina_programa("error rack limit exceeded");
 
     // Cria espaço para adicionar switch(es)
-    racks[rack_da_operacao - 1].switchs = calloc(contador_switches, sizeof(Rack));
     printf(">> Chegou ate aqui\n");
     for(int i = 0; i < contador_switches; i++){
         if(switches_para_operar[i] != 0){
+            // Checa se switch já está instalado neste rack
+            if(racks[rack_da_operacao - 1].switchs[ switches_para_operar[i] ].id_switch == switches_para_operar[i])
+                // TODO: Falta enviar o nome do switch e do rack
+                informa_erro_e_termina_programa("error switch <switch_id> already installed in <rack_id>");
+
             racks[rack_da_operacao - 1].switchs->id_switch = switches_para_operar[i];
             racks[rack_da_operacao - 1].quantidade_racks_alocados += 1;
             printf(">> Passou aqui tambem!\n");
         }
     }
-
-    // // se não há nenhum rack
-    // if(racks == NULL){
-    //     // Instancia 1 rack e adiciona a informação
-    //     racks = calloc(1, sizeof(Rack));
-    //     racks[0].id_rack = rack_da_operacao;
-    //     racks[0].switchs = calloc(contador_switches, sizeof(Rack));
-    //     printf(">> Chegou ate aqui\n");
-    //     for(int i = 0; i < contador_switches; i++){
-    //         if(switches_para_operar[i] != 0){
-    //             racks[0].switchs->id_switch = switches_para_operar[i];
-    //             racks[0].quantidade_racks_alocados += 1;
-    //             printf(">> Passou aqui tambem!\n");
-    //         }
-    //     }
-    // }else{
-    //     // Checar se rack tem espaço
-    //     int qual_rack;
-    //     for(int i = 0; i < MAX_RACK; i++)
-    //         if(racks[i].id_rack == rack_da_operacao){
-    //             qual_rack = i;
-    //             break;
-    //         }
-    //     if(racks[qual_rack].quantidade_racks_alocados + contador_switches > MAX_SWITCH)
-    //         informa_erro_e_termina_programa("error rack limit exceeded");
-
-    //     racks[qual_rack].switchs = calloc(contador_switches, sizeof(Rack));
-    //     printf(">> Chegou ate aqui\n"); // NOTE: DUPLICAÇÃO DE CÓDIGO
-    //     for(int i = 0; i < contador_switches; i++){
-    //         if(switches_para_operar[i] != 0){
-    //             racks[0].switchs->id_switch = switches_para_operar[i];
-    //             racks[0].quantidade_racks_alocados += 1;
-    //             printf(">> Passou aqui tambem!\n");
-    //         }
-    //     }
-
-    // }
 
 }
 
@@ -143,7 +112,7 @@ void processar_comando(char *mensagem, Rack *racks){
                     informa_erro_e_termina_programa("error switch type unknown");
                     break; // pode ser desnecessário
                 }
-                if(contador_switches > 4){  // ultrapassa limite de switches TODO: DAR BREAK E RETORNAR MSG
+                if(contador_switches > 3){  // ultrapassa limite de switches TODO: DAR BREAK E RETORNAR MSG
                     informa_erro_e_termina_programa("error rack limit exceeded");
                     break; // pode ser desnecessário
                 }
