@@ -2,18 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h> // _Bool
-#include <netinet/in.h>
-#include <sys/socket.h>
-/* Implementação do código que vai interagir com os equipamentos,
-e receber os pedidos do cliente virá aqui.
-Ter interface para:
-- instalação
-- desinstalação
-- leitura de dados dos equipamentos
-
-- Rack é uma TAD que armazena TADs do tipo Switch
-- Switch é uma TAD que contém tipo, ...
-*/
+// #include <netinet/in.h>
+// #include <sys/socket.h>
 
 void informa_erro_e_termina_programa(char *mensagem){
     printf("%s", mensagem);
@@ -32,7 +22,14 @@ typedef struct{
     Switch *switchs;
 } Rack;
 
-Rack *racks = NULL;
+// Inicializa racks
+void inicializar_racks(Rack *racks){
+    for(int i = 0; i < MAX_RACK; i++){
+        racks[i].id_rack = i + 1;
+        racks[i].quantidade_racks_alocados = 0;
+        racks[i].switchs = NULL;
+    }
+}
 
 // Cria conexão TCP
 int criar_conexao_tcp(char* tipo_de_endereco){
@@ -52,8 +49,131 @@ int criar_conexao_tcp(char* tipo_de_endereco){
     return sock;
 }
 
-int main(int argc, char *argv[]){
+void adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
+    if(racks[rack_da_operacao - 1].quantidade_racks_alocados + contador_switches > MAX_SWITCH)
+        informa_erro_e_termina_programa("error rack limit exceeded");
 
+    // Cria espaço para adicionar switch(es)
+    racks[rack_da_operacao - 1].switchs = calloc(contador_switches, sizeof(Rack));
+    printf(">> Chegou ate aqui\n");
+    for(int i = 0; i < contador_switches; i++){
+        if(switches_para_operar[i] != 0){
+            racks[rack_da_operacao - 1].switchs->id_switch = switches_para_operar[i];
+            racks[rack_da_operacao - 1].quantidade_racks_alocados += 1;
+            printf(">> Passou aqui tambem!\n");
+        }
+    }
+
+    // // se não há nenhum rack
+    // if(racks == NULL){
+    //     // Instancia 1 rack e adiciona a informação
+    //     racks = calloc(1, sizeof(Rack));
+    //     racks[0].id_rack = rack_da_operacao;
+    //     racks[0].switchs = calloc(contador_switches, sizeof(Rack));
+    //     printf(">> Chegou ate aqui\n");
+    //     for(int i = 0; i < contador_switches; i++){
+    //         if(switches_para_operar[i] != 0){
+    //             racks[0].switchs->id_switch = switches_para_operar[i];
+    //             racks[0].quantidade_racks_alocados += 1;
+    //             printf(">> Passou aqui tambem!\n");
+    //         }
+    //     }
+    // }else{
+    //     // Checar se rack tem espaço
+    //     int qual_rack;
+    //     for(int i = 0; i < MAX_RACK; i++)
+    //         if(racks[i].id_rack == rack_da_operacao){
+    //             qual_rack = i;
+    //             break;
+    //         }
+    //     if(racks[qual_rack].quantidade_racks_alocados + contador_switches > MAX_SWITCH)
+    //         informa_erro_e_termina_programa("error rack limit exceeded");
+
+    //     racks[qual_rack].switchs = calloc(contador_switches, sizeof(Rack));
+    //     printf(">> Chegou ate aqui\n"); // NOTE: DUPLICAÇÃO DE CÓDIGO
+    //     for(int i = 0; i < contador_switches; i++){
+    //         if(switches_para_operar[i] != 0){
+    //             racks[0].switchs->id_switch = switches_para_operar[i];
+    //             racks[0].quantidade_racks_alocados += 1;
+    //             printf(">> Passou aqui tambem!\n");
+    //         }
+    //     }
+
+    // }
+
+}
+
+// Processa o comando recebido
+void processar_comando(char *mensagem, Rack *racks){
+    char *palavra; palavra = strtok(mensagem, " ");
+    int switches_para_operar[3] = {0,0,0};
+    int contador_switches = 0;
+    int rack_da_operacao = -1;
+
+    if(strcmp(palavra, "add") == 0){
+        printf("comando digitado: %s\n", palavra);
+        
+        palavra = strtok(NULL, " ");
+        printf("palavra atual: %s\n", palavra);
+        if(strcmp(palavra, "sw") != 0){
+            // TODO: Mensagem desconhecida, ENCERRAR CONEXÃO
+            printf(">> mensagem [%s] desconhecida\nENCERRAR CONEXÃO\n", palavra);
+        }
+
+        while(palavra != NULL){
+            palavra = strtok(NULL, " ");
+            printf("palavra atual: %s\n", palavra);
+
+            if(palavra == NULL)
+                break;
+            if(strcmp(palavra, "in") == 0){
+                palavra = strtok(NULL, " ");
+                rack_da_operacao = atoi(palavra);
+                if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK)
+                    informa_erro_e_termina_programa("error rack doesn't exist\n");
+                break; // pode ser desnecessário
+            }
+            else if(strcmp(palavra, "sw") == 0){ // NOTE: Não vai entrar aqui mais não - pode apagar esse 'else if'
+                printf("\n\n>>>UAI, NAO EH PRA ENTRAR AQUI NAO SOO!\n\n");
+                continue;
+            }
+            else{
+                int switch_id = atoi(palavra);
+                if(switch_id < 1 || switch_id > 4){ // tipo inválido de switch
+                    informa_erro_e_termina_programa("error switch type unknown");
+                    break; // pode ser desnecessário
+                }
+                if(contador_switches > 4){  // ultrapassa limite de switches TODO: DAR BREAK E RETORNAR MSG
+                    informa_erro_e_termina_programa("error rack limit exceeded");
+                    break; // pode ser desnecessário
+                }
+                switches_para_operar[contador_switches] = switch_id;
+                contador_switches += 1;
+            }
+
+        }
+        // NOTE: PRINTS EXTRAS
+        printf("contado_switches: %d | ", contador_switches);
+        for(int i = 0; i < 3; i++)
+            printf("%d ", switches_para_operar[i]);
+        printf(" | rack_da_operacao: %d\n", rack_da_operacao);
+
+        // Adiciona switch(s) no rack
+        adicionar_switch(racks, rack_da_operacao, switches_para_operar, contador_switches);
+
+    }else if(strcmp(palavra, "rm") == 0){
+        printf("comando digitado: %s\n", palavra);
+    }else if(strcmp(palavra, "get") == 0){
+        printf("comando digitado: %s\n", palavra);
+    }else if(strcmp(palavra, "ls") == 0){
+        printf("comando digitado: %s\n", palavra);
+    }else{
+        // TODO: Se receber mensagem desconhecida, ENCERRAR CONEXÃO
+        printf(">> mensagem [%s] desconhecida\nENCERRAR CONEXÃO", palavra);
+    }
+}
+
+int main(int argc, char *argv[]){
     // Args:
     // Tipo do endereço
     // Número de porta
@@ -64,15 +184,23 @@ int main(int argc, char *argv[]){
     //     exit(1);
     // }
 
-    char *tipo_de_endereco = argv[1];
+    // char *tipo_de_endereco = argv[1];
     // int numero_de_porta = atoi(argv[2]);
+    char tipo_de_endereco[3], mensagem[30];
+    // int numero_de_porta;
+    // scanf("%s %d", tipo_de_endereco, &numero_de_porta);
+
+    // int socket_do_servidor = criar_conexao_tcp(tipo_de_endereco);
+
+    Rack *racks = calloc(MAX_RACK, sizeof(Rack));
+    inicializar_racks(racks);
 
     while(true){
         printf("## Digite uma mensagem: ");
         fflush(stdin);
         fgets(mensagem, 30, stdin);
-        processar_comando(mensagem);
-        break;
+        processar_comando(mensagem, racks);
+        // break;
     }
 
     return 0;
