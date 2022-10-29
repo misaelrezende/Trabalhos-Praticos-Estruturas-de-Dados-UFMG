@@ -15,6 +15,25 @@ Ter interface para:
 - Switch é uma TAD que contém tipo, ...
 */
 
+void informa_erro_e_termina_programa(char *mensagem){
+    printf("%s", mensagem);
+    exit(1);
+}
+
+const int MAX_RACK = 4; // número máximo de racks
+const int MAX_SWITCH = 3; // número máximo de switchs
+typedef struct{
+    int id_switch; // switch id
+} Switch;
+
+typedef struct{
+    int id_rack; // rack number
+    int quantidade_racks_alocados;
+    Switch *switchs;
+} Rack;
+
+Rack *racks = NULL;
+
 // Cria conexão TCP
 int criar_conexao_tcp(char* tipo_de_endereco){
     int sock;
@@ -38,17 +57,23 @@ int main(int argc, char *argv[]){
     // Args:
     // Tipo do endereço
     // Número de porta
-    if(argc != 3){
-        fprintf(stderr,
-        "O servidor precisa de exatamente de 2 parametros de entrada:\n\
-        ./server <tipo de endereço '<v4|v6>'> <número da porta>\n");
-        exit(1);
-    }
+    // if(argc != 3){
+    //     fprintf(stderr,
+    //     "O servidor precisa de exatamente de 2 parametros de entrada:\n\
+    //     ./server <tipo de endereço '<v4|v6>'> <número da porta>\n");
+    //     exit(1);
+    // }
 
     char *tipo_de_endereco = argv[1];
     // int numero_de_porta = atoi(argv[2]);
 
-    int socket_do_servidor = criar_conexao_tcp(tipo_de_endereco);
+    while(true){
+        printf("## Digite uma mensagem: ");
+        fflush(stdin);
+        fgets(mensagem, 30, stdin);
+        processar_comando(mensagem);
+        break;
+    }
 
     return 0;
 }
