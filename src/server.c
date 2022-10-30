@@ -14,7 +14,6 @@ typedef struct{
 } Switch;
 
 typedef struct{
-    int id_rack; // rack number
     int quantidade_switches_alocados;
     Switch switchs[MAX_SWITCH];
 } Rack;
@@ -24,10 +23,11 @@ void informa_erro_e_termina_programa(char *mensagem){
     exit(1);
 }
 
-// Inicializa racks
+/* Inicializa racks
+   Assume que racks tem ids de 1 a 4.
+*/
 void inicializar_racks(Rack *racks){
     for(int i = 0; i < MAX_RACK; i++){
-        racks[i].id_rack = i + 1;
         racks[i].quantidade_switches_alocados = 0;
         for(int j = 0; j < MAX_SWITCH; j++)
             racks[i].switchs[j].id_switch = -1;
