@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h> // _Bool
+#include <time.h> // rand()
 // #include <netinet/in.h>
 // #include <sys/socket.h>
 
@@ -93,6 +94,39 @@ void listar_switches(Rack *racks, int rack_da_operacao){
 
 }
 
+void ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
+    if(racks[rack_da_operacao - 1].quantidade_switches_alocados == 0)
+        informa_erro_e_termina_programa("error switch doesn't exist");
+
+    int switches_impressos = 0;
+    int limite_superior = 5000;
+    int limite_inferior = 1;
+    bool switch_encontrado = false;
+
+    for(int j = 0; j < contador_switches; j++){
+
+        if(racks[rack_da_operacao - 1].switchs[ switches_para_operar[j] ].id_switch == switches_para_operar[j]){
+
+            int numero_randomico = (rand() % (limite_superior + 1 - limite_inferior));
+
+            if(switches_impressos == contador_switches - 1){ // último a ser impresso
+                printf("%d Kbs\n", numero_randomico);
+                switch_encontrado = true;
+                break;
+            }else{
+                printf("%d Kbs ", numero_randomico);
+                switches_impressos += 1;
+                switch_encontrado = true;
+            }
+        }
+
+    }
+
+    // Caso switch não tenha sido instalado no rack
+    if(switch_encontrado == false)
+        informa_erro_e_termina_programa("error switch doesn't exist");
+
+}
 // Processa o comando recebido
 void processar_comando(char *mensagem, Rack *racks){
     char *palavra; palavra = strtok(mensagem, " ");
@@ -156,6 +190,39 @@ void processar_comando(char *mensagem, Rack *racks){
         printf("comando digitado: %s\n", palavra);
     }else if(strcmp(palavra, "get") == 0){
         printf("comando digitado: %s\n", palavra);
+
+        while(palavra != NULL){
+            palavra = strtok(NULL, " ");
+            printf("palavra atual: %s\n", palavra);
+
+            if(palavra == NULL)
+                break;
+            if(strcmp(palavra, "in") == 0){
+                palavra = strtok(NULL, " ");
+                rack_da_operacao = atoi(palavra);
+                if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK){
+                    informa_erro_e_termina_programa("error rack doesn't exist\n");
+                    break; // pode ser desnecessário
+                }
+            }else{
+                int switch_id = atoi(palavra);
+                if(switch_id < 1 || switch_id > 4){ // tipo inválido de switch
+                    informa_erro_e_termina_programa("error switch type unknown");
+                    break; // pode ser desnecessário
+                }
+                switches_para_operar[contador_switches] = switch_id;
+                contador_switches += 1;
+            }
+
+        }
+        // NOTE: PRINTS EXTRAS
+        printf("contado_switches: %d | ", contador_switches);
+        for(int i = 0; i < 3; i++)
+            printf("%d ", switches_para_operar[i]);
+        printf(" | rack_da_operacao: %d\n", rack_da_operacao);
+
+        ler_dados_de_switches(racks, rack_da_operacao, switches_para_operar, contador_switches);
+
     }else if(strcmp(palavra, "ls") == 0){
         printf("comando digitado: %s\n", palavra);
 
