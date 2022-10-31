@@ -3,11 +3,16 @@
 #include <string.h>
 #include <stdbool.h> // _Bool
 #include <time.h> // rand()
-// #include <netinet/in.h>
-// #include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+// #include <unistd.h>
 
 #define MAX_RACK   4 // número máximo de racks
 #define MAX_SWITCH 3 // número máximo de switchs
+#define BUFSIZE    500  // message max size
+static const int MAXPENDING = 1; // Pedidos de conexão pendentes máximos
 
 typedef struct{
     int id_switch; // switch id
@@ -35,19 +40,25 @@ void inicializar_racks(Rack *racks){
 }
 
 // Cria conexão TCP
-int criar_conexao_tcp(char* tipo_de_endereco){
+int criar_conexao_tcp(char *tipo_de_endereco){
     int sock;
-    _Bool ipv4 = false;
-    if(strcmp(tipo_de_endereco, "V4") == 0)
+    bool ipv4 = false;
+    if(strcmp(tipo_de_endereco, "v4") == 0){
         ipv4 = true;
-
-    if(ipv4)
-        sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+        // printf("ipv4\n");
+    }
     else
+        // printf("ipv6\n");
+
+    if(ipv4 == true)
+        // Cria um socket IPv4 usando TCP
         sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    else
+        // Cria um socket IPv6 usando TCP
+        sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
     if(sock < 0)
-        printf("Falha em inicar conexão socket.\n");
+        informa_erro_e_termina_programa("Falha em iniciar conexao socket.\n");
 
     return sock;
 }
@@ -311,16 +322,16 @@ int main(int argc, char *argv[]){
     // Args:
     // Tipo do endereço
     // Número de porta
-    // if(argc != 3){
-    //     fprintf(stderr,
-    //     "O servidor precisa de exatamente de 2 parametros de entrada:\n\
-    //     ./server <tipo de endereço '<v4|v6>'> <número da porta>\n");
-    //     exit(1);
-    // }
+    if(argc != 3){
+        fprintf(stderr,
+        "O servidor precisa de exatamente de 2 parametros de entrada:\n\
+        ./server <tipo de endereco '<v4|v6>'> <numero da porta>\n");
+        exit(1);
+    }
 
-    // char *tipo_de_endereco = argv[1];
-    // int numero_de_porta = atoi(argv[2]);
-    char tipo_de_endereco[3], mensagem[30];
+    char *tipo_de_endereco = argv[1];
+    int numero_de_porta = atoi(argv[2]);
+    // char mensagem[30];
     // int numero_de_porta;
     // scanf("%s %d", tipo_de_endereco, &numero_de_porta);
 
