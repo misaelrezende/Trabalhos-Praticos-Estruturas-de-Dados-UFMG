@@ -7,11 +7,11 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
-// #include <unistd.h>
+#include <unistd.h>
 
 #define MAX_RACK   4 // número máximo de racks
 #define MAX_SWITCH 3 // número máximo de switchs
-#define BUFSIZE    500  // message max size
+#define BUFFER_SIZE 200  // message max size
 static const int MAXPENDING = 1; // Pedidos de conexão pendentes máximos
 
 typedef struct{
@@ -43,12 +43,8 @@ void inicializar_racks(Rack *racks){
 int criar_conexao_tcp(char *tipo_de_endereco){
     int sock;
     bool ipv4 = false;
-    if(strcmp(tipo_de_endereco, "v4") == 0){
+    if(strcmp(tipo_de_endereco, "v4") == 0)
         ipv4 = true;
-        // printf("ipv4\n");
-    }
-    else
-        // printf("ipv6\n");
 
     if(ipv4 == true)
         // Cria um socket IPv4 usando TCP
@@ -63,11 +59,61 @@ int criar_conexao_tcp(char *tipo_de_endereco){
     return sock;
 }
 
-void adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
-    if(racks[rack_da_operacao - 1].quantidade_switches_alocados + contador_switches > MAX_SWITCH)
-        informa_erro_e_termina_programa("error rack limit exceeded");
+// Abre conexão TCP
+void abrir_conexao_tcp(int tcp_socket, int numero_de_porta, char *tipo_de_endereco){
+    if(strcmp(tipo_de_endereco, "v4") == 0){
+        // Construct local address structure
+        struct sockaddr_in endereco_servidor;                       // Local address
+        memset(&endereco_servidor, 0, sizeof(endereco_servidor));   // Zero out structure
+        endereco_servidor.sin_family = AF_INET;                     // IPv4 address family
+        endereco_servidor.sin_addr.s_addr = htonl(INADDR_ANY);      // Any incoming interface
+        endereco_servidor.sin_port = htons(numero_de_porta);        // Local port
 
-    // Cria espaço para adicionar switch(es)
+        // Bind to the local address
+        if(bind(tcp_socket, (struct sockaddr*) &endereco_servidor, sizeof(endereco_servidor)) < 0){
+            // Fecha a conexão devido a erro
+            close(tcp_socket);
+            informa_erro_e_termina_programa("Falha no bind()\n");
+        }
+    }else if(strcmp(tipo_de_endereco, "v6") == 0){
+        // Construct local address structure
+        struct sockaddr_in6 endereco_servidor;                      // local address
+        memset(&endereco_servidor, 0, sizeof(endereco_servidor));   // Zero out structure
+        endereco_servidor.sin6_family = AF_INET6;                   // IPv6 address family
+        endereco_servidor.sin6_addr = in6addr_any;                  // Any incoming interface
+        endereco_servidor.sin6_port = htons(numero_de_porta);       // Local port
+
+        // Bind to the local address
+        if(bind(tcp_socket, (struct sockaddr*) &endereco_servidor, sizeof(endereco_servidor)) < 0){
+            // Fecha a conexão devido a erro
+            close(tcp_socket);
+            informa_erro_e_termina_programa("Falha no bind()\n");
+        }
+    }
+
+    // Abrir escuta para conexão de cliente
+    if(listen(tcp_socket, MAXPENDING) < 0){
+        // Fecha a conexão devido a erro
+        close(tcp_socket);
+        informa_erro_e_termina_programa("Falha no listen()\n");
+    }
+    
+    printf("INFO: Server listening at port %i\n", numero_de_porta);
+}
+
+
+char* adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
+    char mensagem_de_retorno[BUFFER_SIZE] = "", *ptr_msg_retorno;
+
+    if(racks[rack_da_operacao - 1].quantidade_switches_alocados + contador_switches > MAX_SWITCH){
+        strcat(mensagem_de_retorno, "error rack limit exceeded\n");
+        ptr_msg_retorno = mensagem_de_retorno;
+        return ptr_msg_retorno;
+    }
+
+    int switches_alocados = 0;
+    char switch_id[2], rack_id[2];
+
     printf(">> Chegou ate aqui\n");
     for(int i = 0; i < contador_switches; i++){
         if(switches_para_operar[i] != 0){
@@ -318,6 +364,7 @@ void processar_comando(char *mensagem, Rack *racks){
     }
 }
 
+
 int main(int argc, char *argv[]){
     // Args:
     // Tipo do endereço
@@ -331,22 +378,14 @@ int main(int argc, char *argv[]){
 
     char *tipo_de_endereco = argv[1];
     int numero_de_porta = atoi(argv[2]);
-    // char mensagem[30];
-    // int numero_de_porta;
-    // scanf("%s %d", tipo_de_endereco, &numero_de_porta);
 
-    // int socket_do_servidor = criar_conexao_tcp(tipo_de_endereco);
+    int socket_do_servidor = criar_conexao_tcp(tipo_de_endereco);
+    abrir_conexao_tcp(socket_do_servidor, numero_de_porta, tipo_de_endereco);
 
-    Rack *racks = calloc(MAX_RACK, sizeof(Rack));
-    inicializar_racks(racks);
-
-    while(true){
-        printf("## Digite uma mensagem: ");
-        fflush(stdin);
-        fgets(mensagem, 30, stdin);
-        processar_comando(mensagem, racks);
-        // break;
-    }
+    if(strcmp(tipo_de_endereco, "v4") == 0)
+        comunicar_ipv4(socket_do_servidor);
+    else if(strcmp(tipo_de_endereco, "v6") == 0)
+        comunicar_ipv6(socket_do_servidor);
 
     return 0;
 }
