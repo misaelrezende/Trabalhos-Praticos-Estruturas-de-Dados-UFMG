@@ -436,8 +436,132 @@ char* processar_comando(char *mensagem, Rack *racks){
         ptr_msg_retorno = mensagem_de_retorno;
         return ptr_msg_retorno;
     }else{
-        // TODO: Se receber mensagem desconhecida, ENCERRAR CONEXÃO
-        printf(">> mensagem [%s] desconhecida\nENCERRAR CONEXÃO\n", palavra);
+        printf("Mensagem [%s] desconhecida\nA conexao sera encerrada\n", palavra);
+        return NULL;
+    }
+
+    ptr_msg_retorno = mensagem_de_retorno;
+    return ptr_msg_retorno;
+}
+
+
+void tratar_conexao_cliente(int socket_do_servidor, int socket_do_cliente){
+    Rack *racks = calloc(MAX_RACK, sizeof(Rack));
+    inicializar_racks(racks);
+
+    char buffer[BUFFER_SIZE] = "";
+    ssize_t num_bytes_recebidos;
+    char resposta_para_cliente[BUFFER_SIZE] = "", mensagem[BUFFER_SIZE] = "";
+    char *mensagem_para_retornar = NULL;
+
+    do{ // Desde que tenha alguma solicitação do cliente, faça:
+        num_bytes_recebidos = recv(socket_do_cliente, buffer, BUFFER_SIZE, 0);
+        if(num_bytes_recebidos < 0)
+            informa_erro_e_termina_programa("Falha no recv() ao receber mensagem do cliente.\n");
+        else if(num_bytes_recebidos == 0){
+            if(DEBUG == true)
+                printf("Conexao encerrada pelo cliente.\n");
+            close(socket_do_cliente);
+            return;
+        }
+
+        // imprime a mensagem enviada pelo cliente
+        printf("<< %s", buffer);
+
+        mensagem[BUFFER_SIZE] = "";
+        // Remove o caractere '\n'
+        strncpy(mensagem, buffer, strlen(buffer) - 1);
+        mensagem_para_retornar = processar_comando(mensagem, racks);
+
+        if(mensagem_para_retornar == NULL){
+            printf("Mensagem desconhecida enviada por cliente.\nA conexao com cliente sera encerrada.\n");
+            close(socket_do_cliente);
+            return;
+        }
+        if(strcmp(mensagem_para_retornar, "exit") == 0){
+            printf("Comando exit recebido.\nEncerrando cliente e servidor.\n");
+            close(socket_do_cliente);
+            close(socket_do_servidor);
+            free(racks);
+            exit(1);
+        }
+
+        // Concatena resposta para enviar a cliente
+        strcat(resposta_para_cliente, mensagem_para_retornar);
+        strcat(resposta_para_cliente, "\n");
+        ssize_t num_bytes_enviados = send(socket_do_cliente, resposta_para_cliente, strlen(resposta_para_cliente), 0);
+
+        if (num_bytes_enviados < 0) // no message was sent
+            informa_erro_e_termina_programa("Falha no send() ao enviar mensagem.\n");
+        // else if(num_bytes_enviados != num_bytes_recebidos)
+        //     DieWithUserMessage("sendto()", "sent unexpected number of bytes");
+
+        // reseta buffer, resposta_para_cliente e mensagem
+        memset(&buffer, 0, sizeof(buffer));
+        memset(&resposta_para_cliente, 0, sizeof(resposta_para_cliente));
+        memset(&mensagem, 0, sizeof(mensagem));
+
+    }while(num_bytes_recebidos > 0);
+
+    close(socket_do_cliente);
+    free(racks);
+}
+
+void comunicar_ipv4(int socket_do_servidor){
+    struct sockaddr_in endereco_cliente;
+    socklen_t tamanho_endereco_cliente;
+    int socket_do_cliente;
+
+    while(true){
+        tamanho_endereco_cliente = sizeof(endereco_cliente);
+
+        // Espera conexão de cliente
+        socket_do_cliente = accept(socket_do_servidor, (struct sockaddr *) &endereco_cliente, &tamanho_endereco_cliente);
+        if(socket_do_cliente < 0)
+            informa_erro_e_termina_programa("Falha no accept().");
+
+        if(DEBUG == true)
+            printf("Clinte agora esta conectado.");
+
+        char nome_do_cliente[INET_ADDRSTRLEN];
+        if(inet_ntop(AF_INET, &endereco_cliente.sin_addr.s_addr, nome_do_cliente,
+            sizeof(nome_do_cliente)) != NULL)
+            if(DEBUG == true)
+                printf("Cliente %s | %d\n", nome_do_cliente, ntohs(endereco_cliente.sin_port));
+        else
+            if(DEBUG == true)
+                printf("Nao eh possivel obter endereco do cliente");
+
+        tratar_conexao_cliente(socket_do_servidor, socket_do_cliente);
+    }
+}
+
+void comunicar_ipv6(int socket_do_servidor){
+    struct sockaddr_in6 endereco_cliente;
+    socklen_t tamanho_endereco_cliente;
+    int socket_do_cliente;
+
+    while(true){
+        tamanho_endereco_cliente = sizeof(endereco_cliente);
+
+        // Espera conexão de cliente
+        socket_do_cliente = accept(socket_do_servidor, (struct sockaddr *) &endereco_cliente, &tamanho_endereco_cliente);
+        if(socket_do_cliente < 0)
+            informa_erro_e_termina_programa("Falha no accept().");
+
+        if(DEBUG == true)
+            printf("Clinte agora esta conectado.");
+
+        char nome_do_cliente[INET6_ADDRSTRLEN];
+        if(inet_ntop(AF_INET6, &endereco_cliente.sin6_addr.s6_addr, nome_do_cliente,
+            sizeof(nome_do_cliente)) != NULL)
+            if(DEBUG == true)
+                printf("Cliente %s | %d\n", nome_do_cliente, ntohs(endereco_cliente.sin6_port));
+        else
+            if(DEBUG == true)
+                printf("Nao eh possivel obter endereco do cliente");
+
+        tratar_conexao_cliente(socket_do_servidor, socket_do_cliente);
     }
 }
 
