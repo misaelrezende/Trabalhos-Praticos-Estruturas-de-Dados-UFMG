@@ -158,24 +158,35 @@ char* adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_ope
     return ptr_msg_retorno;
 }
 
-void listar_switches(Rack *racks, int rack_da_operacao){
-    if(racks[rack_da_operacao - 1].quantidade_switches_alocados == 0)
-        informa_erro_e_termina_programa("empty rack");
+// Lista switch(es) do rack
+char* listar_switches(Rack *racks, int rack_da_operacao){
+    char mensagem_de_retorno[BUFFER_SIZE] = "", *ptr_msg_retorno;
+    char switch_id[2];
+
+    if(racks[rack_da_operacao - 1].quantidade_switches_alocados == 0){
+        strcat(mensagem_de_retorno, "empty rack\n");
+        ptr_msg_retorno = mensagem_de_retorno;
+        return ptr_msg_retorno;
+    }
 
     int switches_impressos = 0;
     for(int i = 0; i < MAX_SWITCH; i++){
         if(racks[rack_da_operacao - 1].switchs[i].id_switch != -1){
 
+            sprintf(switch_id, "%d", racks[rack_da_operacao - 1].switchs[i].id_switch); // converte id (int to char)
             if(switches_impressos == racks[rack_da_operacao - 1].quantidade_switches_alocados - 1){
-                printf("%d\n", racks[rack_da_operacao - 1].switchs[i].id_switch);
+                strcat(mensagem_de_retorno, switch_id);
+                strcat(mensagem_de_retorno, "\n");
                 break;
             }else{
-                printf("%d ", racks[rack_da_operacao - 1].switchs[i].id_switch);
                 switches_impressos += 1;
+                strcat(mensagem_de_retorno, switch_id);
+                strcat(mensagem_de_retorno, " ");
             }
         }
     }
-
+    ptr_msg_retorno = mensagem_de_retorno;
+    return ptr_msg_retorno;
 }
 
 void ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
