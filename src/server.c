@@ -241,20 +241,38 @@ char* ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_par
 
 }
 
-void remover_switch(Rack *racks, int rack_da_operacao, int *switches_para_operar){
+// Remove switch de rack
+char* remover_switch(Rack *racks, int rack_da_operacao, int *switches_para_operar){
+    char mensagem_de_retorno[BUFFER_SIZE] = "", *ptr_msg_retorno;
+    char switch_id[2], rack_id[2];
+
     // Rack vazio, não há nenhum switch a ser removido
-    if(racks[ rack_da_operacao - 1].quantidade_switches_alocados == 0)
-        informa_erro_e_termina_programa("error switch doesn't exist");
+    if(racks[ rack_da_operacao - 1].quantidade_switches_alocados == 0){
+        strcat(mensagem_de_retorno, "error switch doesn't exist\n");
+        ptr_msg_retorno = mensagem_de_retorno;
+        return ptr_msg_retorno;
+    }
     else if(racks[ rack_da_operacao - 1 ].switchs[ switches_para_operar[0] ].id_switch == switches_para_operar[0]){
         // Remove switch
         racks[ rack_da_operacao - 1 ].switchs[ switches_para_operar[0] ].id_switch = -1;
         // Diminui por 1 o número de switches alocados
         racks[ rack_da_operacao - 1].quantidade_switches_alocados -= 1;
 
-        // TODO: Falta enviar o nome do switch e do rack
-        informa_erro_e_termina_programa("switch <switch_id> removed from <rack_id>");
+        strcat(mensagem_de_retorno, "switch ");
+
+        sprintf(switch_id, "%d", switches_para_operar[0]);  // converte id (int to char)
+        sprintf(rack_id, "%d", rack_da_operacao);           // converte id (int to char)
+
+        strcat(mensagem_de_retorno, switch_id);
+        strcat(mensagem_de_retorno, " removed from ");
+        strcat(mensagem_de_retorno, rack_id);
+        strcat(mensagem_de_retorno, "\n");
+        ptr_msg_retorno = mensagem_de_retorno;
+        return ptr_msg_retorno;
     }else{
-        informa_erro_e_termina_programa("error switch doesn't exist");
+        strcat(mensagem_de_retorno, "error switch doesn't exist\n");
+        ptr_msg_retorno = mensagem_de_retorno;
+        return ptr_msg_retorno;
     }
 }
 
