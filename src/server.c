@@ -189,9 +189,15 @@ char* listar_switches(Rack *racks, int rack_da_operacao){
     return ptr_msg_retorno;
 }
 
-void ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
-    if(racks[rack_da_operacao - 1].quantidade_switches_alocados == 0)
-        informa_erro_e_termina_programa("error switch doesn't exist");
+// Lê dados sobre velocidade de tráfego dos switches
+char* ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
+    char mensagem_de_retorno[BUFFER_SIZE] = "", *ptr_msg_retorno;
+    char velocidade[10];
+    if(racks[rack_da_operacao - 1].quantidade_switches_alocados == 0){
+        strcat(mensagem_de_retorno, "error switch doesn't exist\n");
+        ptr_msg_retorno = mensagem_de_retorno;
+        return ptr_msg_retorno;
+    }
 
     int switches_impressos = 0;
     int limite_superior = 5000;
@@ -203,13 +209,19 @@ void ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_para
         if(racks[rack_da_operacao - 1].switchs[ switches_para_operar[j] ].id_switch == switches_para_operar[j]){
 
             int numero_randomico = (rand() % (limite_superior + 1 - limite_inferior));
+            sprintf(velocidade, "%d", numero_randomico);    // converte id (int to char*)
 
             if(switches_impressos == contador_switches - 1){ // último a ser impresso
-                printf("%d Kbs\n", numero_randomico);
+                if(contador_switches == 1)
+                    strcat(mensagem_de_retorno, velocidade);
+                else
+                    strcat(mensagem_de_retorno, velocidade);
+                strcat(mensagem_de_retorno, " Kbs\n");
                 switch_encontrado = true;
                 break;
             }else{
-                printf("%d Kbs ", numero_randomico);
+                strcat(mensagem_de_retorno, velocidade);
+                strcat(mensagem_de_retorno, " Kbs ");
                 switches_impressos += 1;
                 switch_encontrado = true;
             }
@@ -218,8 +230,14 @@ void ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_para
     }
 
     // Caso switch não tenha sido instalado no rack
-    if(switch_encontrado == false)
-        informa_erro_e_termina_programa("error switch doesn't exist");
+    if(switch_encontrado == false){
+        strcat(mensagem_de_retorno, "error switch doesn't exist\n");
+        ptr_msg_retorno = mensagem_de_retorno;
+        return ptr_msg_retorno;
+    }
+
+    ptr_msg_retorno = mensagem_de_retorno;
+    return ptr_msg_retorno;
 
 }
 
