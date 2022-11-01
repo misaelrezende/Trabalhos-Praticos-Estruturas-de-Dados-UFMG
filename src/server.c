@@ -13,6 +13,7 @@
 #define MAX_SWITCH 3 // número máximo de switchs
 #define BUFFER_SIZE 200  // message max size
 static const int MAXPENDING = 1; // Pedidos de conexão pendentes máximos
+#define DEBUG true
 
 typedef struct{
     int id_switch; // switch id
@@ -97,11 +98,12 @@ void abrir_conexao_tcp(int tcp_socket, int numero_de_porta, char *tipo_de_endere
         close(tcp_socket);
         informa_erro_e_termina_programa("Falha no listen()\n");
     }
-    
-    printf("INFO: Server listening at port %i\n", numero_de_porta);
+
+    if(DEBUG == true)
+        printf(">> Servidor escutando na porta %i\n", numero_de_porta);
 }
 
-
+// Adiciona switch(es) no rack
 char* adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
     char mensagem_de_retorno[BUFFER_SIZE] = "", *ptr_msg_retorno;
 
@@ -114,21 +116,46 @@ char* adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_ope
     int switches_alocados = 0;
     char switch_id[2], rack_id[2];
 
-    printf(">> Chegou ate aqui\n");
     for(int i = 0; i < contador_switches; i++){
         if(switches_para_operar[i] != 0){
 
             // Checa se switch já está instalado neste rack
-            if(racks[rack_da_operacao - 1].switchs[ switches_para_operar[i] ].id_switch == switches_para_operar[i])
-                // TODO: Falta enviar o nome do switch e do rack
-                informa_erro_e_termina_programa("error switch <switch_id> already installed in <rack_id>");
+            if(racks[rack_da_operacao - 1].switchs[ switches_para_operar[i] ].id_switch == switches_para_operar[i]){
+                strcat(mensagem_de_retorno, "error switch ");
+                sprintf(switch_id, "%d", switches_para_operar[i]);  // converte id (int to char)
+                sprintf(rack_id, "%d", rack_da_operacao);           // converte id (int to char)
+
+                strcat(mensagem_de_retorno, switch_id);
+                strncat(mensagem_de_retorno, " already installed in ", 50);
+                strcat(mensagem_de_retorno, rack_id);
+                strcat(mensagem_de_retorno, "\n");
+                // return *mensagem_de_retorno;
+                ptr_msg_retorno = mensagem_de_retorno;
+                return ptr_msg_retorno;
+            }
 
             racks[rack_da_operacao - 1].switchs[ switches_para_operar[i] ].id_switch = switches_para_operar[i];
             racks[rack_da_operacao - 1].quantidade_switches_alocados += 1;
-            printf(">> Passou aqui tambem!\n");
+
+            switches_alocados += 1;
+
+            sprintf(switch_id, "%d", switches_para_operar[i]); // converte id (int to char)
+            if(switches_alocados == 1){
+                strcat(mensagem_de_retorno,"switch ");
+                strcat(mensagem_de_retorno, switch_id);
+            }else if(switches_alocados == contador_switches){ // ultimo switch alocado
+                strcat(mensagem_de_retorno, " ");
+                strcat(mensagem_de_retorno, switch_id);
+            }else{ // ainda nao eh ultimo switch nao
+                strcat(mensagem_de_retorno, " ");
+                strcat(mensagem_de_retorno, switch_id);
+            }
         }
     }
 
+    strcat(mensagem_de_retorno, " installed\n");
+    ptr_msg_retorno = mensagem_de_retorno;
+    return ptr_msg_retorno;
 }
 
 void listar_switches(Rack *racks, int rack_da_operacao){
