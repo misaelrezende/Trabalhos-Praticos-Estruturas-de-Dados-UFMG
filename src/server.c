@@ -468,7 +468,6 @@ void tratar_conexao_cliente(int socket_do_servidor, int socket_do_cliente){
         // imprime a mensagem enviada pelo cliente
         printf("<< %s", buffer);
 
-        mensagem[BUFFER_SIZE] = "";
         // Remove o caractere '\n'
         strncpy(mensagem, buffer, strlen(buffer) - 1);
         mensagem_para_retornar = processar_comando(mensagem, racks);
@@ -525,9 +524,10 @@ void comunicar_ipv4(int socket_do_servidor){
 
         char nome_do_cliente[INET_ADDRSTRLEN];
         if(inet_ntop(AF_INET, &endereco_cliente.sin_addr.s_addr, nome_do_cliente,
-            sizeof(nome_do_cliente)) != NULL)
+            sizeof(nome_do_cliente)) != NULL){
             if(DEBUG == true)
                 printf("Cliente %s | %d\n", nome_do_cliente, ntohs(endereco_cliente.sin_port));
+        }
         else
             if(DEBUG == true)
                 printf("Nao eh possivel obter endereco do cliente");
@@ -554,9 +554,10 @@ void comunicar_ipv6(int socket_do_servidor){
 
         char nome_do_cliente[INET6_ADDRSTRLEN];
         if(inet_ntop(AF_INET6, &endereco_cliente.sin6_addr.s6_addr, nome_do_cliente,
-            sizeof(nome_do_cliente)) != NULL)
+            sizeof(nome_do_cliente)) != NULL){
             if(DEBUG == true)
                 printf("Cliente %s | %d\n", nome_do_cliente, ntohs(endereco_cliente.sin6_port));
+        }
         else
             if(DEBUG == true)
                 printf("Nao eh possivel obter endereco do cliente");
