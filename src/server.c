@@ -11,23 +11,18 @@
 
 #define MAX_RACK   4 // número máximo de racks
 #define MAX_SWITCH 3 // número máximo de switchs
-#define BUFFER_SIZE 200  // message max size
+#define BUFFER_SIZE 200
 static const int MAXPENDING = 1; // Pedidos de conexão pendentes máximos
 #define DEBUG false
 
 typedef struct{
-    int id_switch; // switch id
+    int id_switch;
 } Switch;
 
 typedef struct{
     int quantidade_switches_alocados;
     Switch switchs[MAX_SWITCH];
 } Rack;
-
-void informa_erro_e_termina_programa(char *mensagem){
-    printf("%s", mensagem);
-    exit(1);
-}
 
 /* Inicializa racks
    Assume que racks tem ids de 1 a 4.
@@ -38,6 +33,11 @@ void inicializar_racks(Rack *racks){
         for(int j = 0; j < MAX_SWITCH; j++)
             racks[i].switchs[j].id_switch = -1;
     }
+}
+
+void informa_erro_e_termina_programa(char *mensagem){
+    printf("%s", mensagem);
+    exit(1);
 }
 
 // Cria conexão TCP
@@ -129,7 +129,6 @@ char* adicionar_switch(Rack *racks, int rack_da_operacao, int *switches_para_ope
                 strncat(mensagem_de_retorno, " already installed in ", 50);
                 strcat(mensagem_de_retorno, rack_id);
                 strcat(mensagem_de_retorno, "\n");
-                // return *mensagem_de_retorno;
                 ptr_msg_retorno = mensagem_de_retorno;
                 return ptr_msg_retorno;
             }
@@ -193,6 +192,7 @@ char* listar_switches(Rack *racks, int rack_da_operacao){
 char* ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_para_operar, int contador_switches){
     char mensagem_de_retorno[BUFFER_SIZE] = "", *ptr_msg_retorno;
     char velocidade[10];
+
     if(racks[rack_da_operacao - 1].quantidade_switches_alocados == 0){
         strcat(mensagem_de_retorno, "error switch doesn't exist\n");
         ptr_msg_retorno = mensagem_de_retorno;
@@ -238,7 +238,6 @@ char* ler_dados_de_switches(Rack *racks, int rack_da_operacao, int *switches_par
 
     ptr_msg_retorno = mensagem_de_retorno;
     return ptr_msg_retorno;
-
 }
 
 // Remove switch de rack
@@ -288,7 +287,7 @@ char* processar_comando(char *mensagem, Rack *racks){
     int rack_da_operacao = -1;
 
     if(strcmp(palavra, "add") == 0){
-        
+
         palavra = strtok(NULL, " ");
         if(DEBUG == true)
             printf("palavra atual: %s\n", palavra);
@@ -341,7 +340,7 @@ char* processar_comando(char *mensagem, Rack *racks){
         if(DEBUG == true)
             printf("palavra atual: %s\n", palavra);
         if(strcmp(palavra, "sw") != 0){
-            printf("Mensagem [%s] desconhecida\nA conexao sera encerrada\n", palavra); // tratamento EXTRA
+            printf("Mensagem [%s] desconhecida\nA conexao sera encerrada\n", palavra);
             return NULL;
         }
 
@@ -446,15 +445,16 @@ char* processar_comando(char *mensagem, Rack *racks){
 
 
 void tratar_conexao_cliente(int socket_do_servidor, int socket_do_cliente){
+    // Inicializa racks vazios
     Rack *racks = calloc(MAX_RACK, sizeof(Rack));
     inicializar_racks(racks);
 
     char buffer[BUFFER_SIZE] = "";
-    ssize_t num_bytes_recebidos;
     char resposta_para_cliente[BUFFER_SIZE] = "", mensagem[BUFFER_SIZE] = "";
     char *mensagem_para_retornar = NULL;
+    ssize_t num_bytes_recebidos;
 
-    do{ // Desde que tenha alguma solicitação do cliente, faça:
+    do{ // Desde que tenha alguma solicitação do cliente (envio de mensagem), faça:
         num_bytes_recebidos = recv(socket_do_cliente, buffer, BUFFER_SIZE, 0);
         if(num_bytes_recebidos < 0)
             informa_erro_e_termina_programa("Falha no recv() ao receber mensagem do cliente.\n");
@@ -490,7 +490,8 @@ void tratar_conexao_cliente(int socket_do_servidor, int socket_do_cliente){
         strcat(resposta_para_cliente, "\n");
         ssize_t num_bytes_enviados = send(socket_do_cliente, resposta_para_cliente, strlen(resposta_para_cliente), 0);
 
-        if (num_bytes_enviados < 0) // no message was sent
+        // Se nada foi enviado
+        if (num_bytes_enviados < 0)
             informa_erro_e_termina_programa("Falha no send() ao enviar mensagem.\n");
         // else if(num_bytes_enviados != num_bytes_recebidos)
         //     DieWithUserMessage("sendto()", "sent unexpected number of bytes");
@@ -517,20 +518,18 @@ void comunicar_ipv4(int socket_do_servidor){
         // Espera conexão de cliente
         socket_do_cliente = accept(socket_do_servidor, (struct sockaddr *) &endereco_cliente, &tamanho_endereco_cliente);
         if(socket_do_cliente < 0)
-            informa_erro_e_termina_programa("Falha no accept().");
+            informa_erro_e_termina_programa("Falha no accept().\n");
 
-        if(DEBUG == true)
-            printf("Clinte agora esta conectado.");
+        if(DEBUG == true){
+            printf("Cliente agora esta conectado.\n");
 
-        char nome_do_cliente[INET_ADDRSTRLEN];
-        if(inet_ntop(AF_INET, &endereco_cliente.sin_addr.s_addr, nome_do_cliente,
-            sizeof(nome_do_cliente)) != NULL){
-            if(DEBUG == true)
+            char nome_do_cliente[INET_ADDRSTRLEN]; // armazena endereço do cliente
+            if(inet_ntop(AF_INET, &endereco_cliente.sin_addr.s_addr, nome_do_cliente,
+                sizeof(nome_do_cliente)) != NULL)
                 printf("Cliente %s | %d\n", nome_do_cliente, ntohs(endereco_cliente.sin_port));
+            else
+                printf("Nao eh possivel obter endereco do cliente\n");
         }
-        else
-            if(DEBUG == true)
-                printf("Nao eh possivel obter endereco do cliente");
 
         tratar_conexao_cliente(socket_do_servidor, socket_do_cliente);
     }
@@ -547,20 +546,18 @@ void comunicar_ipv6(int socket_do_servidor){
         // Espera conexão de cliente
         socket_do_cliente = accept(socket_do_servidor, (struct sockaddr *) &endereco_cliente, &tamanho_endereco_cliente);
         if(socket_do_cliente < 0)
-            informa_erro_e_termina_programa("Falha no accept().");
+            informa_erro_e_termina_programa("Falha no accept().\n");
 
-        if(DEBUG == true)
-            printf("Clinte agora esta conectado.");
+        if(DEBUG == true){
+            printf("Cliente agora esta conectado.\n");
 
-        char nome_do_cliente[INET6_ADDRSTRLEN];
-        if(inet_ntop(AF_INET6, &endereco_cliente.sin6_addr.s6_addr, nome_do_cliente,
-            sizeof(nome_do_cliente)) != NULL){
-            if(DEBUG == true)
+            char nome_do_cliente[INET6_ADDRSTRLEN]; // armazena endereço do cliente
+            if(inet_ntop(AF_INET6, &endereco_cliente.sin6_addr.s6_addr, nome_do_cliente,
+                sizeof(nome_do_cliente)) != NULL)
                 printf("Cliente %s | %d\n", nome_do_cliente, ntohs(endereco_cliente.sin6_port));
+            else
+                printf("Nao eh possivel obter endereco do cliente.\n");
         }
-        else
-            if(DEBUG == true)
-                printf("Nao eh possivel obter endereco do cliente");
 
         tratar_conexao_cliente(socket_do_servidor, socket_do_cliente);
     }

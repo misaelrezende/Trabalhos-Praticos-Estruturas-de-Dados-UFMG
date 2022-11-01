@@ -111,7 +111,7 @@ int main(int argc, char *argv[]){
     if(argc != 3){
         fprintf(stderr,
         "O cliente precisa de exatamente de 2 parametros de entrada:\n\
-        ./server <endereco ip <numero da porta>\n");
+        ./client <endereco ip <numero da porta>\n");
         exit(1);
     }
 
