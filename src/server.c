@@ -13,7 +13,7 @@
 #define MAX_SWITCH 3 // número máximo de switchs
 #define BUFFER_SIZE 200  // message max size
 static const int MAXPENDING = 1; // Pedidos de conexão pendentes máximos
-#define DEBUG true
+#define DEBUG false
 
 typedef struct{
     int id_switch; // switch id
@@ -277,25 +277,30 @@ char* remover_switch(Rack *racks, int rack_da_operacao, int *switches_para_opera
 }
 
 // Processa o comando recebido
-void processar_comando(char *mensagem, Rack *racks){
+char* processar_comando(char *mensagem, Rack *racks){
+    if(DEBUG == true)
+        printf("Processando mensagem: %s\n", mensagem);
+
+    char mensagem_de_retorno[BUFFER_SIZE] = "", *ptr_msg_retorno;;
     char *palavra; palavra = strtok(mensagem, " ");
     int switches_para_operar[3] = {0,0,0};
     int contador_switches = 0;
     int rack_da_operacao = -1;
 
     if(strcmp(palavra, "add") == 0){
-        printf("comando digitado: %s\n", palavra);
         
         palavra = strtok(NULL, " ");
-        printf("palavra atual: %s\n", palavra);
+        if(DEBUG == true)
+            printf("palavra atual: %s\n", palavra);
         if(strcmp(palavra, "sw") != 0){
-            // TODO: Mensagem desconhecida, ENCERRAR CONEXÃO
-            printf(">> mensagem [%s] desconhecida\nENCERRAR CONEXÃO\n", palavra);
+            printf("Mensagem [%s] desconhecida\nA conexao sera encerrada\n", palavra);
+            return NULL;
         }
 
         while(palavra != NULL){
             palavra = strtok(NULL, " ");
-            printf("palavra atual: %s\n", palavra);
+            if(DEBUG == true)
+                printf("palavra atual: %s\n", palavra);
 
             if(palavra == NULL)
                 break;
@@ -303,51 +308,47 @@ void processar_comando(char *mensagem, Rack *racks){
                 palavra = strtok(NULL, " ");
                 rack_da_operacao = atoi(palavra);
                 if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK){
-                    informa_erro_e_termina_programa("error rack doesn't exist\n");
-                    break; // pode ser desnecessário
+                    strcat(mensagem_de_retorno, "error rack doesn't exist\n");
+                    ptr_msg_retorno = mensagem_de_retorno;
+                    return ptr_msg_retorno;
                 }
-            }
-            else if(strcmp(palavra, "sw") == 0){ // NOTE: Não vai entrar aqui mais não - pode apagar esse 'else if'
-                printf("\n\n>>>UAI, NAO EH PRA ENTRAR AQUI NAO SOO!\n\n");
-                continue;
             }
             else{
                 int switch_id = atoi(palavra);
                 if(switch_id < 1 || switch_id > 4){ // tipo inválido de switch
-                    informa_erro_e_termina_programa("error switch type unknown");
-                    break; // pode ser desnecessário
+                    strcat(mensagem_de_retorno, "error switch type unknown\n");
+                    ptr_msg_retorno = mensagem_de_retorno;
+                    return ptr_msg_retorno;
                 }
-                if(contador_switches > 3){  // ultrapassa limite de switches TODO: DAR BREAK E RETORNAR MSG
-                    informa_erro_e_termina_programa("error rack limit exceeded");
-                    break; // pode ser desnecessário
+                if(contador_switches > 3){  // ultrapassa limite de switches
+                    strcat(mensagem_de_retorno, "error rack limit exceeded\n");
+                    ptr_msg_retorno = mensagem_de_retorno;
+                    return ptr_msg_retorno;
                 }
                 switches_para_operar[contador_switches] = switch_id;
                 contador_switches += 1;
             }
 
         }
-        // NOTE: PRINTS EXTRAS
-        printf("contado_switches: %d | ", contador_switches);
-        for(int i = 0; i < 3; i++)
-            printf("%d ", switches_para_operar[i]);
-        printf(" | rack_da_operacao: %d\n", rack_da_operacao);
 
         // Adiciona switch(s) no rack
-        adicionar_switch(racks, rack_da_operacao, switches_para_operar, contador_switches);
+        ptr_msg_retorno = adicionar_switch(racks, rack_da_operacao, switches_para_operar, contador_switches);
+        return ptr_msg_retorno;
 
     }else if(strcmp(palavra, "rm") == 0){
-        printf("comando digitado: %s\n", palavra);
 
         palavra = strtok(NULL, " ");
-        printf("palavra atual: %s\n", palavra);
+        if(DEBUG == true)
+            printf("palavra atual: %s\n", palavra);
         if(strcmp(palavra, "sw") != 0){
-            // TODO: Mensagem desconhecida, ENCERRAR CONEXÃO
-            printf(">> mensagem [%s] desconhecida\nENCERRAR CONEXÃO\n", palavra); // tratamento EXTRA
+            printf("Mensagem [%s] desconhecida\nA conexao sera encerrada\n", palavra); // tratamento EXTRA
+            return NULL;
         }
 
         while(palavra != NULL){
             palavra = strtok(NULL, " ");
-            printf("palavra atual: %s\n", palavra);
+            if(DEBUG == true)
+                printf("palavra atual: %s\n", palavra);
 
             if(palavra == NULL)
                 break;
@@ -355,83 +356,85 @@ void processar_comando(char *mensagem, Rack *racks){
                 palavra = strtok(NULL, " ");
                 rack_da_operacao = atoi(palavra);
                 if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK){
-                    informa_erro_e_termina_programa("error rack doesn't exist\n"); // tratamento EXTRA
-                    break; // pode ser desnecessário
+                    strcat(mensagem_de_retorno, "error rack doesn't exist\n");
+                    ptr_msg_retorno = mensagem_de_retorno;
+                    return ptr_msg_retorno;
                 }
             }
             else{
                 int switch_id = atoi(palavra);
                 if(switch_id < 1 || switch_id > 4){ // tipo inválido de switch
-                    informa_erro_e_termina_programa("error switch type unknown");
-                    break; // pode ser desnecessário
+                    strcat(mensagem_de_retorno, "error switch type unknown\n");
+                    ptr_msg_retorno = mensagem_de_retorno;
+                    return ptr_msg_retorno;
                 }
                 switches_para_operar[contador_switches] = switch_id;
                 contador_switches += 1;
             }
 
         }
-        // NOTE: PRINTS EXTRAS
-        printf("contado_switches: %d | ", contador_switches);
-        for(int i = 0; i < 3; i++)
-            printf("%d ", switches_para_operar[i]);
-        printf(" | rack_da_operacao: %d\n", rack_da_operacao);
 
-        remover_switch(racks, rack_da_operacao, switches_para_operar);
+        ptr_msg_retorno = remover_switch(racks, rack_da_operacao, switches_para_operar);
+        return ptr_msg_retorno;
 
     }else if(strcmp(palavra, "get") == 0){
-        printf("comando digitado: %s\n", palavra);
 
         while(palavra != NULL){
             palavra = strtok(NULL, " ");
-            printf("palavra atual: %s\n", palavra);
+            if(DEBUG == true)
+                printf("palavra atual: %s\n", palavra);
 
             if(palavra == NULL)
                 break;
             if(strcmp(palavra, "in") == 0){
                 palavra = strtok(NULL, " ");
                 rack_da_operacao = atoi(palavra);
-                if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK){
-                    informa_erro_e_termina_programa("error rack doesn't exist\n");
-                    break; // pode ser desnecessário
+                if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK){ // tratamento EXTRA
+                    strcat(mensagem_de_retorno, "error rack doesn't exist\n");
+                    ptr_msg_retorno = mensagem_de_retorno;
+                    return ptr_msg_retorno;
                 }
             }else{
                 int switch_id = atoi(palavra);
                 if(switch_id < 1 || switch_id > 4){ // tipo inválido de switch
-                    informa_erro_e_termina_programa("error switch type unknown");
-                    break; // pode ser desnecessário
+                    strcat(mensagem_de_retorno, "error switch type unknown\n"); // tratamento EXTRA
+                    ptr_msg_retorno = mensagem_de_retorno;
+                    return ptr_msg_retorno;
                 }
                 switches_para_operar[contador_switches] = switch_id;
                 contador_switches += 1;
             }
 
         }
-        // NOTE: PRINTS EXTRAS
-        printf("contado_switches: %d | ", contador_switches);
-        for(int i = 0; i < 3; i++)
-            printf("%d ", switches_para_operar[i]);
-        printf(" | rack_da_operacao: %d\n", rack_da_operacao);
 
-        ler_dados_de_switches(racks, rack_da_operacao, switches_para_operar, contador_switches);
+        ptr_msg_retorno = ler_dados_de_switches(racks, rack_da_operacao, switches_para_operar, contador_switches);
+        return ptr_msg_retorno;
 
     }else if(strcmp(palavra, "ls") == 0){
-        printf("comando digitado: %s\n", palavra);
 
         while(palavra != NULL){
             palavra = strtok(NULL, " ");
-            printf("palavra atual: %s\n", palavra);
+            if(DEBUG == true)
+                printf("palavra atual: %s\n", palavra);
 
             if(palavra == NULL)
                 break;
 
             rack_da_operacao = atoi(palavra);
             if(rack_da_operacao < 1 || rack_da_operacao > MAX_RACK){
-                informa_erro_e_termina_programa("error rack doesn't exist\n");
-                break; // pode ser desnecessário
+                strcat(mensagem_de_retorno, "error rack doesn't exist\n");
+                ptr_msg_retorno = mensagem_de_retorno;
+                return ptr_msg_retorno;
             }
         }
 
-        listar_switches(racks, rack_da_operacao);
+        ptr_msg_retorno = listar_switches(racks, rack_da_operacao);
+        return ptr_msg_retorno;
 
+    }else if(strcmp(palavra, "exit") == 0){
+        strcat(mensagem_de_retorno, "exit");
+        ptr_msg_retorno = mensagem_de_retorno;
+        return ptr_msg_retorno;
     }else{
         // TODO: Se receber mensagem desconhecida, ENCERRAR CONEXÃO
         printf(">> mensagem [%s] desconhecida\nENCERRAR CONEXÃO\n", palavra);
