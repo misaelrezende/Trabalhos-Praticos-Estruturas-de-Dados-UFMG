@@ -5,9 +5,9 @@ compile_binaries: equipment server
 equipment: equipment.o
 	@$(CC) $(CFLAGS) -o equipment src/build/equipment.o
 
-equipment.o: src/client.c
+equipment.o: src/equipment.c
 	@mkdir -p src/build
-	@$(CC) $(CFLAGS) -c src/client.c -o src/build/equipment.o
+	@$(CC) $(CFLAGS) -c src/equipment.c -o src/build/equipment.o
 
 server: server.o
 	@$(CC) $(CFLAGS) -o server src/build/server.o
