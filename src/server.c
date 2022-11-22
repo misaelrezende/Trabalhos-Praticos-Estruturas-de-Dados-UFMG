@@ -72,49 +72,82 @@ void abrir_conexao_tcp(int socket_do_servidor, int numero_de_porta){
         printf(">> Servidor escutando na porta %i\n", numero_de_porta);
 }
 
-void* comunicar(void* cliente){
-	Cliente* cliente_atual = (Cliente*) cliente;
-	int indice = cliente_atual->indice;
-	int socket_do_cliente = cliente_atual->socket_id;
+char* processar_comando(char *mensagem){
+	if(DEBUG == true)
+		printf("Processando comando: %s", mensagem);
 
-	printf("Cliente %d conectado.\n", indice + 1);
+	if(strcmp(mensagem, "close connection\n") == 0){
+		printf("Fechando conexao\n");
+		return "close connection";
+	}else if(strcmp(mensagem, "list equipment\n") == 0){
+		printf("Listando equipamentos\n");
+		return "list equipment";
+	}
+
+	return NULL;
+}
+
+void* comunicar(void* equipamento){
+	Equipamento* equipamento_atual = (Equipamento*) equipamento;
+	int indice = equipamento_atual->indice;
+	int socket_do_cliente = equipamento_atual->socket_id;
+	char *mensagem_para_retornar = NULL;
+	char mensagem[MAX_SIZE];
+
+	// Envia número de id a equipamento recentemente conectado
+	char msg[10] = "New ID: ", id[2];
+	sprintf(id, "%d", indice);  // converte id (int to char)
+	strcat(msg, id);
+	ssize_t num_bytes_enviados = send(socket_do_cliente, msg, strlen(msg), 0);
+	if(num_bytes_enviados < 0)
+		informa_erro_e_termina_programa("Falha no send() ao enviar mensagem para equipamento.\n");
+	else if(num_bytes_enviados != strlen(msg))
+		informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
+
+	// printf("Equipamento %d conectado.\n", indice + 1);
 
 	while(true){
-
-		char mensagem[MAX_SIZE];
 		ssize_t num_bytes_recebidos = recv(socket_do_cliente, mensagem, MAX_SIZE, 0);
+
 		if(num_bytes_recebidos < 0)
-            informa_erro_e_termina_programa("Falha no recv() ao receber mensagem do cliente.\n");
+            informa_erro_e_termina_programa("Falha no recv() ao receber mensagem do equipamento.\n");
         else if(num_bytes_recebidos == 0){
             if(DEBUG == true)
-                printf("Conexao encerrada pelo cliente.\n");
+                printf("Conexao encerrada pelo equipamento %d.\n", indice + 1);
             close(socket_do_cliente);
-            return;
+            return NULL;
         }
+
+
 		mensagem[num_bytes_recebidos] = '\0';
 
-		char resposta_para_cliente[MAX_SIZE]; // TODO: resposta para o cliente?
+		printf("recebido no servidor: %s", mensagem);
+		printf("mensagem size %li\n", strlen(mensagem));
+		printf("%d %d\n", mensagem[strlen(mensagem) - 2], mensagem[strlen(mensagem) - 1]);
 
-		if(strcmp(mensagem, "SEND") == 0){
+		// char resposta_para_cliente[MAX_SIZE]; // TODO: resposta para o equipamento?
 
-			num_bytes_recebidos = recv(socket_do_cliente, mensagem, MAX_SIZE, 0);
-			mensagem[num_bytes_recebidos] = '\0';
-			printf("Recebido: %s", mensagem);
-			int id = atoi(mensagem) - 1;
-
-			num_bytes_recebidos = recv(socket_do_cliente, mensagem, MAX_SIZE, 0); // TODO: checar erros
-			mensagem[num_bytes_recebidos] = '\0';
-
-			ssize_t num_bytes_enviados = send(clientes[id].socket_id, mensagem, MAX_SIZE, 0);
-			// TODO: tratar caso de mensagem não enviada.
-			// 		 Se houver falha, servidor está sendo encerrado.
-			// // Se nada foi enviado
-			// if (num_bytes_enviados < 0)
-			// 	informa_erro_e_termina_programa("Falha no send() ao enviar mensagem para cliente.\n");
-
+		mensagem_para_retornar = processar_comando(mensagem);
+		if(mensagem_para_retornar == NULL){
+			printf("Mensagem desconhecida enviada por equipamento.\nA conexao com cliente sera encerrada.\n");
+			close(socket_do_cliente);
+			return NULL;
 		}
 
-	}
+		if(strcmp(mensagem_para_retornar, "close connection") == 0){
+			printf("Comando 'close connection' recebido.\nA conexao com o equipamento sera encerrada.\n");
+			close(socket_do_cliente);
+			return NULL;
+		}
+
+		ssize_t num_bytes_enviados = send(socket_do_cliente, mensagem_para_retornar, strlen(mensagem_para_retornar), 0);
+		if(num_bytes_enviados < 0)
+			informa_erro_e_termina_programa("Falha no send() ao enviar mensagem para equipamento.\n");
+		else if(num_bytes_enviados != strlen(mensagem_para_retornar))
+			informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
+	}	
+
+	close(socket_do_cliente);
 
 	return NULL;
 }
