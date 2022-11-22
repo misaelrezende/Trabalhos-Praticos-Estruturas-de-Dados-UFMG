@@ -30,7 +30,7 @@ int criar_e_abrir_conexao_tcp(char *endereco_ip, int numero_de_porta){
 	endereco_servidor.sin_port = htons(numero_de_porta);	// Local port
 
 	if(connect(socket_cliente, (struct sockaddr*) &endereco_servidor, sizeof(endereco_servidor)) == -1){
-		informa_erro_e_termina_programa("Erro ao conectar o cliente.\n");
+		informa_erro_e_termina_programa("Nao foi possivel estabelecer uma conexao com o servidor.\nErro ao conectar o cliente.\n");
 	}
 
 	if(DEBUG == true)
@@ -39,25 +39,44 @@ int criar_e_abrir_conexao_tcp(char *endereco_ip, int numero_de_porta){
 	return socket_cliente;
 }
 
-void* receber_dados(void* socket_id){
+// Recebe e envia dados do/para servidor
+void* receber_e_enviar_dados(void* socket_id){
 	int socket_do_cliente = *((int *) socket_id);
+	size_t tamanho_mensagem;
+	char mensagem_recebida[MAX_SIZE];
+	char *entrada = NULL;
 
 	while(true){
-
-		char mensagem[MAX_SIZE];
-		ssize_t num_bytes_recebidos = recv(socket_do_cliente, mensagem, MAX_SIZE, 0);
+		// Recebimento de dados
+		ssize_t num_bytes_recebidos = recv(socket_do_cliente, mensagem_recebida, MAX_SIZE, 0);
 		if(num_bytes_recebidos < 0)
             informa_erro_e_termina_programa("Falha no recv() ao receber mensagem do servidor.\n");
         else if(num_bytes_recebidos == 0){
             if(DEBUG == true)
-                printf("Falha no recv(). Conexao encerrada antencipadamente pelo servidor.\n");
-				// informa_erro_e_termina_programa("Falha no recv(). Conexao encerrada antencipadamente pelo servidor.\n");
-            close(socket_do_cliente);
-            return;
-        }
-		mensagem[num_bytes_recebidos] = '\0';
-		printf("%s\n", mensagem);
+                printf("Falha no recv().\nConexao encerrada antecipadamente pelo servidor.\n");
 
+            close(socket_do_cliente);
+            return NULL;
+        }
+
+		mensagem_recebida[num_bytes_recebidos] = '\0';
+		printf("mensagem recebida pelo cliente: %s\n", mensagem_recebida);
+
+		// Envio de dados
+		// printf("Digite: ");
+		getline(&entrada, &tamanho_mensagem, stdin); // lê com '\n'
+		tamanho_mensagem = strlen(entrada);
+
+		if(strcmp(mensagem, "close connection\n") == 0){
+			printf("Fechando conexao\n");
+			return NULL;
+		}
+
+		ssize_t num_bytes_enviados = send(socket_do_cliente, entrada, strlen(entrada), 0);
+		if(num_bytes_enviados < 0)
+			informa_erro_e_termina_programa("Falha no send() ao enviar mensagem para servidor.\n");
+		else if(num_bytes_enviados != strlen(entrada))
+			informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
 	}
 
 }
@@ -82,27 +101,11 @@ int main(int argc, char* argv[]){
 
     //Thread para receber mensagens
 	pthread_t thread;
-	pthread_create(&thread, NULL, receber_dados, (void *) &socket_do_cliente );
+	int valor_de_retorno = pthread_create(&thread, NULL, receber_e_enviar_dados, (void *) &socket_do_cliente);
+	if(valor_de_retorno != 0)
+		printf("Thread 'receber_e_enviar_dados' falhou\n");
 
-	while(true){
+	pthread_join(thread, NULL);
 
-		char entrada[MAX_SIZE];
-		printf("Digite: ");
-		scanf("%s", entrada);
-
-		if(strcmp(entrada, "SEND") == 0){
-			printf("ENTROU AQUI\n");
-			send(socket_do_cliente, entrada, MAX_SIZE,0); // TODO: checar se envio foi ok
-			
-			scanf("%s",entrada);
-			send(socket_do_cliente, entrada, MAX_SIZE,0);
-			
-			scanf(" %[^\n]s",entrada);
-			send(socket_do_cliente, entrada, MAX_SIZE,0);
-
-		}
-
-	}
-
-
+	return 0;
 }
