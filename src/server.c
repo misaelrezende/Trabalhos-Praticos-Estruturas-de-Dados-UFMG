@@ -12,6 +12,7 @@
 
 #define MAX_SIZE 1024
 #define DEBUG true
+#define MAXCONNECTED 10 // Quantidade máxima de conexões
 static const int MAXPENDING = 10; // Pedidos de conexão pendentes máximos
 
 void informa_erro_e_termina_programa(char *mensagem){
@@ -21,18 +22,20 @@ void informa_erro_e_termina_programa(char *mensagem){
 
 
 int contador_clientes = 0;
-static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+// static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+// static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
-typedef struct cliente{
+typedef struct{
+	int id;
+	float temperatura; // Entre 0 e 10, com duas casas decimais
 	int indice;
 	int socket_id;
-	struct sockaddr_in endereco_cliente;
+	struct sockaddr_in endereco_equipamento;
 	unsigned int tamanho;
-} Cliente;
+} Equipamento;
 
-Cliente clientes[MAX_SIZE];
-pthread_t thread[MAX_SIZE];
+Equipamento vetor_de_equipamentos[MAXCONNECTED];
+pthread_t vetor_de_threads[MAXCONNECTED];
 
 // Cria conexão TCP
 int criar_conexao_tcp(){
@@ -132,29 +135,39 @@ int main(int argc, char* argv[]){
 	abrir_conexao_tcp(socket_do_servidor, numero_de_porta);
 	int socket_do_cliente;
 
+	// TODO: Como limitar o número de equipamentos conectados?
 	while(true){
+		if(contador_clientes == 10)
+			continue;
+		else if(contador_clientes <= 9){
+			// Espera conexão de equipamento
+			socket_do_cliente = accept(socket_do_servidor,
+				(struct sockaddr*) &vetor_de_equipamentos[contador_clientes].endereco_equipamento,
+				&vetor_de_equipamentos[contador_clientes].tamanho);
+			if(socket_do_cliente < 0)
+				informa_erro_e_termina_programa("Falha no accept().\nEquipamento nao conectado\n");
 
-		// Espera conexão de cliente
-		socket_do_cliente = accept(socket_do_servidor,
-			(struct sockaddr*) &clientes[contador_clientes].endereco_cliente,
-			&clientes[contador_clientes].tamanho);
-		if(socket_do_cliente < 0)
-            informa_erro_e_termina_programa("Falha no accept().\nCliente nao conectado\n");
+			vetor_de_equipamentos[contador_clientes].socket_id = socket_do_cliente;
+			vetor_de_equipamentos[contador_clientes].indice = contador_clientes;
 
-		clientes[contador_clientes].socket_id = socket_do_cliente;
-		clientes[contador_clientes].indice = contador_clientes;
-        if(DEBUG == true)
-            printf("Cliente agora esta conectado.\n");
+			printf("Equipment %d added\n", contador_clientes);
+			// TODO: BROADCAST que equipamento foi adicionado (2.b.1)
+			// TODO: Enviar a este equipamento a lista de equip. conectados na rede
 
-		pthread_create(&thread[contador_clientes], NULL, comunicar,
-			(void *) &clientes[contador_clientes]);
+			int valor_de_retorno = pthread_create(&vetor_de_threads[contador_clientes], NULL, comunicar,
+				(void *) &vetor_de_equipamentos[contador_clientes]);
+			if(valor_de_retorno != 0){
+				printf("Thread %lu: ", (unsigned long int) vetor_de_threads[contador_clientes]);
+				informa_erro_e_termina_programa("Falha no pthread_create().\n");
+			}
 
-		contador_clientes++;
+			contador_clientes++;
+		}
  
 	}
 
-	for(int i = 0 ; i < contador_clientes ; i++)
-		pthread_join(thread[i],NULL);
+	for(int i = 0; i < contador_clientes; i++)
+		pthread_join(vetor_de_threads[i], NULL);
 
 	return 0;
 }
