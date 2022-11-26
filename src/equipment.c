@@ -62,15 +62,20 @@ void* receber_e_enviar_dados(void* socket_id){
 		mensagem_recebida[num_bytes_recebidos] = '\0';
 		printf("mensagem recebida pelo cliente: %s\n", mensagem_recebida);
 
+		if(entrada != NULL){ // evita erro de comparação com NULL
+			if(strcmp(entrada, "close connection\n") == 0){
+				if(DEBUG == true)
+					printf("Fechando conexao\n");
+
+				close(socket_do_cliente);
+				return NULL;
+			}
+		}
+
 		// Envio de dados
 		// printf("Digite: ");
 		getline(&entrada, &tamanho_mensagem, stdin); // lê com '\n'
 		tamanho_mensagem = strlen(entrada);
-
-		if(strcmp(entrada, "close connection\n") == 0){
-			printf("Fechando conexao\n");
-			return NULL;
-		}
 
 		ssize_t num_bytes_enviados = send(socket_do_cliente, entrada, strlen(entrada), 0);
 		if(num_bytes_enviados < 0)

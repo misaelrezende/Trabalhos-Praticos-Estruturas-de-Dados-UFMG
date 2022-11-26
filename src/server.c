@@ -37,6 +37,16 @@ typedef struct{
 Equipamento vetor_de_equipamentos[MAXCONNECTED];
 pthread_t vetor_de_threads[MAXCONNECTED];
 
+// Inicializa os equipamentos com valores padrão
+// Inicializa id, indice e socket_id com valor '-1'
+void inicializar_equipamentos(Equipamento *equipamentos){
+	for(int i = 0; i < MAXCONNECTED; i++){
+		equipamentos->id = -1;
+		equipamentos->indice = -1;
+		equipamentos->socket_id = -1;
+	}
+}
+
 // Cria conexão TCP
 int criar_conexao_tcp(){
 	int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -72,15 +82,22 @@ void abrir_conexao_tcp(int socket_do_servidor, int numero_de_porta){
         printf(">> Servidor escutando na porta %i\n", numero_de_porta);
 }
 
+// Verifica se houve erro no envio de mensagem.
+// Termina o programa em caso de erro.
+void verificar_erro_envio_de_mensagem(ssize_t numero_bytes_enviados, int tamanho_mensagem){
+	if(numero_bytes_enviados < 0)
+		informa_erro_e_termina_programa("Falha no send() ao enviar mensagem para equipamento.\n");
+	else if(numero_bytes_enviados != tamanho_mensagem)
+		informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
+}
+
 char* processar_comando(char *mensagem){
 	if(DEBUG == true)
 		printf("Processando comando: %s", mensagem);
 
 	if(strcmp(mensagem, "close connection\n") == 0){
-		printf("Fechando conexao\n");
 		return "close connection";
 	}else if(strcmp(mensagem, "list equipment\n") == 0){
-		printf("Listando equipamentos\n");
 		return "list equipment";
 	}
 
@@ -100,10 +117,7 @@ void* comunicar(void* equipamento){
 	strcat(msg, id);
 
 	ssize_t num_bytes_enviados = send(socket_do_cliente, msg, strlen(msg), 0);
-	if(num_bytes_enviados < 0)
-		informa_erro_e_termina_programa("Falha no send() ao enviar mensagem para equipamento.\n");
-	else if(num_bytes_enviados != strlen(msg))
-		informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
+	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(msg));
 
 	// printf("Equipamento %d conectado.\n", indice);
 
@@ -125,7 +139,7 @@ void* comunicar(void* equipamento){
 		mensagem[num_bytes_recebidos] = '\0';
 		printf("recebido no servidor: %s", mensagem); // mensagem[strlen(mensagem) - 1] == '\n'
 
-		// char resposta_para_cliente[MAX_SIZE]; // TODO: resposta para o equipamento?
+		char resposta_para_cliente[MAX_SIZE]; // TODO: resposta para o equipamento?
 
 		mensagem_para_retornar = processar_comando(mensagem);
 		if(mensagem_para_retornar == NULL){
@@ -135,16 +149,22 @@ void* comunicar(void* equipamento){
 		}
 
 		if(strcmp(mensagem_para_retornar, "close connection") == 0){
-			printf("Comando 'close connection' recebido.\nA conexao com o equipamento sera encerrada.\n");
+			if(DEBUG == true)
+				printf("Comando 'close connection' recebido.\nA conexao com o equipamento sera encerrada.\n");
+
+			strcpy(resposta_para_cliente, "Sucess");
+
+			// TODO: Enviar mensagem também a outros equipamentos conectados
+
+			ssize_t num_bytes_enviados = send(socket_do_cliente, resposta_para_cliente, strlen(resposta_para_cliente), 0);
+			verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
+
 			close(socket_do_cliente);
 			return NULL;
 		}
 
 		ssize_t num_bytes_enviados = send(socket_do_cliente, mensagem_para_retornar, strlen(mensagem_para_retornar), 0);
-		if(num_bytes_enviados < 0)
-			informa_erro_e_termina_programa("Falha no send() ao enviar mensagem para equipamento.\n");
-		else if(num_bytes_enviados != strlen(mensagem_para_retornar))
-			informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
+		verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem_para_retornar));
 	}	
 
 	close(socket_do_cliente);
@@ -167,6 +187,9 @@ int main(int argc, char* argv[]){
 	int socket_do_servidor = criar_conexao_tcp();
 	abrir_conexao_tcp(socket_do_servidor, numero_de_porta);
 	int socket_do_cliente;
+
+	// Inicializa os equipamentos com valores padrão
+	inicializar_equipamentos(vetor_de_equipamentos);
 
 	// TODO: Como limitar o número de equipamentos conectados?
 	while(true){
