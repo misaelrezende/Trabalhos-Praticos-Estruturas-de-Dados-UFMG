@@ -98,13 +98,14 @@ void* comunicar(void* equipamento){
 	char msg[10] = "New ID: ", id[2];
 	sprintf(id, "%d", indice);  // converte id (int to char)
 	strcat(msg, id);
+
 	ssize_t num_bytes_enviados = send(socket_do_cliente, msg, strlen(msg), 0);
 	if(num_bytes_enviados < 0)
 		informa_erro_e_termina_programa("Falha no send() ao enviar mensagem para equipamento.\n");
 	else if(num_bytes_enviados != strlen(msg))
 		informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
 
-	// printf("Equipamento %d conectado.\n", indice + 1);
+	// printf("Equipamento %d conectado.\n", indice);
 
 	while(true){
 		ssize_t num_bytes_recebidos = recv(socket_do_cliente, mensagem, MAX_SIZE, 0);
@@ -113,17 +114,16 @@ void* comunicar(void* equipamento){
             informa_erro_e_termina_programa("Falha no recv() ao receber mensagem do equipamento.\n");
         else if(num_bytes_recebidos == 0){
             if(DEBUG == true)
-                printf("Conexao encerrada pelo equipamento %d.\n", indice + 1);
+                printf("Conexao encerrada pelo equipamento %d.\n", indice);
+
+			printf("Equipment %d removed\n", indice);
             close(socket_do_cliente);
             return NULL;
         }
 
 
 		mensagem[num_bytes_recebidos] = '\0';
-
-		printf("recebido no servidor: %s", mensagem);
-		printf("mensagem size %li\n", strlen(mensagem));
-		printf("%d %d\n", mensagem[strlen(mensagem) - 2], mensagem[strlen(mensagem) - 1]);
+		printf("recebido no servidor: %s", mensagem); // mensagem[strlen(mensagem) - 1] == '\n'
 
 		// char resposta_para_cliente[MAX_SIZE]; // TODO: resposta para o equipamento?
 

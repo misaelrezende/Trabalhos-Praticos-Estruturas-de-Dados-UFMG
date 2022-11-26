@@ -67,7 +67,7 @@ void* receber_e_enviar_dados(void* socket_id){
 		getline(&entrada, &tamanho_mensagem, stdin); // lê com '\n'
 		tamanho_mensagem = strlen(entrada);
 
-		if(strcmp(mensagem, "close connection\n") == 0){
+		if(strcmp(entrada, "close connection\n") == 0){
 			printf("Fechando conexao\n");
 			return NULL;
 		}
