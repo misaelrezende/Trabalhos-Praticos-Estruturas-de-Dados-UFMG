@@ -122,18 +122,18 @@ char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
 
 void* comunicar(void* equipamento){
 	Equipamento* equipamento_atual = (Equipamento*) equipamento;
-	int id = equipamento_atual->id;
+	int id_atual = equipamento_atual->id;
 	int socket_do_cliente = equipamento_atual->socket_id;
 	char *mensagem_para_retornar = NULL;
 	char mensagem[MAX_SIZE];
 
 	// Envia número de id a equipamento recentemente conectado
-	char msg[10] = "New ID: ", id_char[2];
-	sprintf(id_char, "%d", id);  // converte id (int to char)
-	strcat(msg, id_char);
+	char mensagem_novo_id[10] = "New ID: ", id_char[2];
+	sprintf(id_char, "%d", id_atual);  // converte id (int to char)
+	strcat(mensagem_novo_id, id_char);
 
-	ssize_t num_bytes_enviados = send(socket_do_cliente, msg, strlen(msg), 0);
-	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(msg));
+	ssize_t num_bytes_enviados = send(socket_do_cliente, mensagem_novo_id, strlen(mensagem_novo_id), 0);
+	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem_novo_id));
 
 
 	while(true){
@@ -143,13 +143,11 @@ void* comunicar(void* equipamento){
             informa_erro_e_termina_programa("Falha no recv() ao receber mensagem do equipamento.\n");
         else if(num_bytes_recebidos == 0){
             if(DEBUG == true)
-                printf("Conexao encerrada pelo equipamento %d.\n", id);
+                printf("Conexao encerrada pelo equipamento %d.\n", id_atual);
 
 			// Se equipamento encerrar abrutamente, remova equipamento
-			remover_equipamento(equipamento_atual);
-			printf("Equipment %d removed\n", id);
-            close(socket_do_cliente);
-            return NULL;
+			printf("Equipment %d removed\n", id_atual);
+            break;
         }
 
 
@@ -161,15 +159,14 @@ void* comunicar(void* equipamento){
 		mensagem_para_retornar = processar_comando(mensagem, equipamento_atual);
 		if(mensagem_para_retornar == NULL){
 			printf("Mensagem desconhecida enviada por equipamento.\nA conexao com cliente sera encerrada.\n");
-			close(socket_do_cliente);
-			return NULL;
+			break;
 		}
 
 		if(strcmp(mensagem_para_retornar, "close connection") == 0){
 			if(DEBUG == true)
 				printf("Comando 'close connection' recebido.\n");
 
-			printf("Equipment %d removed\n", id);
+			printf("Equipment %d removed\n", id_atual);
 			strcpy(resposta_para_cliente, "Sucess");
 
 			// TODO: Enviar mensagem também a outros equipamentos conectados (2.b.1)
@@ -177,13 +174,12 @@ void* comunicar(void* equipamento){
 			ssize_t num_bytes_enviados = send(socket_do_cliente, resposta_para_cliente, strlen(resposta_para_cliente), 0);
 			verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
 
-			close(socket_do_cliente);
-			return NULL;
+			break;
 		}
 
 		ssize_t num_bytes_enviados = send(socket_do_cliente, mensagem_para_retornar, strlen(mensagem_para_retornar), 0);
 		verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem_para_retornar));
-	}	
+	}
 
 	close(socket_do_cliente);
 
