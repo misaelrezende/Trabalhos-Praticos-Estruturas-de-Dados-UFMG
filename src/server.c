@@ -29,10 +29,10 @@ typedef struct{
 	float temperatura; // Entre 0 e 10, com duas casas decimais
 	int socket_id;
 	struct sockaddr_in endereco_equipamento;
-	unsigned int tamanho;
+	int equipamentos_existentes[MAXCONNECTED];
 } Equipamento;
 
-Equipamento vetor_de_equipamentos[MAXCONNECTED];
+Equipamento vetor_de_equipamentos[MAXCONNECTED+1];
 pthread_t vetor_de_threads[MAXCONNECTED];
 
 // Inicializa os equipamentos com valores padrão
@@ -121,9 +121,9 @@ char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
 }
 
 void* comunicar(void* equipamento){
-	Equipamento* equipamento_atual = (Equipamento*) equipamento;
-	int id_atual = equipamento_atual->id;
-	int socket_do_cliente = equipamento_atual->socket_id;
+	Equipamento* equipamentos = (Equipamento*) equipamento;
+	int id_atual = equipamentos[10].id;
+	int socket_do_cliente = equipamentos[id_atual].socket_id;
 	char *mensagem_para_retornar = NULL;
 	char mensagem[MAX_SIZE];
 
@@ -152,19 +152,18 @@ void* comunicar(void* equipamento){
 
 
 		mensagem[num_bytes_recebidos] = '\0';
-		printf("recebido no servidor: %s", mensagem); // mensagem[strlen(mensagem) - 1] == '\n'
+		if(DEBUG == true)
+			printf("recebido no servidor: %s", mensagem); // mensagem[strlen(mensagem) - 1] == '\n'
 
 		char resposta_para_cliente[MAX_SIZE]; // TODO: resposta para o equipamento?
 
-		mensagem_para_retornar = processar_comando(mensagem, equipamento_atual);
+		mensagem_para_retornar = processar_comando(mensagem, &equipamentos[id_atual]);
 		if(mensagem_para_retornar == NULL){
 			printf("Mensagem desconhecida enviada por equipamento.\nA conexao com cliente sera encerrada.\n");
 			break;
 		}
 
 		if(strcmp(mensagem_para_retornar, "close connection") == 0){
-			if(DEBUG == true)
-				printf("Comando 'close connection' recebido.\n");
 
 			printf("Equipment %d removed\n", id_atual);
 			strcpy(resposta_para_cliente, "Sucess");
@@ -200,7 +199,11 @@ int main(int argc, char* argv[]){
 
 	int socket_do_servidor = criar_conexao_tcp();
 	abrir_conexao_tcp(socket_do_servidor, numero_de_porta);
+
 	int socket_do_cliente, contador_clientes = 0;
+	struct sockaddr_in endereco_cliente;
+	socklen_t tamanho_endereco_cliente;
+	tamanho_endereco_cliente = sizeof(endereco_cliente);
 
 	// Inicializa os equipamentos com valores padrão
 	inicializar_equipamentos(vetor_de_equipamentos);
@@ -214,7 +217,7 @@ int main(int argc, char* argv[]){
 			// Espera conexão de equipamento
 			socket_do_cliente = accept(socket_do_servidor,
 				(struct sockaddr*) &vetor_de_equipamentos[posicao_valida].endereco_equipamento,
-				&vetor_de_equipamentos[posicao_valida].tamanho);
+				&tamanho_endereco_cliente);
 			if(socket_do_cliente < 0)
 				informa_erro_e_termina_programa("Falha no accept().\nEquipamento nao conectado\n");
 
@@ -224,8 +227,11 @@ int main(int argc, char* argv[]){
 			printf("Equipment %d added\n", posicao_valida);
 			// TODO: Enviar a este equipamento a lista de equip. conectados na rede
 
+			// Work around: posição do id desse equipamento a ser tratado na funcao comunicar()
+			vetor_de_equipamentos[10].id = posicao_valida;
+
 			int valor_de_retorno = pthread_create(&vetor_de_threads[posicao_valida], NULL, comunicar,
-				(void *) &vetor_de_equipamentos[posicao_valida]);
+				(void *) &vetor_de_equipamentos);
 			if(valor_de_retorno != 0){
 				printf("Thread %lu: ", (unsigned long int) vetor_de_threads[posicao_valida]);
 				informa_erro_e_termina_programa("Falha no pthread_create().\n");
