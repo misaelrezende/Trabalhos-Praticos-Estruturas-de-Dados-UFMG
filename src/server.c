@@ -138,14 +138,14 @@ char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
 
 /* Adiciona id do equipamento atual a lista dos outros equipamentos
 conectados no servidor */
-void adicionar_id_a_equipamentos_conectados(Equipamento* equipamento_atual, int id_atual){
+void adicionar_id_a_equipamentos_conectados(Equipamento* equipamentos, int id_atual){
 	printf("Adiciona equip na lista dos outros: ");
 	for(int i = 0; i < MAXCONNECTED; i++){
-		if(equipamento_atual[i].id != -1 && equipamento_atual[i].id != id_atual){
-			printf("%d, ", equipamento_atual[i].id);
+		if(equipamentos[i].id != -1 && equipamentos[i].id != id_atual){
+			printf("%d, ", equipamentos[i].id);
 			for(int j = 0; j < MAXCONNECTED; j++){
-				if(equipamento_atual[i].equipamentos_conectados[j] != 1){
-					equipamento_atual[i].equipamentos_conectados[j] = id_atual; // adiciona na lista dos outros conectados
+				if(equipamentos[i].equipamentos_conectados[j] == -1){
+					equipamentos[i].equipamentos_conectados[j] = id_atual; // adiciona na lista dos outros conectados
 					break;
 				}
 			}
@@ -172,6 +172,24 @@ void remover_id_de_equipamentos_conectados(Equipamento* equipamentos, int id_atu
 	fflush(stdout);
 }
 
+/* Envia lista de equipamentos já conectados na rede
+para o equipamento atual */
+void enviar_lista_equipamentos_conectados(Equipamento* equipamentos, int id_atual){
+	int equipamento_atual;
+	for(int i = 0; i < MAXCONNECTED; i++){
+		equipamento_atual = equipamentos[i].id;
+
+		if(equipamento_atual != -1 && equipamento_atual != id_atual){
+			for(int j = 0; j < MAXCONNECTED; j++){
+				if(equipamentos[id_atual].equipamentos_conectados[j] == -1){
+					equipamentos[id_atual].equipamentos_conectados[j] = equipamento_atual; // adiciona equipamento já conectado na lista do equipamento atual
+					break;
+				}
+			}
+		}
+	}
+}
+
 void* comunicar(void* equipamento){
 	Equipamento* equipamentos = (Equipamento*) equipamento;
 	int id_atual = equipamentos[10].id;
@@ -188,6 +206,7 @@ void* comunicar(void* equipamento){
 	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem_novo_id));
 
 	adicionar_id_a_equipamentos_conectados(equipamentos, id_atual);
+	enviar_lista_equipamentos_conectados(equipamentos, id_atual);
 	fflush(stdout);
 
 	while(true){
