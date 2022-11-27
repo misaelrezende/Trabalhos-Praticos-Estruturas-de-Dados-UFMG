@@ -29,18 +29,21 @@ typedef struct{
 	float temperatura; // Entre 0 e 10, com duas casas decimais
 	int socket_id;
 	struct sockaddr_in endereco_equipamento;
-	int equipamentos_existentes[MAXCONNECTED];
+	int equipamentos_conectados[MAXCONNECTED];
 } Equipamento;
 
 Equipamento vetor_de_equipamentos[MAXCONNECTED+1];
 pthread_t vetor_de_threads[MAXCONNECTED];
 
-// Inicializa os equipamentos com valores padrão
-// Inicializa id e socket_id com valor '-1'
+/* Inicializa os equipamentos com valores padrão.
+Inicializa lista de equipamentos conectados com valor padrão.
+Inicializa id e socket_id com valor '-1' */
 void inicializar_equipamentos(Equipamento *equipamentos){
 	for(int i = 0; i < MAXCONNECTED; i++){
 		equipamentos[i].id = -1;
 		equipamentos[i].socket_id = -1;
+		for(int j = 0; j < MAXCONNECTED; j++)
+			equipamentos[i].equipamentos_conectados[j] = -1;
 	}
 }
 
@@ -102,6 +105,12 @@ int encontrar_posicao_livre(Equipamento *equipamentos){
 
 // Remove equipamento do vetor de equipamentos
 void remover_equipamento(Equipamento *equipamento_atual){
+	// Limpa lista de equipamentos conectados desse equipamento
+	for(int j = 0; j < MAXCONNECTED; j++){
+		if(equipamento_atual->equipamentos_conectados[j] != -1){
+			equipamento_atual->equipamentos_conectados[j] = -1;
+		}
+	}
 	equipamento_atual->id = -1;
 	equipamento_atual->socket_id = -1;
 }
@@ -114,10 +123,53 @@ char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
 		remover_equipamento(equipamento_atual);
 		return "close connection";
 	}else if(strcmp(mensagem, "list equipment\n") == 0){
+		printf("Equipamentos conectados sao: ");
+		for(int j = 0; j < MAXCONNECTED; j++){
+			if(equipamento_atual->equipamentos_conectados[j] != -1)
+				printf("%d ", equipamento_atual->equipamentos_conectados[j]);
+		}
+		printf("\n");
+
 		return "list equipment";
 	}
 
 	return NULL;
+}
+
+/* Adiciona id do equipamento atual a lista dos outros equipamentos
+conectados no servidor */
+void adicionar_id_a_equipamentos_conectados(Equipamento* equipamento_atual, int id_atual){
+	printf("Adiciona equip na lista dos outros: ");
+	for(int i = 0; i < MAXCONNECTED; i++){
+		if(equipamento_atual[i].id != -1 && equipamento_atual[i].id != id_atual){
+			printf("%d, ", equipamento_atual[i].id);
+			for(int j = 0; j < MAXCONNECTED; j++){
+				if(equipamento_atual[i].equipamentos_conectados[j] != 1){
+					equipamento_atual[i].equipamentos_conectados[j] = id_atual; // adiciona na lista dos outros conectados
+					break;
+				}
+			}
+		}
+	}
+	fflush(stdout);
+}
+
+/* Remove id do equipamento removido da lista de outros equipamentos
+conectados no servidor */
+void remover_id_de_equipamentos_conectados(Equipamento* equipamentos, int id_atual){
+	printf("Removendo equip %d da lista dos outros: ", id_atual);
+	for(int i = 0; i < MAXCONNECTED; i++){
+		if(equipamentos[i].id != -1 && equipamentos[i].id != id_atual){
+			printf("%d, ", equipamentos[i].id);
+			for(int j = 0; j < MAXCONNECTED; j++){
+				if(equipamentos[i].equipamentos_conectados[j] == id_atual){
+					equipamentos[i].equipamentos_conectados[j] = -1;
+					break;
+				}
+			}
+		}
+	}
+	fflush(stdout);
 }
 
 void* comunicar(void* equipamento){
@@ -135,6 +187,8 @@ void* comunicar(void* equipamento){
 	ssize_t num_bytes_enviados = send(socket_do_cliente, mensagem_novo_id, strlen(mensagem_novo_id), 0);
 	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem_novo_id));
 
+	adicionar_id_a_equipamentos_conectados(equipamentos, id_atual);
+	fflush(stdout);
 
 	while(true){
 		ssize_t num_bytes_recebidos = recv(socket_do_cliente, mensagem, MAX_SIZE, 0);
@@ -180,6 +234,8 @@ void* comunicar(void* equipamento){
 		verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem_para_retornar));
 	}
 
+	remover_id_de_equipamentos_conectados(equipamentos, id_atual);
+	remover_equipamento(&equipamentos[id_atual]);
 	close(socket_do_cliente);
 
 	return NULL;
@@ -224,7 +280,7 @@ int main(int argc, char* argv[]){
 			vetor_de_equipamentos[posicao_valida].socket_id = socket_do_cliente;
 			vetor_de_equipamentos[posicao_valida].id = posicao_valida;
 
-			printf("Equipment %d added\n", posicao_valida);
+			printf("\nEquipment %d added\n", posicao_valida);
 			// TODO: Enviar a este equipamento a lista de equip. conectados na rede
 
 			// Work around: posição do id desse equipamento a ser tratado na funcao comunicar()
@@ -238,7 +294,7 @@ int main(int argc, char* argv[]){
 			}
 
 			posicao_valida = encontrar_posicao_livre(vetor_de_equipamentos);
-			contador_clientes++;
+			contador_clientes++; // TODO: como diminuir essa contagem em caso de remoção?
 		}
  
 	}
