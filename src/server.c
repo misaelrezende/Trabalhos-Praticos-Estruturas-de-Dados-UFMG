@@ -27,6 +27,8 @@ typedef struct{
 	int socket_id;
 	struct sockaddr_in endereco_equipamento;
 	int equipamentos_conectados[MAXCONNECTED];
+	// Work around: posicao MAXCONNECTED indica a quantidade de equipamentos atualmente conectados no servidor
+	int total_equipamentos_conectados;
 } Equipamento;
 
 Equipamento vetor_de_equipamentos[MAXCONNECTED+1];
@@ -48,6 +50,8 @@ void inicializar_equipamentos(Equipamento *equipamentos){
 		for(int j = 0; j < MAXCONNECTED; j++)
 			equipamentos[i].equipamentos_conectados[j] = -1;
 	}
+
+	equipamentos[10].total_equipamentos_conectados = 0;
 }
 
 // Cria conexão TCP
@@ -296,6 +300,7 @@ void* comunicar(void* equipamento){
 
 			// Enviar broadcast de equipamento removido arbitrariamente a outros equipamentos conectados (Encerramento de Conexão com Servidor: 2.b.ii)
 			enviar_mensagem_broadcast(equipamentos, id_atual, resposta_para_cliente);
+			equipamentos[10].total_equipamentos_conectados -= 1; // Diminui da lista de equipamentos conectados
             break;
         }
 
@@ -326,6 +331,7 @@ void* comunicar(void* equipamento){
 
 			// Enviar broadcast de equipamento removido a outros equipamentos conectados (Encerramento de Conexão com Servidor: 2.b.ii)
 			enviar_mensagem_broadcast(equipamentos, id_atual, resposta_para_cliente);
+			equipamentos[10].total_equipamentos_conectados -= 1; // Diminui da lista de equipamentos conectados
 			break;
 		}
 
@@ -366,9 +372,9 @@ int main(int argc, char* argv[]){
 
 	// TODO: Como limitar o número de equipamentos conectados?
 	while(true){
-		if(contador_clientes == 10)
+		if(vetor_de_equipamentos[10].total_equipamentos_conectados == 10)
 			continue;
-		else if(contador_clientes <= 9){
+		else if(vetor_de_equipamentos[10].total_equipamentos_conectados <= 9){
 			// Espera conexão de equipamento
 			socket_do_cliente = accept(socket_do_servidor,
 				(struct sockaddr*) &vetor_de_equipamentos[posicao_valida].endereco_equipamento,
@@ -392,12 +398,12 @@ int main(int argc, char* argv[]){
 			}
 
 			posicao_valida = encontrar_posicao_livre(vetor_de_equipamentos);
-			contador_clientes++; // TODO: como diminuir essa contagem em caso de remoção?
+			vetor_de_equipamentos[10].total_equipamentos_conectados += 1;
 		}
  
 	}
 
-	for(int i = 0; i < contador_clientes; i++)
+	for(int i = 0; i < vetor_de_equipamentos[10].total_equipamentos_conectados; i++)
 		pthread_join(vetor_de_threads[i], NULL);
 
 	return 0;
