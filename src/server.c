@@ -39,9 +39,15 @@ pthread_t vetor_de_threads[MAXCONNECTED];
 Inicializa lista de equipamentos conectados com valor padrão.
 Inicializa id e socket_id com valor '-1' */
 void inicializar_equipamentos(Equipamento *equipamentos){
+	float limite_superior = 10, numero_randomico;
+
 	for(int i = 0; i < MAXCONNECTED; i++){
 		equipamentos[i].id = -1;
 		equipamentos[i].socket_id = -1;
+
+		numero_randomico = (float) rand() / (float) (RAND_MAX / limite_superior); // BUG: Ainda retorna o mesmo valor
+		equipamentos[i].temperatura = numero_randomico;
+
 		for(int j = 0; j < MAXCONNECTED; j++)
 			equipamentos[i].equipamentos_conectados[j] = -1;
 	}
@@ -115,6 +121,20 @@ void remover_equipamento(Equipamento *equipamento_atual){
 	equipamento_atual->socket_id = -1;
 }
 
+// Recebe e consulta a temperatura do equipamento requerido
+float requisitar_temperatura(Equipamento *equipamento_atual, int equipamento_solicitado){
+	float temperatura = -1;
+
+	for(int j = 0; j < MAXCONNECTED; j++){
+		if(equipamento_atual->equipamentos_conectados[j] == equipamento_solicitado){
+			temperatura = equipamento_atual[equipamento_solicitado].temperatura;
+			break;
+		}
+	}
+	return temperatura;
+}
+
+// Processa o comando recebido pelo equipamento atual
 char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
 	if(DEBUG == true)
 		printf("Processando comando: %s", mensagem);
@@ -131,6 +151,25 @@ char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
 		printf("\n");
 
 		return "list equipment";
+	}
+
+	char *palavra; palavra = strtok(mensagem, " ");
+	int equipamento_solicitado;
+	if(strcmp(palavra, "request") == 0){ // assume que comando foi enviado corretamente
+		while(palavra != NULL){
+            palavra = strtok(NULL, " ");
+			if(strcmp(palavra, "from") == 0){
+				palavra = strtok(NULL, " ");
+				equipamento_solicitado = atoi(palavra);
+				break;
+			}
+		}
+
+		float temperatura = requisitar_temperatura(equipamento_atual, equipamento_solicitado);
+		char *ptr_msg_retorno = NULL, auxiliar[10];
+		sprintf(auxiliar, "%f", temperatura);  // converte id (int to char)
+		ptr_msg_retorno = auxiliar;
+		return ptr_msg_retorno;
 	}
 
 	return NULL;
@@ -249,8 +288,9 @@ void* comunicar(void* equipamento){
 			break;
 		}
 
-		ssize_t num_bytes_enviados = send(socket_do_cliente, mensagem_para_retornar, strlen(mensagem_para_retornar), 0);
-		verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem_para_retornar));
+		strcpy(resposta_para_cliente, mensagem_para_retornar);
+		ssize_t num_bytes_enviados = send(socket_do_cliente, resposta_para_cliente, strlen(resposta_para_cliente), 0);
+		verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
 	}
 
 	remover_id_de_equipamentos_conectados(equipamentos, id_atual);
