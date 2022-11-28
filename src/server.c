@@ -207,9 +207,9 @@ void remover_id_de_equipamentos_conectados(Equipamento* equipamentos, int id_atu
 	}
 }
 
-/* Envia lista de equipamentos já conectados na rede
+/* Atualiza lista de equipamentos já conectados na rede
 para o equipamento atual */
-void enviar_lista_equipamentos_conectados(Equipamento* equipamentos, int id_atual){
+void atualizar_lista_equipamentos_conectados(Equipamento* equipamentos, int id_atual){
 	int equipamento_atual;
 	for(int i = 0; i < MAXCONNECTED; i++){
 		equipamento_atual = equipamentos[i].id;
@@ -217,10 +217,32 @@ void enviar_lista_equipamentos_conectados(Equipamento* equipamentos, int id_atua
 		if(equipamento_atual != -1 && equipamento_atual != id_atual){
 			for(int j = 0; j < MAXCONNECTED; j++){
 				if(equipamentos[id_atual].equipamentos_conectados[j] == -1){
-					equipamentos[id_atual].equipamentos_conectados[j] = equipamento_atual; // adiciona equipamento já conectado na lista do equipamento atual
+					// adiciona equipamento já conectado na lista do equipamento atual
+					equipamentos[id_atual].equipamentos_conectados[j] = equipamento_atual;
 					break;
 				}
 			}
+		}
+	}
+}
+
+// Envia mensagem para um equipamento
+void enviar_mensagem_unicast(int socket, char* mensagem){
+	ssize_t num_bytes_enviados = send(socket, mensagem, strlen(mensagem), 0);
+	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem));
+}
+
+// Envia mensagem a todos equipamentos conectados
+void enviar_mensagem_broadcast(Equipamento* equipamentos, int id_atual, char* mensagem){
+	int socket_conectado, id_equipamento_conectado;
+	for(int j = 0; j < MAXCONNECTED; j++){
+		id_equipamento_conectado = equipamentos[id_atual].equipamentos_conectados[j];
+
+		if(id_equipamento_conectado != -1){
+			socket_conectado = equipamentos[id_equipamento_conectado].socket_id;
+			enviar_mensagem_unicast(socket_conectado, mensagem);
+			// ssize_t num_bytes_enviados = send(socket_conectado, resposta_para_cliente, strlen(resposta_para_cliente), 0);
+			// verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
 		}
 	}
 }
@@ -231,17 +253,27 @@ void* comunicar(void* equipamento){
 	int socket_do_cliente = equipamentos[id_atual].socket_id;
 	char *mensagem_para_retornar = NULL;
 	char mensagem[MAX_SIZE];
+	char resposta_para_cliente[MAX_SIZE];
 
-	// Envia número de id a equipamento recentemente conectado
-	char mensagem_novo_id[10] = "New ID: ", id_char[2];
+	char mensagem_novo_id[10] = "New ID: ", id_char[3];
 	sprintf(id_char, "%d", id_atual);  // converte id (int to char)
 	strcat(mensagem_novo_id, id_char);
 
-	ssize_t num_bytes_enviados = send(socket_do_cliente, mensagem_novo_id, strlen(mensagem_novo_id), 0);
-	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem_novo_id));
+	// Envia número de id a equipamento recentemente conectado
+	enviar_mensagem_unicast(socket_do_cliente, mensagem_novo_id);
 
-	adicionar_id_a_equipamentos_conectados(equipamentos, id_atual);
-	enviar_lista_equipamentos_conectados(equipamentos, id_atual);
+	memset(id_char, 0, 3);
+	memset(resposta_para_cliente, 0, MAX_SIZE);
+	strcat(resposta_para_cliente, "Equipment ");
+	sprintf(id_char, "%d", id_atual);
+	strcat(resposta_para_cliente, id_char);
+	strcat(resposta_para_cliente, " added");
+
+	adicionar_id_a_equipamentos_conectados(equipamentos, id_atual); // (Abertura de Conexão com Servidor: 2.b)
+	atualizar_lista_equipamentos_conectados(equipamentos, id_atual); // (Abertura de Conexão com Servidor: 2.b.ii e 2.b.iii)
+
+	// Enviar broadcast de equipamento adicionado a outros equipamentos conectados (Abertura de Conexão com Servidor: 2.b.i)
+	enviar_mensagem_broadcast(equipamentos, id_atual, resposta_para_cliente);
 
 	while(true){
 		ssize_t num_bytes_recebidos = recv(socket_do_cliente, mensagem, MAX_SIZE, 0);
@@ -254,15 +286,22 @@ void* comunicar(void* equipamento){
 
 			// Se equipamento encerrar abrutamente, remova equipamento
 			printf("Equipment %d removed\n", id_atual);
+
+			memset(id_char, 0, 3);
+			memset(resposta_para_cliente, 0, MAX_SIZE);
+			strcat(resposta_para_cliente, "Equipment ");
+			sprintf(id_char, "%d", id_atual);
+			strcat(resposta_para_cliente, id_char);
+			strcat(resposta_para_cliente, " removed");
+
+			// Enviar broadcast de equipamento removido arbitrariamente a outros equipamentos conectados (Encerramento de Conexão com Servidor: 2.b.ii)
+			enviar_mensagem_broadcast(equipamentos, id_atual, resposta_para_cliente);
             break;
         }
-
 
 		mensagem[num_bytes_recebidos] = '\0';
 		if(DEBUG == true)
 			printf("recebido no servidor: %s", mensagem); // mensagem[strlen(mensagem) - 1] == '\n'
-
-		char resposta_para_cliente[MAX_SIZE]; // TODO: resposta para o equipamento?
 
 		mensagem_para_retornar = processar_comando(mensagem, &equipamentos[id_atual]);
 		if(mensagem_para_retornar == NULL){
@@ -271,37 +310,27 @@ void* comunicar(void* equipamento){
 		}
 
 		if(strcmp(mensagem_para_retornar, "close connection") == 0){
-
 			printf("Equipment %d removed\n", id_atual);
+			memset(resposta_para_cliente, 0, MAX_SIZE);
 			strcpy(resposta_para_cliente, "Sucess");
 
-			ssize_t num_bytes_enviados = send(socket_do_cliente, resposta_para_cliente, strlen(resposta_para_cliente), 0);
-			verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
+			// Envia unicast de equipamento removido (Encerramento de Conexão com Servidor: 2.b)
+			enviar_mensagem_unicast(socket_do_cliente, resposta_para_cliente);
 
-			// TODO: Enviar mensagem também a outros equipamentos conectados (2.b.1)
-			char id_char[3];
+			memset(id_char, 0, 3);
 			memset(resposta_para_cliente, 0, MAX_SIZE);
 			strcat(resposta_para_cliente, "Equipment ");
 			sprintf(id_char, "%d", id_atual);
 			strcat(resposta_para_cliente, id_char);
 			strcat(resposta_para_cliente, " removed");
 
-			int socket_conectado, id_equipamento_conectado;
-			for(int j = 0; j < MAXCONNECTED; j++){
-				id_equipamento_conectado = equipamentos[id_atual].equipamentos_conectados[j];
-
-				if(id_equipamento_conectado != -1){
-					socket_conectado = equipamentos[id_equipamento_conectado].socket_id;
-					ssize_t num_bytes_enviados = send(socket_conectado, resposta_para_cliente, strlen(resposta_para_cliente), 0);
-					verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
-				}
-			}
+			// Enviar broadcast de equipamento removido a outros equipamentos conectados (Encerramento de Conexão com Servidor: 2.b.ii)
+			enviar_mensagem_broadcast(equipamentos, id_atual, resposta_para_cliente);
 			break;
 		}
 
 		strcpy(resposta_para_cliente, mensagem_para_retornar);
-		ssize_t num_bytes_enviados = send(socket_do_cliente, resposta_para_cliente, strlen(resposta_para_cliente), 0);
-		verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
+		enviar_mensagem_unicast(socket_do_cliente, resposta_para_cliente);
 	}
 
 	remover_id_de_equipamentos_conectados(equipamentos, id_atual);
