@@ -39,15 +39,12 @@ int criar_e_abrir_conexao_tcp(char *endereco_ip, int numero_de_porta){
 	return socket_cliente;
 }
 
-// Recebe e envia dados do/para servidor
-void* receber_e_enviar_dados(void* socket_id){
+// Recebe dados do servidor
+void* receber_dados(void* socket_id){
 	int socket_do_cliente = *((int *) socket_id);
-	size_t tamanho_mensagem;
 	char mensagem_recebida[MAX_SIZE];
-	char *entrada = NULL;
 
 	while(true){
-		// Recebimento de dados
 		ssize_t num_bytes_recebidos = recv(socket_do_cliente, mensagem_recebida, MAX_SIZE, 0);
 		if(num_bytes_recebidos < 0)
             informa_erro_e_termina_programa("Falha no recv() ao receber mensagem do servidor.\n");
@@ -60,8 +57,19 @@ void* receber_e_enviar_dados(void* socket_id){
         }
 
 		mensagem_recebida[num_bytes_recebidos] = '\0';
-		printf("mensagem recebida pelo cliente: %s\n", mensagem_recebida);
+		if(DEBUG == true)
+			printf("mensagem recebida pelo cliente: ");
+		printf("%s\n", mensagem_recebida);
+	}
+}
 
+// Envia dados para o servidor
+void *enviar_dados(void* socket_id){
+	int socket_do_cliente = *((int *) socket_id);
+	size_t tamanho_mensagem;
+	char *entrada = NULL;
+
+	while(true){
 		if(entrada != NULL){ // evita erro de comparação com NULL
 			if(strcmp(entrada, "close connection\n") == 0){
 				if(DEBUG == true)
@@ -72,8 +80,6 @@ void* receber_e_enviar_dados(void* socket_id){
 			}
 		}
 
-		// Envio de dados
-		// printf("Digite: ");
 		getline(&entrada, &tamanho_mensagem, stdin); // lê com '\n'
 		tamanho_mensagem = strlen(entrada);
 
@@ -83,7 +89,6 @@ void* receber_e_enviar_dados(void* socket_id){
 		else if(num_bytes_enviados != strlen(entrada))
 			informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
 	}
-
 }
 
 
@@ -104,13 +109,18 @@ int main(int argc, char* argv[]){
 	int socket_do_cliente = criar_e_abrir_conexao_tcp(endereco_ip, numero_de_porta);
 
 
-    //Thread para receber mensagens
-	pthread_t thread;
-	int valor_de_retorno = pthread_create(&thread, NULL, receber_e_enviar_dados, (void *) &socket_do_cliente);
-	if(valor_de_retorno != 0)
-		printf("Thread 'receber_e_enviar_dados' falhou\n");
+    //Thread para receber e enviar mensagens
+	pthread_t thread_recebimento, thread_envio;
+	int valor_retorno_recebimento = pthread_create(&thread_recebimento, NULL, receber_dados, (void *) &socket_do_cliente);
+	if(valor_retorno_recebimento != 0)
+		printf("Thread 'receber_dados' falhou\n");
 
-	pthread_join(thread, NULL);
+	int valor_retorno_envio = pthread_create(&thread_envio, NULL, enviar_dados, (void *) &socket_do_cliente);
+	if(valor_retorno_envio != 0)
+		printf("Thread 'enviar_dados' falhou\n");
+
+	pthread_join(thread_recebimento, NULL);
+	pthread_join(thread_envio, NULL);
 
 	return 0;
 }
