@@ -137,7 +137,7 @@ char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
 		printf("Processando comando: %s", mensagem);
 
 	if(strcmp(mensagem, "close connection\n") == 0){
-		remover_equipamento(equipamento_atual);
+		// remover_equipamento(equipamento_atual);
 		return "close connection";
 	}else if(strcmp(mensagem, "list equipment\n") == 0){
 		char lista_de_equipamentos[20], id[3], *ptr_msg_retorno;
@@ -275,11 +275,27 @@ void* comunicar(void* equipamento){
 			printf("Equipment %d removed\n", id_atual);
 			strcpy(resposta_para_cliente, "Sucess");
 
-			// TODO: Enviar mensagem também a outros equipamentos conectados (2.b.1)
-
 			ssize_t num_bytes_enviados = send(socket_do_cliente, resposta_para_cliente, strlen(resposta_para_cliente), 0);
 			verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
 
+			// TODO: Enviar mensagem também a outros equipamentos conectados (2.b.1)
+			char id_char[3];
+			memset(resposta_para_cliente, 0, MAX_SIZE);
+			strcat(resposta_para_cliente, "Equipment ");
+			sprintf(id_char, "%d", id_atual);
+			strcat(resposta_para_cliente, id_char);
+			strcat(resposta_para_cliente, " removed");
+
+			int socket_conectado, id_equipamento_conectado;
+			for(int j = 0; j < MAXCONNECTED; j++){
+				id_equipamento_conectado = equipamentos[id_atual].equipamentos_conectados[j];
+
+				if(id_equipamento_conectado != -1){
+					socket_conectado = equipamentos[id_equipamento_conectado].socket_id;
+					ssize_t num_bytes_enviados = send(socket_conectado, resposta_para_cliente, strlen(resposta_para_cliente), 0);
+					verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
+				}
+			}
 			break;
 		}
 
