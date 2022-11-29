@@ -162,9 +162,9 @@ char* processar_comando(char *mensagem, Equipamento *equipamentos, int id_atual)
 	if(strcmp(mensagem, "close connection\n") == 0){
 		return "close connection";
 	}else if(strcmp(mensagem, "list equipment\n") == 0){
-		char lista_de_equipamentos[20], id[3], *ptr_msg_retorno;
+		char lista_de_equipamentos[20] = "", id[3], *ptr_msg_retorno;
 		int equipamento;
-
+		// Obtém lista de equipamentos conectados
 		for(int j = 0; j < MAXCONNECTED; j++){
 			equipamento = equipamentos[id_atual].equipamentos_conectados[j];
 			if(equipamento != -1){
@@ -266,8 +266,7 @@ void* comunicar(void* equipamento){
 	int id_atual = equipamentos[10].id;
 	int socket_do_cliente = equipamentos[id_atual].socket_id;
 	char *mensagem_para_retornar = NULL;
-	char mensagem[MAX_SIZE];
-	char resposta_para_cliente[MAX_SIZE];
+	char mensagem[MAX_SIZE], resposta_para_cliente[MAX_SIZE];
 
 	char mensagem_novo_id[10] = "New ID: ", id_char[3];
 	sprintf(id_char, "%d", id_atual);  // converte id (int to char)
