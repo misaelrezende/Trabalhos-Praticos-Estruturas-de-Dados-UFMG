@@ -11,7 +11,7 @@
 #include <stdbool.h> // bool
 
 #define MAX_SIZE 1024
-#define DEBUG true
+#define DEBUG false
 
 void informa_erro_e_termina_programa(char *mensagem){
     printf("%s", mensagem);

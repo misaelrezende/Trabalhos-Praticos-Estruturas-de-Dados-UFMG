@@ -11,7 +11,7 @@
 #include <stdbool.h> // bool
 
 #define MAX_SIZE 1024
-#define DEBUG true
+#define DEBUG false
 #define MAXCONNECTED 10 // Quantidade máxima de conexões
 static const int MAXPENDING = 10; // Pedidos de conexão pendentes máximos
 
@@ -98,6 +98,25 @@ void verificar_erro_envio_de_mensagem(ssize_t numero_bytes_enviados, int tamanho
 		informa_erro_e_termina_programa("Falha no send().\nEnviado numero inesperado de bytes.\n");
 }
 
+// Envia mensagem para um equipamento
+void enviar_mensagem_unicast(int socket, char* mensagem){
+	ssize_t num_bytes_enviados = send(socket, mensagem, strlen(mensagem), 0);
+	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem));
+}
+
+// Envia mensagem a todos equipamentos conectados
+void enviar_mensagem_broadcast(Equipamento* equipamentos, int id_atual, char* mensagem){
+	int socket_conectado, id_equipamento_conectado;
+	for(int j = 0; j < MAXCONNECTED; j++){
+		id_equipamento_conectado = equipamentos[id_atual].equipamentos_conectados[j];
+
+		if(id_equipamento_conectado != -1){
+			socket_conectado = equipamentos[id_equipamento_conectado].socket_id;
+			enviar_mensagem_unicast(socket_conectado, mensagem);
+		}
+	}
+}
+
 // Encontra uma posição livre no vetor de equipamentos
 int encontrar_posicao_livre(Equipamento *equipamentos){
 	int posicao;
@@ -136,19 +155,18 @@ float requisitar_temperatura(Equipamento *equipamento_atual, int equipamento_sol
 }
 
 // Processa o comando recebido pelo equipamento atual
-char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
+char* processar_comando(char *mensagem, Equipamento *equipamentos, int id_atual){
 	if(DEBUG == true)
 		printf("Processando comando: %s", mensagem);
 
 	if(strcmp(mensagem, "close connection\n") == 0){
-		// remover_equipamento(equipamento_atual);
 		return "close connection";
 	}else if(strcmp(mensagem, "list equipment\n") == 0){
 		char lista_de_equipamentos[20], id[3], *ptr_msg_retorno;
 		int equipamento;
 
 		for(int j = 0; j < MAXCONNECTED; j++){
-			equipamento = equipamento_atual->equipamentos_conectados[j];
+			equipamento = equipamentos[id_atual].equipamentos_conectados[j];
 			if(equipamento != -1){
 				sprintf(id, "%d ", equipamento);
 				strcat(lista_de_equipamentos, id);
@@ -171,9 +189,22 @@ char* processar_comando(char *mensagem, Equipamento *equipamento_atual){
 			}
 		}
 
-		float temperatura = requisitar_temperatura(equipamento_atual, equipamento_solicitado);
-		char *ptr_msg_retorno = NULL, auxiliar[10];
-		sprintf(auxiliar, "%f", temperatura);  // converte id (int to char)
+		float temperatura = requisitar_temperatura(&equipamentos[id_atual], equipamento_solicitado);
+		char *ptr_msg_retorno = NULL, auxiliar[30] = "", id_char[10];
+		if(temperatura == -1){ // caso equipamento não seja encontrado (2.b)
+			printf("Equipment %d not found\n", equipamento_solicitado); // (2.b.i)
+			strcat(auxiliar, "Target equipment not found"); // (2.b.i.1)
+		}else{
+			// Informa equipamento do requerimento de informação (2.b.ii.1)
+			enviar_mensagem_unicast(equipamentos[equipamento_solicitado].socket_id, "requested information");
+
+			strcat(auxiliar, "Value from ");
+			sprintf(id_char, "%d: ", equipamento_solicitado);
+			strcat(auxiliar, id_char);
+			sprintf(id_char, "%.2f", temperatura);
+			strcat(auxiliar, id_char); // (2.b.ii.2.b.ii)
+		}
+
 		ptr_msg_retorno = auxiliar;
 		return ptr_msg_retorno;
 	}
@@ -226,27 +257,6 @@ void atualizar_lista_equipamentos_conectados(Equipamento* equipamentos, int id_a
 					break;
 				}
 			}
-		}
-	}
-}
-
-// Envia mensagem para um equipamento
-void enviar_mensagem_unicast(int socket, char* mensagem){
-	ssize_t num_bytes_enviados = send(socket, mensagem, strlen(mensagem), 0);
-	verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(mensagem));
-}
-
-// Envia mensagem a todos equipamentos conectados
-void enviar_mensagem_broadcast(Equipamento* equipamentos, int id_atual, char* mensagem){
-	int socket_conectado, id_equipamento_conectado;
-	for(int j = 0; j < MAXCONNECTED; j++){
-		id_equipamento_conectado = equipamentos[id_atual].equipamentos_conectados[j];
-
-		if(id_equipamento_conectado != -1){
-			socket_conectado = equipamentos[id_equipamento_conectado].socket_id;
-			enviar_mensagem_unicast(socket_conectado, mensagem);
-			// ssize_t num_bytes_enviados = send(socket_conectado, resposta_para_cliente, strlen(resposta_para_cliente), 0);
-			// verificar_erro_envio_de_mensagem(num_bytes_enviados, strlen(resposta_para_cliente));
 		}
 	}
 }
@@ -308,7 +318,7 @@ void* comunicar(void* equipamento){
 		if(DEBUG == true)
 			printf("recebido no servidor: %s", mensagem); // mensagem[strlen(mensagem) - 1] == '\n'
 
-		mensagem_para_retornar = processar_comando(mensagem, &equipamentos[id_atual]);
+		mensagem_para_retornar = processar_comando(mensagem, equipamentos, id_atual);
 		if(mensagem_para_retornar == NULL){
 			printf("Mensagem desconhecida enviada por equipamento.\nA conexao com cliente sera encerrada.\n");
 			break;
@@ -361,7 +371,7 @@ int main(int argc, char* argv[]){
 	int socket_do_servidor = criar_conexao_tcp();
 	abrir_conexao_tcp(socket_do_servidor, numero_de_porta);
 
-	int socket_do_cliente, contador_clientes = 0;
+	int socket_do_cliente;
 	struct sockaddr_in endereco_cliente;
 	socklen_t tamanho_endereco_cliente;
 	tamanho_endereco_cliente = sizeof(endereco_cliente);
@@ -370,7 +380,6 @@ int main(int argc, char* argv[]){
 	inicializar_equipamentos(vetor_de_equipamentos);
 	int posicao_valida = 0; // próxima posicao válida do vetor
 
-	// TODO: Como limitar o número de equipamentos conectados?
 	while(true){
 		if(vetor_de_equipamentos[10].total_equipamentos_conectados == 10)
 			continue;
