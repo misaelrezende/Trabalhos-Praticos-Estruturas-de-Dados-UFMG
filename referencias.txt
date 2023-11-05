@@ -1,4 +1,4 @@
 # Referências:
 - [Gensim Tutorial: Word2Vec Model](https://radimrehurek.com/gensim/auto_examples/tutorials/run_word2vec.html)
 - [Gensim API - Word2Vec](https://radimrehurek.com/gensim/models/word2vec.html)
-- 
+- [Gensim API - KeyedVectors](https://radimrehurek.com/gensim/models/keyedvectors.html#gensim.models.keyedvectors.KeyedVectors)
